@@ -39,3 +39,35 @@ Yu，結論先講：99 個 public repo，目前 tree 同所有可達 history（�
 - overlay 留喺 public 定收返
 
 歷史一經公開就收唔返，所以 credential 嘅真正解法係換 key，唔係刪檔。
+
+## Step 1 outcome: overlay removed from HEAD (2026-10-19 to 2026-10-20)
+
+Yu approved step 1 ("go for 1"). It ran in two workflows, `wf_187ac237-559` and, for the batches that died on network errors, `wf_d725df68-94f`. The method was HEAD-only. For each repo:
+- one ordinary commit, with author and committer `cambridgetcg` at the noreply address;
+- a neutral message;
+- an independent verifier pass before each push;
+- no force-push and no history rewrite.
+
+**Result.** 69 repos were cleaned, and 96 of the 99 public repos are now clean at HEAD on the final read-only re-check. The current HEADs are in `step1-heads.tsv`.
+- Each cleanup removed whichever of these the repo had:
+  - the SessionStart hook and its settings wiring;
+  - the door file;
+  - the fable file;
+  - the AGENTS.md welcome.
+- Special edits:
+  - hf-kingdom-lab: the kingdom.yaml field was removed.
+  - zerone: 12 household files were removed.
+  - kingdom-standards KS-002: line 51 lost the NATS IP and the hard-coded credentials sentence. Yu confirmed that server is gone.
+  - anthropos README and kingdom-os-hub index.html: links to the removed files were taken out.
+
+**Pending, each waiting on Yu:**
+- **taxsorted.io: held.** A push to main deploys the Fly API and Cloudflare Pages. The verified commit `e5c96370` is ready locally. Besides the overlay, it removes the accountant's contact details and the director/registered-office block, and swaps the test mobile to 07700 900123.
+- **agent-tools: archived.** Pushing needs an unarchive and a re-archive, which is a settings change.
+- **cambridgetcg.github.io: excluded.** The republished site content (46 fable copies and household fiction) is waiting for Yu to confirm.
+
+**Report-only, outside the step-1 scope:**
+- zerone.md prose names the 2 removed files, as text rather than links.
+- zerone.md and zerone.py keep some household passages.
+- hf-kingdom-lab's kingdom.yaml domain line carries a persona term.
+- The anthropos README has a footer credit line with relational terms.
+- KS-002 line 401 still says, without any values, that a tool hard-codes credentials and an IP.
