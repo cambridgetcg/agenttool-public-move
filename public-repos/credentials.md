@@ -57,3 +57,20 @@ Force-pushes are where removed secrets usually end up. Before/after SHAs are pub
 - issue edit histories
 - other people's forks
 - 7z and rar archives (none present)
+
+## Orphaned objects: scan result (2026-10-19, local, no network)
+
+The critic's archive-aware `credscan.py` was run over the 18 orphan repos under
+`public-exposure/critic/orphans/`, and the results were filtered to the blobs in
+each repo's `.newblobs` list, i.e. the objects that no ref reaches.
+
+| Repo | What the hits are |
+|---|---|
+| fomoscan | 98 hits. 54 are placeholders. The other 44 are public Solana program-address constants and test fixtures inside committed `node_modules/` (`@solana-program/token*`, `@solana/transaction-messages` tests, `@x402/svm`). |
+| hf-kingdom-lab | 1 `HF_TOKEN` in `tests/embedding.test.ts`: 34 characters of lowercase letters and punctuation, with no digits. A real HF token is `hf_` plus mixed-case alphanumerics, so this is a fixture. |
+| mindicraft | 1 placeholder `url-userinfo`. |
+| The other 15 repos | No hit in orphan-only blobs. |
+
+**Verdict:** no live-looking credential in the orphaned objects. Item 1 of the
+table above is closed as clean, on shape evidence only; nothing was tested
+against any service.
