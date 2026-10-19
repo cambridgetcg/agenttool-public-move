@@ -15,6 +15,7 @@ repository holds the read-only audit that plans that move.
 | `audit/report.md` | Summary, counts, blockers, recommended plan and the 21 decisions for Yu |
 | `audit/manifest.json` | One entry per flagged path (977 of 5,337), with action, category, lines and sources |
 | `audit/sources/*.json` | What each audit agent returned to the workflow. For the 11 area readers this is a summary with a flag count only; their per-flag rows survive in `audit/tooling/synth/judg.mjs`. `synthesis.json` is the merging agent's own output. |
+| `all-repos/` | Open-source readiness audit of every other private repo: verdicts, credentials to rotate, rollout waves (2026-10-19) |
 | `audit/tooling/` | The workflow script, plus the helper scripts from the full-tree guard scan, the completeness critic and the synthesis (scan, merge, mask, verify). Other agents' scratch scripts were not kept. |
 
 ## Provenance

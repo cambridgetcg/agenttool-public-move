@@ -1,0 +1,137 @@
+{
+ "issues": [
+  {
+   "repo": "Love",
+   "severity": "must",
+   "suggested_verdict": "D (unchanged); add these to the revocation list",
+   "issue": "MISSED CREDENTIALS (verified by my all-blob scan; gitleaks and the sweep do not open tar.gz). HEAD backups/backup-20260402-151915.tar.gz and backups/backup-20260402-152048.tar.gz (both added in 9091523, 2026-04-07) contain credentials/.deploy/production.env, tools/.vault-decrypt (a path the repo's own .gitignore excludes) and a session log. Inside: one AWS access key pair (AKIA ID, sha256 prefix f6e88721, with its 40-char secret), 2 Anthropic API keys (sk-ant- prefix), 1 OpenAI project key (sk-proj- prefix, in memory/sessions/sage-fix-20260328-075513.log), 2 Stripe live secret keys (sk_live_), 1 Stripe webhook secret, 2 Postgres URLs with passwords (non-RDS hosts) and 2 Brave keys. The batch-08 entry describes backups/ only as repo-state snapshots and lists none of these. The repo also runs a canary/honeypot system, and the two files disagree on the Anthropic and Stripe values, so some may be decoys; that is unverified. One Brave key also sits in kingdom-workspace HEAD and in a prediction-markets cron line, so at least that one was in real use. Treat all as live: rotate at AWS, Anthropic, OpenAI and Stripe (both keys and the webhook), plus the two databases and Brave."
+  },
+  {
+   "repo": "rewardspro-production",
+   "severity": "must",
+   "suggested_verdict": "D (unchanged); add to revocation list",
+   "issue": "MISSED CREDENTIALS IN HEAD (verified). infrastructure/terraform/tfplan (added 1bb55d9, 2026-01-19) is a zip whose tfstate and tfstate-prev hold an aws_iam_access_key resource in the second AWS account (0435...). That resource carries the access key ID (sha256 prefix 2b65d114), its 40-char secret and ses_smtp_password_v4. The vercel_environment_variables output in the same state adds CRON_SECRET and INTERNAL_API_SECRET (64 hex each) and the Aurora secret ARN. gitleaks did not see it because it is inside a zip, and the batch-15 entry does not list it. The same blob (0dfb1c4b63) sits in Cambridge-TCG-monorepo history at apps/rewardspro/infrastructure/terraform/tfplan (added 10a40cc6, deleted 0c18191a on 2026-07-23). Deactivate and delete that IAM key, which also kills the SES SMTP password, and rotate CRON_SECRET and INTERNAL_API_SECRET. Liveness is unverified."
+  },
+  {
+   "repo": "business-ecosystem",
+   "severity": "must",
+   "suggested_verdict": "D (unchanged); revocation list was wrong ('None real')",
+   "issue": "MISSED CREDENTIALS IN HEAD (verified). infrastructure/terraform/environments/dev/tfplan (from the initial commit be3b94c, 2026-01-29) is a zip whose embedded state holds three secrets, all in the main account (0343...): an aws_db_instance master password (52 chars), an aws_elasticache_replication_group auth_token (32 chars), and a further 47-char password in the plan (the state also has an aws_mq_broker). batch-09 read only the .tfstate files and reported 'None real'. Three more committed tfplans (foundational/accounting/terraform, progress-tracking-standalone, state) hold account IDs and one placeholder token only. Rotate these secrets, or confirm that the dev RDS, ElastiCache and MQ resources are destroyed. Keep every tfplan out of any snapshot."
+  },
+  {
+   "repo": "Cambridge-TCG-monorepo",
+   "severity": "must",
+   "suggested_verdict": "D (unchanged); revocation list incomplete",
+   "issue": "HEAD STILL HOLDS SCRUBBED CREDENTIALS (verified by hash). (1) apps/wholesale/tools/__pycache__/fulfillment.cpython-314.pyc (HEAD blob 4988a30f48) still embeds the tcg-wholesale RDS postgres credential (sha256 prefix 3698b09a). batch-06 says that credential was removed in 021b6039, but this bytecode copy was missed, the same pattern as agent-trace. (2) HEAD apps/wholesale/tools/remambo-order.ts, order-promos.ts and inspect-remambo.ts hard-code the Remambo account password as the fallback default for REMAMBO_PASS (12 chars). (3) HEAD apps/wholesale/e2e/helpers.ts does the same for E2E_ADMIN_PASSWORD with the wholesale admin password (10 chars). Items 2 and 3 came in with 02236b09 (2026-04-27). tcg-wholesale scrubbed exactly these values to ***REMOVED-ROTATE-ME*** markers, so importing it into the monorepo undid that scrub. Neither appears in the batch-06 revocation list, which mentions only the owner's address in the same three files."
+  },
+  {
+   "repo": "zerone-core",
+   "severity": "must",
+   "suggested_verdict": "D (unchanged), but part of the history is already public",
+   "issue": "HISTORY ALREADY PUBLIC (verified with GitHub commit GETs). The public repo cambridgetcg/zerone (created 2026-06-09) shares 28 of its 35 commits with zerone-core and zerone-chain: the root 61e7f5ec ('genesis', 2026-05-30) through 2026-06-10. Its public HEAD serves the canon narrative files today: zerone.md, zerone.py, bedtime.py, party.py, the two AI-return letters and others, plus the household door and story files. The shared blobs hit relational rules r05/r06/r07/r16, and the 28 commits use 1 non-noreply identity (56 uses). batch-02 and batch-04 both say 'keep canon/ private', but those early versions are already public. The D verdicts still stand for everything after 2026-06-10. Only Yu can decide what to do about the public zerone repo; this audit is read-only. zerone-codeberg-archive shares no commits with it. I checked root commits of 21 other private-to-public name pairs and found no other shared history."
+  },
+  {
+   "repo": "cross-repo (99 public repos)",
+   "severity": "must",
+   "suggested_verdict": "n/a",
+   "issue": "THE HOUSEHOLD OVERLAY IS ALREADY PUBLIC (verified by root listings of all 99 public cambridgetcg repos). 70 public repos carry 115 root .md files whose names match the denylist, 60 have .claude/ directories, and 79 have AGENTS.md. For open-lens, xenia and kingdom-os-hub I verified that .claude/hooks/love-bomb.sh is byte-identical (blob 0dd14869) to the private overlay. This SessionStart hook quotes the owner and injects pet names into any agent session. So the most common snapshot blocker in this audit has already been broadcast, and the standing rule 'relational material stays private' is already breached in public repos. Every new snapshot should still strip the overlay. Cleaning the existing public repos is a separate decision for Yu, and their history would keep the files anyway."
+  },
+  {
+   "repo": "research-review-initiative",
+   "severity": "must",
+   "suggested_verdict": "B (kept; fix list incomplete)",
+   "issue": "SPOT-CHECK. batch-14 says 'publishable: the whole current tree', but the 3 HEAD PDFs are not clean: v0.1/REPORT.pdf, followups/restricted-repair-v0.1/NOTE.pdf and followups/translation-v0.1/NOTE.pdf embed 8 file:///Users/<home>/Desktop/research-review-initiative/... link URIs for a Mac account other than this machine's. The review zip, which contains REPORT.pdf, carries the same links. The sweep skips binaries, which is why the batch called the tree clean. Regenerate the PDFs with relative links. Everything else in that entry checked out: 1 non-noreply identity on 4 commits, no third-party paper bytes, and 14 zip members that duplicate tree files. Related: the same 3 PDFs sit in zerone-core HEAD under dashboard/public/research/checkpoints/2026-09-14-demimetric-v1/. The zerone-core entry lists that directory as publishable 'after review', and the dashboard may already serve it (not checked). If it does, the 'contact the authors before publishing' caveat may already be overtaken."
+  },
+  {
+   "repo": "cross-repo (revocation list dedupe)",
+   "severity": "must",
+   "suggested_verdict": "n/a",
+   "issue": "ONE CREDENTIAL, SEVERAL BATCH ENTRIES (verified by value hash). Rotate each once. (a) The tcg-wholesale RDS master password (24 chars, us-east-1, sha 3698b09a) is in four repos: Cambridge-TCG-monorepo (HEAD pyc plus 7 history .py, 02236b09), cambridgetcg-storefront (.sovereign-state.json and sovereign.log, 0c41c90a), cambridge-tcg (web/tradein script, e1933d4) and tcg-wholesale (scrubbed marker). Earlier notes say this instance has 5432 open and is unencrypted, so rotate it first. (b) The RewardsPro AWS key (ID sha 48e69860) is one key across the monorepo (342e44e5/0568c2f3), rewardspro-shopify (35098a5) and rewardspro-production (35098a50). (c) The rewardspro-dev Aurora password has a URL-encoded copy (sha 7880369c) in the deployment docs of the same three repos and a plain copy (sha 3a0417e2) in encode-password.ts: in rewardspro-production HEAD, and in the history of the other two. (d) The Framer MCP secret (sha f2a3a9ca) is in rewardspro-production HEAD .mcp.json and in monorepo history. (e) The storefront SES AWS key (ID sha 74d5be71) is in Love HEAD (daily note) and in cambridgetcg-storefront history. (f) The Shopify Admin token (sha 94960b4b) is unscrubbed in monorepo history and scrubbed in tcg-wholesale. (g) The NATS HIVE passwords in Love, love-unlimited, castle and KINGDOM-OS are one set and probably dead. (h) One Brave key is in both kingdom-workspace and the Love backups."
+  },
+  {
+   "repo": "cross-repo (revocation coverage)",
+   "severity": "should",
+   "suggested_verdict": "n/a",
+   "issue": "COVERAGE CHECK. Every repo whose history holds a live-looking credential appears in some batch revocation list, except the four gaps above (the Love backups, the rewardspro-production and monorepo tfplan, the business-ecosystem dev tfplan, and the monorepo HEAD pyc and Remambo/admin defaults). Already listed, and needing action or rotation confirmation: seigei (DeepSeek bd08318; basic-auth password in HEAD); whitehack (Alchemy d732bac, which my scan also found in PLATFORM-WORKFLOW.md and reports/WH-C4-CHAIN-002.md, all reachable only from refs/pull/1/head); kingdom-workspace (eBay cert, eBay OAuth, Shopify Partner, 2captcha, AgentTool, 2 Brave keys, and rotation of the pre-rewrite TOTP seeds and keys); love-unlimited (Ollama key in HEAD 2b2d2dc, Ollama 6b25edc, AgentTool d831e64/d1a8c20, WiFi password); kingdom-system (AgentTool 3b31c0a); AxiePro (gho_ token on main 1a20394; GoldRush, Sky Mavis and the cardforum RDS password on the PR ref ea14577); agent-trace (Postgres and Redis in HEAD pyc, 71f5052); castle-of-words (Codeberg token 7e42b1e3); cambridgetcg-storefront (AUTH_SECRET, ADMIN_PASSWORD, WHOLESALE_API_KEY); cambridge-tcg (ADMIN_SECRET d19b987); tcg-wholesale, tradeinpro, agenttool-infra, rewardspro-marketing, agent-identity and agent-vault (ROTATE-ME markers: confirm rotation); cashloom (stale Actions secrets; legacy SaaS keys); prediction-markets (wallet key exposed in chat). INFERRED: agent-trace's pyc credential is the shared 'kingdom' Postgres role, so rotating that role probably also covers the scrubbed DATABASE_URLs in agent-identity and agent-vault. CLOSED: ENCRYPTION_KEY in the RewardsPro CI (sha 76a3f65b) is identical in all three lineages and base64-decodes to a 35-char ASCII string containing 'test', so it is a fixture. Drop the 'confirm' items in batch-06 and batch-07."
+  },
+  {
+   "repo": "rewardspro-shopify",
+   "severity": "should",
+   "suggested_verdict": "B (kept)",
+   "issue": "SPOT-CHECK CORRECTION. The freemail address in scripts/add-test-customer.ts, add-test-transactions.ts and check-customer-widget*.mjs is not 'likely a real person used as a dev-store test customer'. Its hash equals the address in the same rewardspro-production scripts and in the Cambridge-TCG-monorepo and tcg-wholesale remambo tools, which those auditors hash-matched to the owner. Treat it as the owner's personal address. Everything else in that entry checked out: there is no tfplan in this lineage, and ENCRYPTION_KEY is a fixture (see above)."
+  },
+  {
+   "repo": "saas-marketing-template",
+   "severity": "should",
+   "suggested_verdict": "B (kept; fix list incomplete)",
+   "issue": "SPOT-CHECK. Both this repo's HEAD and saas-marketing-suite's carry infrastructure/terraform/environments/dev/tfplan: a zip with tfplan, tfstate, tfstate-prev and tfconfig that bears the main AWS account ID (0343...). Neither batch entry lists it. It holds no secret values (checked), but it is a real plan or state of the account, so drop it from both snapshots. The two repos are near-duplicates: 276 of the template's 301 files are byte-identical with the suite, and both are single commits dated 2026-02-04. Publish at most one."
+  },
+  {
+   "repo": "barakqing-node",
+   "severity": "should",
+   "suggested_verdict": "B",
+   "issue": "VERDICT INCONSISTENT. barakqing-node got D, but its HEAD rule-hit profile is identical file for file to kunance-, heurekin-, zakarqing-, jeongqing- and darshanqing-node, which all got B with the same fixes: overlay files, .nlp-bridge/gate device path, LICENSE r13 and README r16. Change it to B, or publish all six as one npl-node example repo, as three auditors suggested."
+  },
+  {
+   "repo": "agent-bootstrap",
+   "severity": "should",
+   "suggested_verdict": "B",
+   "issue": "VERDICT INCONSISTENT. agent-bootstrap got D for SOUL.md, the overlay and about 6 relational strings in src/. The same class of fix earned B elsewhere: agenttool-sdk-py (relational strings in src/agenttool/soul.py and a SOUL.md shipped inside its wheel) and agent-verify, agent-pulse, agent-memory, agent-trace, agent-identity, agent-vault and agent-economy (SOUL.md plus overlay). Change it to B, or fold all the March 2026 agent-* services into the agenttool-open snapshot, as several auditors suggested."
+  },
+  {
+   "repo": "cardforum",
+   "severity": "should",
+   "suggested_verdict": "D",
+   "issue": "VERDICT INCONSISTENT. cardforum got B, but its publishable set excludes research/onepiece/*.json (189 scraped Cardmarket and TCGplayer files) and the Bright Data scrapers. tcg-pricing-backend and tradeinpro got D for the same exclusion: scraped third-party data plus scrapers kept private. Change it to D. The action is unchanged: a fresh snapshot."
+  },
+  {
+   "repo": "god-is-love",
+   "severity": "should",
+   "suggested_verdict": "C (or fold into another public repo)",
+   "issue": "VERDICT INCONSISTENT. god-is-love got B for the overlay plus one 40-line README. youspeak-cathedral, state-as-truth and insights hold the same overlay plus one short WAKE.md and got C as 'not worth a repo'. Apply one rule to all four. Its README also makes stale claims of '200 public repos'; there are 99 today."
+  },
+  {
+   "repo": "agent-workbench",
+   "severity": "should",
+   "suggested_verdict": "B (confirmed)",
+   "issue": "SPOT-CHECK CONFIRMED B: 15 commits on main (the 4 on the pull refs are rebased duplicates), 1 non-noreply custom-domain identity, no credential shapes beyond test placeholders, and no home paths in binaries. The Claude Code research doc cites public sources only. POLICY INCONSISTENCY: agent_workbench/codex_token.py and scripts/hermes-codex-token hand a ChatGPT-subscription access token to a third-party agent, and the batch lists them as publishable. Meanwhile Claude-unlimited (subscription tools), Love (nerve/ OAuth reuse) and love-unlimited (tools/truth_detector/_oauth.py) keep subscription-credential reuse private. Apply one rule: hold the bridge out of the snapshot until Yu decides."
+  },
+  {
+   "repo": "AxiePro",
+   "severity": "note",
+   "suggested_verdict": "B or D (same action)",
+   "issue": "BORDERLINE CONSISTENCY. AxiePro got B, but its HEAD removal list is as large as tradeinpro's, which got D. The list covers ACCESS_INVENTORY (with an IAM user named after the owner), RDS and ElastiCache hostnames plus ROTATE-ME markers in 8 files, screenshots, archive/ and about 22 status docs. Either verdict leads to the same action: rotate, then take a fresh snapshot of main. The repo-level Actions secrets AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are still set; delete them if the backend stays retired."
+  },
+  {
+   "repo": "cross-repo (duplicates)",
+   "severity": "note",
+   "suggested_verdict": "n/a",
+   "issue": "COPIES THAT SHOULD BE PUBLISHED AT MOST ONCE. (1) RewardsPro has four lineages that share code and credential history: rewardspro, rewardspro-shopify, rewardspro-production and Cambridge-TCG-monorepo apps/rewardspro. (2) The standalone cambridgetcg-storefront got B, while the monorepo keeps its storefront app private. (3) tcg-wholesale (C) is the source of the monorepo's apps/wholesale (D). (4) zerone-core, zerone-chain, zerone-codeberg-archive and the public zerone are one lineage. (5) The two saas-marketing repos. Decide one canonical public copy per lineage before snapshotting, or the same content gets published under different scrubs."
+  },
+  {
+   "repo": "cross-repo (production coupling)",
+   "severity": "should",
+   "suggested_verdict": "n/a",
+   "issue": "LIVE COUPLING, compiled from the sweep and the batch entries. Keep the private repo as the deploy source and leave these out of snapshots. VERCEL: Cambridge-TCG-monorepo (cambridgetcg.com; VERCEL_TOKEN; AWS ECS OIDC role; database migrations in CI); tcg-wholesale (6 crons, Shopify webhook, DATABASE_URL secret, 6-hourly scrape cron failing); cardforum (13 crons) and prism-app (3), liveness unknown; Vercel git links on the static sites. CLOUDFLARE: sinovai (live Worker, cron, signing key); ai-love and youspeak (ai-love.cc Pages, ORDO Worker with hourly cron); gospel-of-the-logos (live); KINGDOM-OS (thekingdom.dev; kv-backup.yml dumps every KV namespace into workflow artifacts, which would be downloadable on a public repo, so remove it first); kingdom-api (3 Workers); castle-of-words publishes into castle-front. FLY / AWS: zerone-core (zerone-1 mainnet, production-signing environment); cashloom (cashloom.io, cashloom-api.fly.dev, 3 stale secrets); betangel-research (collector, plus an order gateway that can be armed); agent-* Fly apps with min_machines_running=1 (they cost money if they still exist); cambridge-tcg Lambdas; business-ecosystem state describing an unauthenticated Lambda URL. REGISTRIES: npm environment secrets in whitehack, yutabase and zerone-core; the PyPI name agenttool-sdk. REPO ACTIONS SECRETS: AxiePro, the monorepo, cashloom, rewardspro-production (CLAUDE_CODE_OAUTH_TOKEN) and tcg-wholesale. SCHEDULED ACTIONS: 25 non-citizen repos plus 4 citizens, most POSTing to sinovai.com every 6 hours with contents: write; a public copy would switch them back on. captioneer's AWS IAM role trusts repo:cambridgetcg/captioneer:* with a wildcard; delete the role before any repo of that name goes public. LOCAL DAEMONS: launchd jobs for Love, love-unlimited and true-love; castle's warden (daily API spend); the citizen fleet (about 48 beats a day)."
+  },
+  {
+   "repo": "cross-repo (tool gaps)",
+   "severity": "should",
+   "suggested_verdict": "n/a",
+   "issue": "SYSTEMATIC GAPS, confirmed by my all-blob passes over all 307 mirrors. Pass 1 was a credential-shape scan of 138,244 blobs (3.94 GB), reading raw bytes plus 91 zips and 906 gzip streams decoded in memory. Pass 2 read binary metadata. With default settings, neither gitleaks nor the sweep's text layers see secrets inside zip or tar.gz (Terraform plans, backups), inside .pyc bytecode, or inside PDFs. Every new credential in this report sits in one of those. Pass 2 found no EXIF GPS in any JPEG. It found home paths in: pyc files (agenttool-sdk-py, 11 in HEAD, which the batch already says to drop; agent-memory, 12 in history; rhetorlint-spec, 1 in history; yutabase, a HEAD pyc that includes this machine's account name); Mach-O binaries (zerone-* and AxiePro history); and the research PDFs. Before anything is published, re-run the sweep with archive and bytecode decoding, and add a Codeberg/userinfo rule."
+  },
+  {
+   "repo": "legible_money",
+   "severity": "note",
+   "suggested_verdict": "D (unchanged)",
+   "issue": "The anonymous-launch question that batch-12 raised is largely moot. cambridgetcg already has public repos named legible and legible-money-web (both created 2026-06-09), so the Legible Money name is already tied to this account. I did not check legible-money-web's content."
+  },
+  {
+   "repo": "citizen-* (family)",
+   "severity": "note",
+   "suggested_verdict": "D (confirmed)",
+   "issue": "Correction: 'internet' is a public cambridgetcg repo (verified in the public listing), so citizen links to it are not dead links to a private repo. Confirmed for the whole family: all 208 citizen sweeps report 0 gitleaks findings, and my scan found 0 credential shapes. 4 citizens run an Actions cron."
+  }
+ ],
+ "coverage": "COMPLETENESS. All 307 audited repos have a verdict. 99 are named in batches 01-15 (56 B, 13 C, 30 D). The other 208 are the citizen family, judged D as a whole, with 11 named overrides (3 C, 8 D). Totals: 0 A, 56 B, 16 C, 235 D. GitHub lists 309 private owned repos, which is these 307 plus the two skipped by design (agenttool, agenttool-public-move); none are forks. There are 99 public repos. No A was given, and none is warranted: every repo except ctcg-fun has at least one non-noreply commit identity, and ctcg-fun is relational (C). No repo is recommended for a visibility flip.\n\nSPOT-CHECKS against the mirrors (7): research-review-initiative B (kept; the PDFs embed home paths); agent-workbench B (confirmed; policy note on the subscription bridge); rewardspro-shopify B (kept; the owner's address was mislabelled; ENCRYPTION_KEY closed as a fixture); saas-marketing-suite and saas-marketing-template B (kept; committed tfplan with the account ID missed; near-duplicates); cambridgetcg-storefront B (confirmed: no credential shapes in HEAD; history holds the shared SES key and the wholesale RDS password); barakqing-node D, which should be B because its hit profile matches five B siblings.\n\nMETHOD. Read-only throughout. I made no push and changed no setting. No repo code was executed. Python ran with -I, and all scripts and outputs are outside mirrors/, under oss-audit/critic/ in the session scratchpad named in the task: tools/credscan.py, tools/binscan.py, tools/ctxinspect.py, tools/sg.py, credscan/*.jsonl and binscan/*.json (sha256 prefixes, shapes and masked paths only, never values), and cred_agg.json. GitHub: about 240 GETs (core 4,747 remaining at the end), covering the private and public repo lists, commit-existence checks of private root commits against public twins, the first 100 commits of each public repo, root listings of each public repo, and 3 hook-blob comparisons. All 'live' judgements are shape-based; I tested no credential and probed no service.\n\nLIMITS. My regexes cover about 20 key families plus generic assignments and URL userinfo; secrets with no prefix (Cloudflare global keys, 32-hex vendor keys) were not hunted. The public-twin check compares only the newest 100 commits of each public repo, plus root-commit tests for 21 name pairs. I did not check the content of public repos beyond root listings and 3 hook blobs, nor whether the zerone dashboard serves the research PDFs. My verdict-consistency checks rest on rule-hit profiles and the batch text, not on full re-reads.\n\nSLIPS, said plainly: one context view printed the 8-character tail of an AWS access key ID (an identifier, not the secret) in my local output before I widened the mask; one masked grep printed two retired server IP addresses from Love's security notes; and I compared an address against the local global git config inside code without printing it. None of this is in this result."
+}
