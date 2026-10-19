@@ -1,0 +1,43 @@
+{
+ "scores": [
+  {
+   "name": "shared-history-overlay：private = public tree + private/ overlay，用「收斂 merge」將 public root 認做 merge base，之後定期真 merge",
+   "score": 6,
+   "reasons": "做得好、而且我驗證過嘅位：\n- 三個 design 入面，只有佢處理咗 public commit 嘅 author/committer email。我驗證過：global user.email 有 set，而且唔係 noreply；private 最近 20 個 commit 入面有 14 個係 non-noreply email（冇印出任何 value）。\n- 只有佢發現 deploy log 會漏 filename：deploy-api.yml:133 用 `printf '%s\\n' \"$out\"` 將成段 survey 輸出印出嚟，而 migrate-pending.sh:190 嘅 error 會印 journaled filename。兩樣我都讀過。所以佢嘅 SEALED 只記 checksum，唔記 filename hash，係啱嘅。\n- 佢要求 generators exclude private/。docs-catalog.py:24 用 git ls-files，我驗證過，所以呢個要求成立。\n- pushurl 用 `file:///dev/null/...`，明確禁止 fork 同 private fork。seed repo 只帶 R0 嘅 objects，佢彩排過。\n- 搵唔到 denylist 就拒絕，除非明確 set override。\n\n弱點（leak safety 角度）：\n(1) R0 = 收斂後嘅 tree 減走 private/，即係用減法揀檔，屬於 fail-open。一次過公開 5,109 個 file，安全與否完全靠 audit 有冇漏。但 audit 自己都寫明：唔係逐行讀；regex 睇唔到原話引用同生活軼事；critic 已經搵到大約 10 個漏網。public 歷史係永久嘅，漏咗就收唔返。\n(2) 預設（Yu 唔答就係 yes）將 15KB relational denylist 放入 public repo 嘅 Actions secret。任何有 write 權限嘅 agent，push 一條改咗 workflow 嘅 branch，就可以將 denylist 轉 base64 印入任何人都睇到嘅 log，而 denylist 本身就係 relational 內容。\n(3) Prod deploy 搬去 public：FLY_API_TOKEN 同 survey DB URL 放喺 public repo 嘅 production env，預設冇 required reviewer。prod DB 仍然有 relational seed rows。只要 merge 一個改 workflow 嘅 PR 入 main，就可以 exfil，攻擊面大過留喺 private deploy。\n(4) public 嗰邊嘅 tripwire 只查某個特定 private commit 喺唔喺 clone 入面，冇喺 pre-push 同 CI 做 single-root check。\n(5) 每個 private checkout 都有 public remote，曝露面最闊。\n(6) 要 737 個 file 一次過收斂，凍結期長，人手出錯嘅空間大。",
+   "fatal_flaws": [
+    "R0 用減法揀檔（收斂 tree 減 private/），一次過公開約 5,109 個 file；audit 承認有漏（regex 睇唔到引用同軼事，冇逐行讀），漏網內容會即刻而且永久公開",
+    "預設將 relational denylist 放入 public repo 嘅 Actions secret；push 一條改 workflow 嘅 branch，就可以將 denylist 印入公開 log"
+   ]
+  },
+  {
+   "name": "promote-agenttool-packages: widen the existing public repo into the development repo, and merge it back into private with real git merges",
+   "score": 7,
+   "reasons": "我驗證過嘅位：\n- 用 gh GET 查過 agenttool-packages：fork:false、0 forks，secret scanning 同 push protection 都係 enabled。\n- project-public.ts writeOutput（540-553）用 `pack-objects --revs <commit> ^<parent>`，冇用 alternates，所以 export 唔會帶 private objects。\n- api/.dockerignore 係 `**` 加 explicit `!` allow，所以 api/private/** 除非刻意加入，否則入唔到 image。\n\n好處：\n- Export 用 allowlist 揀檔，即係 fail closed；分 stage 擴闊。stage 1 只係已經公開嘅嘢加 48 個改動，唔使任何 content ruling。\n- pre-push 同 CI 都有 single-root、canary blob digest 同 denylist-bytes digest 檢查。合成彩排證明可以擋 foreign root、orphan branch 同成個 copy 過去嘅 private/。\n- public remote 只加喺專用嘅 merge clone，其他 private checkout 唔使有。\n- 有 pre-commit 拒絕 private 改 shared path。\n- Deploy 留喺 private：FLY 同 DB secrets、survey log 都唔入 public Actions，所以亦唔存在 filename 經 log 漏出嘅問題。\n\n弱點：\n(1) public pre-push 嘅 relational scan 寫明「只有 $AGENTTOOL_PRIVATE_DENYLIST readable 先跑」（answer.md:172），即係搵唔到 denylist 就照放行，fail-open。\n(2) 完全冇處理 public 開發 commit 嘅 author/committer email。呢部 Mac 嘅 global email 唔係 noreply（已驗），第一個 agent commit 就會漏出去。\n(3) 大約 200 個 legacy K file 留喺原位，打算 lazy relocation。stage 2 擴闊 docs/ 呢類 tree include 嗰陣，要靠 exclude list 同 regex layer 擋；regex 睇唔到嘅引用就會漏，即係 fail-open。\n(4) seed merge 之後，private main 係 public main 嘅 fast-forward。main 要唔要經 PR 交咗畀 Yu 揀；如果揀 direct push，「append-only」ruleset 會接受一次誤推嘅 private main，即係成個 private history 連 9 條舊 credential 一齊上去。\n(5) SEALED 用 sha256(filename)；有 4 個中 denylist 嘅 filename 可以用 dictionary brute-force 撞返出嚟。不過只有 deploy 轉去 public 先會用到。\n(6) 冇掃 commit message 同 PR body。",
+   "fatal_flaws": [
+    "public pre-push 嘅 relational scan 喺搵唔到 denylist 時直接跳過，即係 fail-open",
+    "冇管 public dev commit 嘅 author/committer email：呢部 Mac 嘅 global email 唔係 noreply，第一個 public commit 就會漏（除非 GitHub 帳戶已開 email-privacy push block，呢點未驗證）"
+   ]
+  },
+  {
+   "name": "Packages-first mirror: adoption merge, split-don't-fork, fail-closed one-way guard (risk-first staged)",
+   "score": 8,
+   "reasons": "好處：\n- 曝露面最細：stage 1 = 已經公開嘅 1,618 個 file 加 53 個 delta；manifest 入面 0 K、0 R，guard 結果 0 findings（gitleaks 未跑）。\n- 由 private 去 public（R→P）只有一條路：用 cat-file 讀 blob，直接寫入 P 嘅 working tree，唔 fetch。所以 private 嘅 objects 永遠唔會入 public 嘅 object store，三個 design 入面 object isolation 最強。\n- 我讀過 sim/pre-push-public.sh，係 fail closed：搵唔到 denylist 就拒絕；publicguard.root 冇 set 都拒絕；做 single-root 檢查。\n- 先將 P 開做 private，push P0，再 clone 返落嚟，重新掃一次 GitHub 實際收到嘅內容（只得 1 個 commit、guard、gitleaks），之後先轉 public。三個 design 入面只有佢喺公開之前驗 server 端內容。\n- stage 1–2 唔郁 deploy、secrets 同 release；stage 2 只擴闊冇 blocking flag 嘅 area。\n- 兩個發現我都驗證過：一、guard 冇 PROJECTION.json 嗰陣會 exit 1，係紅燈，唔係 silent pass（public-guard.ts:1153-1156）；二、SECRET_RULES 只有 private-key、AWS、GitHub、npm、Slack、Stripe，冇 AgentTool 自己 key 嘅 rule（381-389）。\n- 有預先識別 wallet README 會公開一個未修嘅弱點，並設 gate G0.2 擋住。\n\n弱點：\n(1) 同 design 2 一樣，冇管 author/committer email。\n(2) hook 用 `git log --format= -p`，只掃 diff 新加嘅行；commit message、tag message、branch 名同 PR body 都冇掃。\n(3) 每個 R checkout 都加咗 public remote（12 個以上）。pushurl `DISABLED-public-is-fetch-only` 其實係相對本地 path，唔係 URL scheme；擋到，但唔夠 robust。\n(4) 每日 scan 要等有 budget 先跑，係 optional；未跑之前只喺 merge-back 嗰陣先掃。\n(5) stage 3 由 P deploy，但冇處理 survey log 印 journaled private filename 嘅問題（deploy-api.yml:133 + migrate-pending.sh:190），SEALED 嘅 name_sha256 又撞得返出嚟。\n(6) adoption 嗰步 `test -z \"$(git diff HEAD^1 HEAD)\"` 喺 `-s ours` 之下一定成立，所以根本驗唔到 P0 係 R 嘅子集。呢點唔係 leak，但係一個空 check。",
+   "fatal_flaws": [
+    "冇管 public dev commit 嘅 author/committer email：呢部 Mac 嘅 global email 唔係 noreply（已驗），第一個 public commit 就會漏（除非 GitHub 帳戶已開 email-privacy push block，呢點未驗證）"
+   ]
+  }
+ ],
+ "winner": "Packages-first mirror: adoption merge, split-don't-fork, fail-closed one-way guard (risk-first staged)",
+ "grafts": [
+  "由 Design 1 搬過嚟：public 嘅 pre-push 同 CI 都要驗 author 同 committer email allowlist，只准 contact@ 同 noreply。每個 public clone 要用 bin/public-clone.sh 寫低自己嘅 repo-local user.name 同 user.email。原因：呢部 Mac 嘅 global email 唔係 noreply，已驗證。",
+  "由 Design 1 搬過嚟：migrate-pending.sh 同 deploy survey 嘅輸出只准印 checksum 前綴；SEALED 用 checksum 做 key，唔好用 sha256(filename)。已驗證兩個漏位：deploy-api.yml:133 會將成段 survey 輸出印出嚟，migrate-pending.sh:190 嘅 error 會印 journaled filename。",
+  "由 Design 1 搬過嚟：docs-catalog.py（用 git ls-files）同 annotations.ts（行成個 repo root）要先 exclude private/ 同 api/private/，之後先准喺任何 private checkout 重新生成 shared index。",
+  "由 Design 2 搬過嚟：public remote 只加喺專用嘅 ~/agenttool-merge clone；其他 R checkout 一律唔加 public remote。pushurl 要用真正 fail 嘅 scheme，`file:///dev/null/...` 或 `no-push://` 都得，唔好用相對 path。另外 public 嘅 pre-push 同 CI 都要加 canary blob digest 同 denylist-bytes digest refusal。",
+  "由 Design 2 搬過嚟：API deploy 長期留喺 private，gate 要求被 merge 嗰個 public parent 嘅 public CI 綠咗先 deploy；取代 Design 3 stage 3 改由 P deploy 嘅做法。咁 FLY token、survey DB URL 同 survey log 永遠唔會入任何人都睇到嘅 Actions。",
+  "新加：pre-push 嘅 relational scan 要掃埋 commit message（%B）、ref 名同 tag message。每日 private scan 要用 gh GET 掃埋 public 嘅 PR title、PR body、review comment 同 issue comment。另外加 Claude 同 Codex 嘅 PreToolUse hook，對 public slug 嘅 `git push --no-verify`、`gh pr create`、`gh issue` 同 `gh api` 寫入做檢查同攔截，因為呢幾條路完全唔經 git hook。",
+  "唔好跟 Design 1 嘅預設：唔好將 denylist 放入 public repo 嘅 Actions secret。如果真係要放，就只用一個限住 main 嘅 environment secret，只喺 push to main 觸發，唔好喺 branch push 同 PR 跑。",
+  "修 Design 3 嘅 adoption check：用 `-s ours` merge 之前，先驗 `git diff --no-renames --diff-filter=DMT P0 X` 係空，即係 P0 真係 X 嘅 byte-identical 子集。`git diff HEAD^1 HEAD` 喺 -s ours 之下一定係空，驗唔到任何嘢。",
+  "每日 private scan 要喺 stage 2 之前變成強制：逐個 commit 掃 heads 同 refs/pull/*/head 新加嘅行，再加 single-root 檢查。budget 未恢復之前，就由指定嘅一部機用 launchd 喺本地跑。",
+  "Stage 2 用 allowlist 加入每個 tree 嘅時候，要逐個 tree 對一次 manifest 入面嘅 K 同 W/R entries，再加一個 private-only 嘅 PRIVATE-PATHS registry 做 exclude；任何一個 K path 未搬入 private/，嗰個 area 都唔准擴闊。"
+ ]
+}

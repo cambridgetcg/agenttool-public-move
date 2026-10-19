@@ -1,0 +1,34 @@
+{
+ "scores": [
+  {
+   "name": "shared-history-overlay：private = public tree + private/ overlay，用「收斂 merge」將 public root 認做 merge base，之後定期真 merge",
+   "score": 7,
+   "reasons": "Engineering-friction judge 評分。下面標【驗】嘅係我喺 /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/topo-design/judge-friction/toy.sh 用 local repo 跑過或者讀過 source 確認咗；標【推】嘅未驗。\n\n**Merge-back 摩擦：三個設計之中最低。**\n- 【驗】commit-tree R0 加收斂 merge C 之後，merge-base 等於 R0。之後 public 做 edit、add、delete，連 `docs/` 成個 dir 改名做 `documentation/`，merge 都係 CLEAN，前後兩個 invariant 都成立。\n- 原因係所有私有嘢都放喺 root `private/`，唔會擺喺任何會被 public 改名嘅 dir 入面。\n- 對比：我喺 toy 證明咗，私有檔散落喺 shared dir 入面嘅話，public 一改 dir 名就會出 `CONFLICT (file location)`（git 預設 `merge.directoryRenames=conflict`）。D2 同 D3 都有呢個風險，D1 冇。\n- Deploy 由 public 出，所以 merge-back 只係將 public 歸檔入 private。weekly 跑一次出錯，都唔會擋住 prod。\n\n**要跟嘅規則：最簡單，只得一條。** Shared path 只可以喺 public clone 改；私有嘢一律放 `private/`。去到 steady state，所有 dev（包括 api）都喺同一個 repo 做。\n\n**CI 成本：最好。** Public CI 全套免費，private 每月少於 150 分鐘。呢個正面解決 private Actions budget 已經用晒嘅問題。\n\n**Deploy：去到 steady state 最簡單，只有一個地方出。** 但 cutover 要做幾樣嘢：\n- 改 SEALED runner，令 twin 只寫 journal、唔執行；\n- 人手 journal step；\n- 修好 error 印 filename 嘅漏洞。\n- 【驗】migrate-pending.sh 冇檢查 migration 次序；deploy gate 見到任何 pending file 都會拒絕 deploy。所以 twin 方案一定要改 runner。\n\n**Release lane：continuity 最差。** 2FA re-point 之前，release 要暫停，或者暫時照用舊 projection lane。去到 a1 之後就係單一 repo。\n\n**去到第一個 milestone 要做嘅嘢：最多。**\n- 第一次 public push 之前，要將 737 個 file 全部按 ruling 改好。\n- 改嘅期間要凍結 private 開發，而開緊嘅 PR 要 port 或者 close。\n- 有好多個 agent 同 session 喺同一時間開工，呢個凍結係實在嘅協調成本。\n\n**Reversibility：低。** R0 一次過公開成個 tree。\n\n**證據最完整：** 真 tree 彩排三輪 0 conflict，加 PG16 fresh-DB probe。",
+   "fatal_flaws": []
+  },
+  {
+   "name": "Packages-first mirror: adoption merge, split-don't-fork, fail-closed one-way guard (risk-first staged)",
+   "score": 6.5,
+   "reasons": "Engineering-friction judge 評分。\n\n**去到第一個 milestone：三個設計之中最平，可逆性亦最高。**\n- Stage 1 只公開 agenttool-packages 已經公開緊嘅範圍。\n- 唔使 content ruling，唔使凍結 private，唔使郁 release、deploy 同 secrets。\n- Yu 只需要決定名同講一聲 go。\n- 【驗】`-s ours` adoption merge 之後，tree 不變，有兩個 root。\n\n**Merge-back：機制正確，但有一個 bug，亦要人手跑。**\n- 【驗】答案入面嘅腳本有 bug：`LAST=$(git log --merges --grep='^Merge public main' ...)` 第一輪攞到嘅係空值。原因係 adoption commit 個 message 係 'Adopt public root…'，對唔上個 grep，所以 `merge-base --is-ancestor` 一定失敗，script 會 abort。答案講第一輪會等於 P0，係錯嘅。修法好簡單：改用 `git merge-base`。\n- Designer 嘅 sim 用咗另一條式，所以冇撞到呢個 bug。\n- Merge-back 由指定嘅一部機人手跑，連續 4 次乾淨先考慮自動化，即係每星期都有 toil。\n\n**Stage 1–2 嘅 interim 摩擦好大，而且可能拖好耐，因為 stage 3 要等 Yu 一次過做 ruling。**\n- 同時有三個 repo：P 做 dev，R 係 private，agenttool-packages 做 release mirror。\n- Release 要行 P → merge-back → project from R → agenttool-packages → tag → CI，前後三跳、兩套 CI。\n- Packages 喺 P 開發，api 喺 R 開發。api/src 用 relative path import packages，所以跨兩邊嘅改動要等 public PR 加 merge-back。\n- 同一批 41 個 package 喺兩個 public repo 都見到，外人會混淆。\n\n**CI：** stage 1–2 嘅 api、apps、bin 測試同 deploy 仍然留喺 private，而 private budget 已經用晒。慳返幾多係 Studio 嘅數字【推】。\n\n**規則數量：** 中等。要守 pushurl、pre-push、drift hook、指定嘅 merge 機，同埋 GUARD_SOURCE 嗰個改動。\n\n**終點：** 去到 stage 3–4 就同 D1 一樣，用 root `private/` 加 public deploy。所以佢等於分階段做嘅 D1，但 interim 要付出上面嘅成本。\n\n**Pushurl：**【驗】`DISABLED-public-is-fetch-only` 會被當成本地 path，push 會失敗，安全。",
+   "fatal_flaws": []
+  },
+  {
+   "name": "promote-agenttool-packages: widen the existing public repo into the development repo, and merge it back into private with real git merges",
+   "score": 5,
+   "reasons": "Engineering-friction judge 評分。\n\n**淨講機制，D2 好有吸引力：**\n- npm trust 唔使 re-point，release 可以直接 tag 綠咗嘅 public commit，冇三 repo 嘅問題。\n- 【驗】E 嘅 parent 係已經有 projection history 嘅 public head。`--allow-unrelated-histories` seed merge 係 CLEAN，tree 等於 R，merge-base 等於 E，舊 history 入面嘅 PROJECTION.json 唔會再出現。\n- 【驗】`no-push://` pushurl 會擋住 push。\n\n**但係同 Yu 嘅決定唔夾。** Yu 決定嘅係「開一個新 public repo」，D2 卻建議重用 agenttool-packages。新 repo 只係擺做 alternative，即係喺度反駁一個已經 firm 咗嘅決定。\n- 用咗之後就鎖死落 'agenttool-packages' 呢個名，但佢要裝埋 api、docs 同 apps；之後改名就要重新 re-point 所有 trust。\n\n**Merge-back 摩擦：比 D1 高。**\n- 大約 200 個 legacy K paths 留喺原位，靠 PRIVATE-PATHS registry 管，overlay 又放喺 `api/private/**`，即係 shared dir 入面。\n- 【驗】私有檔散落喺 shared dir 入面嘅時候，public 一改 dir 名就會出 `CONFLICT (file location)`。另外仲有 add/add collision。\n- 要守嘅 reserved namespace 有 4 種。\n\n**Deploy：短期最簡單，因為留喺 private、唔使 SEALED。** 但有三個問題：\n- prod 要等 merge-back 先 deploy 到，即係每個 api fix 都要 public PR 加 merge-back，再 deploy。\n- Private budget 已經用晒。\n- 【推，GitHub 已知行為】用 GITHUB_TOKEN push 去 private main 唔會觸發 push-triggered 嘅 deploy，要另外 dispatch。\n\n**Epoch 風險：** release tooling（dev-mode tags）要喺 epoch 同一次改，即係 cutover 同時改 release lane。\n\n**Interim：** 同 D3 一樣，packages 喺 public 開發、api 喺 private 開發。",
+   "fatal_flaws": [
+    "Yu 嘅決定係開一個新 public repo，D2 卻建議改用現有嘅 agenttool-packages 做 dev repo，即係反駁一個已經 firm 咗嘅決定。新 repo 只係擺做 alternative。"
+   ]
+  }
+ ],
+ "winner": "shared-history-overlay：private = public tree + private/ overlay，用「收斂 merge」將 public root 認做 merge base，之後定期真 merge",
+ "grafts": [
+  "由 D3 借分階段做法：第一次 public push 唔使等成個收斂完成。R0 先只裝 packages 範圍，即係已經公開緊嗰批，唔使 content ruling，亦唔使凍結 private；做埋 D1 嘅收斂 merge C。之後每擴闊一個 area，就用 D2 嘅 widening export 加一個 commit，parent 係 public main，內容係 identical add。D2 驗證咗呢類 export merge 返 private 係 clean。咁可以保留 D1 嘅終點，同時大幅減少去到第一個 milestone 嘅工作量同凍結。",
+  "保留 D1 嘅 root `private/` namespace：唔好用 D2 嘅 `api/private/**`，亦唔好留散落喺各處嘅 legacy K paths。我喺 toy 驗證咗：私有檔散落喺 shared dir 入面，public 一改 dir 名就會出 `CONFLICT (file location)`；放喺 root `private/` 就 merge 得乾淨。",
+  "由 D2 借 deploy 嘅次序：api 未擴闊落 public 之前，deploy 留喺 private，由現有 deploy-api 出，唔使 SEALED。擴闊之後先搬去 public，同一個 change 入面拆走 private 嘅 deploy secrets。",
+  "由 D3 借 release lane：2FA re-point 之前，照用 merge-back → project-public → agenttool-packages 呢條舊路出 release，順手做埋 GUARD_SOURCE 嘅修正，咁 release 唔使暫停。",
+  "由 D2 借 pre-push 同 CI 嘅兩個檢查：(1) `--single-root`，任何要 push 嘅 commit，root 唔係 R0 就拒絕；(2) canary blob digest。兩樣都比 tripwire 列舉 private SHA 簡單，亦更完整。",
+  "Merge-back 腳本一律用 `git merge-base origin/main public/main` 計 base，唔好靠 commit message 去 grep。D3 嘅 grep 第一輪攞到空值，我已經驗證。",
+  "如果 merge-back workflow 用 GITHUB_TOKEN push 去 private main，push-triggered 嘅 private workflow 唔會被觸發；要跑嘅話就明確 workflow_dispatch。呢點係 GitHub 已知行為，今個 session 未驗。"
+ ]
+}

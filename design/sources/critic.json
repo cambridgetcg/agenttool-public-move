@@ -1,0 +1,143 @@
+{
+ "verdict": "The plan carries out Yu's decision and does not argue with it. Its core mechanics are sound for stage 1 (the packages scope). Two holes must be fixed before P0: (a) the planned public-guard rules would put literal personal values and denylist-derived words into a public file; (b) R-side ADDS under shared trees pass every check and reach npm through the projection. Neither breaks the topology, and both are cheap to fix.\n\n**The core mechanics:**\n- a fresh export root with no shared history;\n- an `-s ours` adoption merge, guarded by a subset check that can fail;\n- merge-base-driven three-way merge-backs;\n- export as files;\n- single root plus canaries;\n- deploy and release stay in R.\n\n**Spot-checks against `/Users/macair/agenttool-wt-1019/topo-src` (3b9aa630; private main is still there, compare ahead 0):**\n- (1) Stage-1 manifest claim CONFIRMED: inside `public/allowlist.json` scope there are 0 keep-private, 0 redact, 5 rewrite (4 ops-sensitive, 1 personal) and 54 review-only entries. There are 53 changes since 42ae9148 (47 modified, 6 added). There are 0 symlinks in scope. None of the 7 unlicensed packages, karma-mirror or witnessed-agent-economy is in scope.\n- (2) API overlay claim CONFIRMED:\n  - `api/Dockerfile` runs `CMD [\"bun\",\"run\",\"src/index.ts\"]` unbundled;\n  - `api/.dockerignore` admits `src/**`;\n  - `api/src/private` does not exist;\n  - `bin/migrate-pending.sh:172` reads only `readdirSync(\"migrations\")`.\n\n  But the migration claim is INCOMPLETE: other readers exist (see gaps).\n- Also confirmed:\n  - `bin/project-public.ts:85` and `:602-605`: GUARD_SOURCE and the guard-ships check;\n  - `:311-321`: allowlist and include trees are read from the SOURCE commit;\n  - `docs-catalog.py` uses `git ls-files`, and `annotations.ts` walks the repo root (lines 205 and 246);\n  - `deploy-api.yml` triggers on push to main for `api/**` and `docs/**`.\n\n**Blocker coverage:**\n\n| Blocker | Status | Notes |\n|---|---|---|\n| B1 guard | Addressed | Tree mode, a fail-closed P pre-push, a daily scan, push protection. Gaps: guard rules that leak (MUST), the allow-record loop, hook installation that fails open, and paths that are not git pushes. |\n| B2 content | Addressed by staging | Verified 0 rulings needed for stage 1. |\n| B3 runtime | Addressed for stage 3 | Optional data plus a code overlay staged into `src/private`. The default of leaving live surfaces unchanged conflicts with what happens at 3a. |\n| B4 migrations | Sound in principle | Relocate, plus twins. Several runners and checks are missing. |\n| B5 baked docs | Sound | Shared manifest; hashes computed at runtime. |\n| B6 indexes | Sound | Generated in P; private views in `private/generated`. R's docs-site source is undefined. |\n| B7 guard gaps | Addressed, but the fix leaks | MUST. |\n| B8 symlinks | Sound | The export refuses them; none in stage 1. |\n| B9 name and trusts | Resolved by the topology | New name for P; R keeps its name and its trusts. |\n| B10 security | Partly | #481 before 3b and the wallet decision are covered. The 2026-09-04 posture items, #475/#476/#486 and the karma-mirror ruling were dropped. |\n| B11 licences | Sound for stage 1 | Stage-3 batch for the rest. |\n| B12 gitleaks | Addressed | Stage 0. |\n| B13 workflows | Addressed | yutabase, the HF probe and .forgejo are handled; no double deploy. A protected env cannot be enforced on R (GitHub Free), and R-only workflows lack repo guards. |\n\n**Decision coverage:**\n\n| Decisions | Status |\n|---|---|\n| D1–4, 11, 12, 18, 19 | Covered |\n| D5–10, 13–15 | Folded into the stage-3 batch. D9's default is silently flipped from take-down to unchanged. |\n| D16 | Covered |\n| D17 | Partial: yutabase deploy-key rotation is missing |\n| D20 (Codeberg) | Dropped |\n| D21 | Partial: the #493/#498 P2 fixes are not listed, and the \"re-open #489/#491/#500 in P\" default does not fit their files |\n\n**Missing areas the task named:**\n- other agents' and Codex checkouts: hooks only, with gaps;\n- issue migration: issues are disabled in P, with no stated policy;\n- the 107 live pages: deferred with a changed default;\n- credential revocation: covered at G0;\n- licences: P's LICENSING.md must absorb R's exceptions by stage 3;\n- agent instruction files and `kingdom.yaml`: they collide.\n\nMy scratch evidence is the open-PR file summary at `/private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/topo-design/critic-completeness/prs.json`. It is private and contains PR file paths.\n\n**Verified vs inferred:** everything above was read or run here, except two GitHub behaviours, which are inferred: the account-wide scope of the email-block setting, and fork object persistence.",
+ "gaps": [
+  {
+   "blocker_or_area": "B1/B7 guard rules (plan 2.1d)",
+   "gap": "Plan adds to the SHARED, public tools/public-guard.ts new tree-mode rules for 'the DB project ref', 'the machine-account name' and 'relational words joined by _ or - in path names'. Existing PERSONAL_RULES are shape-only regexes (verified public/overlay/tools/public-guard.ts:396-430); these three cannot be shape-only, so as written they would publish the account name, the DB ref and denylist-derived words in P (and in agenttool-packages via GUARD_SOURCE).",
+   "fix": "Public guard keeps only shape rules. Rules that need literals or denylist words live in private/bin/relational-scan.ts (P hook, export, merge-back, daily scan), loading terms at runtime from private/guard/*. If a public CI check is wanted, match sha256 of normalised tokens against a hash list, never literals. Add to P5: grep the built P tree for the account name, the DB ref and the denylist terms (counts only).",
+   "severity": "must"
+  },
+  {
+   "blocker_or_area": "I1/I3 invariants, drift check, release lane",
+   "gap": "R pre-commit, R pre-push and the merge-back drift check all use --diff-filter=DMT against paths already in public-sync (rehearsal.sh pre-commit and merge_back). An R commit that ADDS a file under a shared tree (e.g. a new test under packages/collab) passes every check. project-public reads the allowlist from the source commit and ls-trees each include tree (bin/project-public.ts:311-321), so the next projection from origin/main ships that R-only file to agenttool-packages and npm without it ever being in P. It also sets up later add/add and rename conflicts (rehearsal 26, 28). There are also two allowlists (private/export vs private/projection) that can drift apart. Every existing agent still works in R checkouts, so this will happen in the first week.",
+   "fix": "Define the shared scope as the export allowlist's include patterns, not only files present in public-sync, and refuse A under that scope too (pre-commit, pre-push, drift check). Use one allowlist file for both export and projection. Before every projection, assert `git diff --name-only origin/public-sync <source> -- <include paths>` is empty. Add a rehearsal case: R adds a file under a shared tree.",
+   "severity": "must"
+  },
+  {
+   "blocker_or_area": "B1 relational allow records",
+   "gap": "All 30 relational allow entries in the denylist fall inside the stage-1 scope (16 paths; counted without printing terms). They are keyed by (path, rule, line_sha256) (public-guard.ts:617-641). Any P edit of those lines, or rename of those files, makes the P hook refuse and the daily scan alert, and only an R-side edit of private/guard can clear it. Outside PRs that touch these lines alert with no owner. The rehearsal hook uses grep -F term lines, so it models neither regex rules nor allows.",
+   "fix": "relational-scan.ts uses parseDenylist with allows. Document the loop: update the allow in R, then push in P. The daily scan reports allow-misses separately from new hits. Prefer rewriting those 30 lines in stage 0, so stage 1 starts with zero relational allows.",
+   "severity": "should"
+  },
+  {
+   "blocker_or_area": "B1 hook installation (L1)",
+   "gap": "`core.hooksPath private/githooks` is relative to each worktree. R worktrees on branches older than the stage-0 PR (every open-PR worktree) have no such directory, and git silently runs no hook (fail-open). In P, `core.hooksPath tools/githooks` runs whatever the latest merged PR put there, so a merged outside PR can weaken the insider hook.",
+   "fix": "install-guards.sh copies the hooks into a pinned absolute directory (like ~/.local/share/agenttool/execution-seat) and points hooksPath there for ~/agenttool, the 3 standalone clones, Desktop/agenttool, Studio and Codex worktrees. The P hook body comes from that pinned copy, not from P's tree. Verify each install with a refused dry-run push.",
+   "severity": "should"
+  },
+  {
+   "blocker_or_area": "B1/L2-L3 write paths that skip git hooks",
+   "gap": "Codex cloud tasks, the Codex/Claude GitHub apps, gh and web-UI edits, and PR bodies never run git hooks. The PreToolUse hook is optional and local only, and detection is once a day. If R history were pushed to a P branch, R's workflows without a repo guard (deploy-api, publish-pypi) would run in P's public Actions.",
+   "fix": "(a) A scheduled P workflow, every 10-15 min, with public-safe checks only: single root, canary and denylist blob ids, no private/ paths. It deletes offending non-main refs. (b) In stage 0, add `if: github.repository == 'cambridgetcg/agenttool'` to every R-only workflow. (c) State the Codex-cloud policy explicitly: no write access to P until the scan is live.",
+   "severity": "should"
+  },
+  {
+   "blocker_or_area": "Email privacy (judge flaw #3)",
+   "gap": "(1) P CI 'checks every commit' against an allowlist (contact@ and noreply), so every outside contributor's commit fails a required check and public PRs cannot merge. (2) GitHub's 'Block command line pushes that expose my email' applies account-wide (inferred). With this Mac's non-noreply global identity (14 of R's last 20 commits), it would start rejecting agents' pushes to R and to every other repo on the account.",
+   "fix": "In CI, check only commits whose GitHub author or committer login is the owner account; the API gives the login without publishing the email. Switch every machine's global git email to the noreply address before turning on the block, or skip the block and rely on the P hooks plus CI.",
+   "severity": "should"
+  },
+  {
+   "blocker_or_area": "Decision 21 / open PRs and mixed changes",
+   "gap": "From one gh GET of open PR files: #489 touches 0 stage-1 paths, #491 touches 11 stage-1 and 13 R-only paths, and #500 touches 1 stage-1 path plus .github and bin. So 're-open in P' does not fit, and the #488→#489→#491 stack would straddle both repos. There is no general procedure for a change that spans shared and R-only paths, which is common while api imports packages. The Yu-decided #493/#498 P2 fixes are not listed.",
+   "fix": "Add a split rule: the shared part goes through a public-export --upstream PR in P, then merge-back, then the R-only remainder is rebased in R. Keep #488 and #489 in R and split #491 and #500. List #493 and #498 as R-only, landed as Yu decided.",
+   "severity": "should"
+  },
+  {
+   "blocker_or_area": "P0 content review",
+   "gap": "The 'spot-read every file changed since 3b9aa630' rule is stated only for widenings. P0 will include #494, #495 and #496 (2+15+17 stage-1 files) and anything else that lands; the manifest covers none of it, and the regex layers miss quotes and anecdotes.",
+   "fix": "Make that spot read part of P1/P7 for P0 too, with a list of paths and read status kept in private scratch.",
+   "severity": "should"
+  },
+  {
+   "blocker_or_area": "B4 migrations",
+   "gap": "The plan names only bin/migrate-pending.sh and _migrate-one.ts. Other readers (verified):\n- bin/fly-migrate-one.sh refuses any file not under api/migrations (line 36), writes the journal, and has no journal-only twin mode;\n- bin/migrate.sh hardcodes MIG_DIR=api/migrations;\n- ci.yml:209-211 asserts that the .sql count in api/migrations equals the journal row count, which breaks with twins plus a union of folders;\n- api/scripts/_migrate-bootstrap-journal.ts and _apply-ring1-migrations.sh.\n\nIn all, 74 files reference the folder, many of them tests. The tree has 179 .sql files (not 181).",
+   "fix": "Add one shared migrations-dir resolver used by every runner. Give fly-migrate-one a --journal-only twin mode. Fix the launch-core count to count the union minus twins recorded journal-only. Inventory every reader as part of P9.",
+   "severity": "should"
+  },
+  {
+   "blocker_or_area": "Stage-0 PR scope (2.1a-c)",
+   "gap": "Moving public/ to private/projection also breaks:\n- bin/public-release-tag.ts:52, which imports the guard from public/overlay;\n- bin/tests/public-release-tag.test.ts and boring-spine-gate.test.ts;\n- bin/README.md and the generated docs catalog and tags;\n- tests in packages/constructive-intelligence and correspondence-yutabase-projector, which read public/overlay/.github/workflows/publish-npm.yml.\n\nIn all, 16 files reference the old paths. .github/workflows/local-starter.yml, which P runs at stage 1, is missing from the root-split list.",
+   "fix": "Include all of these in the stage-0 PR. Extend P4 to run the public-release-tag tests and a release-tag dry run.",
+   "severity": "should"
+  },
+  {
+   "blocker_or_area": "B3 / decision 9: live private surfaces",
+   "gap": "'Default: leave live surfaces unchanged' quietly reverses the audit's decision-9 default (take down) and cannot hold for the docs site after stage 3a. The site uploads from R, where shared paths become the cleaned text and keep-private docs move to private/docs/, out of the routed catalog. The same applies to kingdom-bundle and the youspeak bundle once they are regenerated from the public subset.",
+   "fix": "Define the site's build source after 3a (the public subset plus an optional private overlay), or state that 3a implies takedown. Ask decision 9 now as its own question, because the exposure is live today and does not depend on P.",
+   "severity": "should"
+  },
+  {
+   "blocker_or_area": "Agent instructions / kingdom metadata (root collisions)",
+   "gap": "R's root AGENTS.md, CLAUDE.md and kingdom.yaml are R-only. P cannot add its own before stage 3 without an add/add conflict, so agents developing in P during stages 1-2 get no repo instructions, and `/kingdom map` cannot see P.",
+   "fix": "In stage 0, move R's private instructions to private/AGENTS.md and private/CLAUDE.md. Make the root AGENTS.md, CLAUDE.md and kingdom.yaml shared public versions with one line: 'if private/AGENTS.md exists, read it'. No new rule pile.",
+   "severity": "should"
+  },
+  {
+   "blocker_or_area": "Widenings (stages 2-3)",
+   "gap": "If R edits a widened area between the widening export and the merge-back, the result is an add/add conflict. The conflict table sends that case to 'relocate into private/', which is wrong for ordinary development work.",
+   "fix": "Set a freeze window for each widening. Add the rule: if R changed a widened path after export, re-export the newer blob into P before merging back.",
+   "severity": "should"
+  },
+  {
+   "blocker_or_area": "Decision 20 / Codeberg",
+   "gap": "The Codeberg copy (zerone-dev/agenttool, which may hold private history; Desktop/agenttool's origin) is not on Yu's list.",
+   "fix": "Carry decision 20 into the 'later' list with the audit's default.",
+   "severity": "note"
+  },
+  {
+   "blocker_or_area": "B10 / decision 17 leftovers",
+   "gap": "Dropped:\n- rotation of the yutabase deploy key;\n- the re-check of the 2026-09-04 posture items (origin auth, DNSSEC, the fail-open limiter, backups);\n- review of #475, #476 and #486;\n- the karma-mirror honeypot ruling.",
+   "fix": "Add them to G0 hygiene and the stage-3 batch.",
+   "severity": "note"
+  },
+  {
+   "blocker_or_area": "B13 deploy secrets / deploy trigger",
+   "gap": "A protected production env cannot be enforced on R under GitHub Free (rulesets and protection return 403; env branch policies are likely unenforced), and the plan does not say so. deploy-api.yml triggers on push to main for api/** and docs/** (verified). A merge-back that an agent pushes with the user token will therefore deploy once the budget returns. 'Deploys stay explicit dispatches' holds only for GITHUB_TOKEN pushes, and the stage-1 docs blobs sit under docs/**.",
+   "fix": "State both facts. Either make deploy-api dispatch-only, or accept push deploys gated on P CI. Keep the step-scoped, expiring Fly token.",
+   "severity": "note"
+  },
+  {
+   "blocker_or_area": "Issue migration",
+   "gap": "P is created with issues disabled, so the public has no bug channel except private vulnerability reporting. There is no policy for R's 9 open issues that concern shared code.",
+   "fix": "Add a one-line decision: issues on or off in P. Re-file sanitized copies only where needed; never migrate automatically.",
+   "severity": "note"
+  },
+  {
+   "blocker_or_area": "L4 leak response",
+   "gap": "After a branch is deleted, its objects can persist through forks of a public repo and refs/pull (inferred GitHub behaviour). L4 covers only branch deletion and a Support purge.",
+   "fix": "Mention the fork network in L4: check for forks during the exposure window, and include them in the Support request.",
+   "severity": "note"
+  },
+  {
+   "blocker_or_area": "Risk table accuracy",
+   "gap": "The 5 stage-1 rewrite files are said to be 'not reachable through git'. Their old bytes stay in agenttool-packages' public, append-only history.",
+   "fix": "Have Yu accept this explicitly, or record that it is the status quo.",
+   "severity": "note"
+  },
+  {
+   "blocker_or_area": "Merge-back vs R hooks (untested)",
+   "gap": "Two interactions are untested. A conflict-resolution commit in the merge clone hits the R pre-commit hook (it needs ALLOW_SHARED_EDIT). The R pre-push drift check compares against the old origin/public-sync, while the same atomic push moves it. The rehearsal installs neither hook in the merge clone.",
+   "fix": "Add both cases to P6/P8.",
+   "severity": "note"
+  },
+  {
+   "blocker_or_area": "Yu's decision: development in public",
+   "gap": "api, apps, docs and bin development stays private until a large batch of rulings and refactors (stage 3), with no time box. That risks a long half-public state.",
+   "fix": "Set a target date and success criteria for M2 (stage 3b: api development in P), and review it at each weekly merge-back.",
+   "severity": "note"
+  },
+  {
+   "blocker_or_area": "B11 licensing",
+   "gap": "The projection's 41-line LICENSING.md replaces R's 72-line root file, which carries exceptions for docs/specs, api routes and the jsonld files. There is no inbound-licence note for public PRs merged into a private repo.",
+   "fix": "At stage 3, merge R's exceptions into the shared LICENSING.md. Add an inbound=outbound (Apache-2.0) or DCO line to CONTRIBUTING.",
+   "severity": "note"
+  },
+  {
+   "blocker_or_area": "Migration twins",
+   "gap": "Twin headers publish the sha256 of each private original. That is a small guess-confirm surface.",
+   "fix": "Accept it, or key twins by an HMAC whose key stays in R.",
+   "severity": "note"
+  }
+ ]
+}
