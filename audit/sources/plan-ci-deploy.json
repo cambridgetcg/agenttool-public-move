@@ -1,0 +1,153 @@
+{
+ "findings": [
+  {
+   "topic": "新 public repo 冇得跑 relational / personal guard",
+   "severity": "blocker",
+   "detail": "如果冇 PROJECTION.json，現有 guard 只會報 integrity/missing-projection，然後就停，path、secret、personal、gitleaks 幾層全部唔會跑。Relational denylist 按設計永遠唔公開（public/private-guard/）。新 repo 係 fresh snapshot 加直接開發，啲 commit 唔係 projection commit。所以搬過去之後，每個 push 同 PR 都冇 relational 檢查，personal layer 都唔會跑。Verified（讀 code 確認）。",
+   "evidence": "public/overlay/tools/public-guard.ts:1153-1156（缺 PROJECTION.json 就提早 return）；public/README.md:13（private-guard 永不 project）；public/overlay/.github/workflows/ci.yml:50-56（guard 預設係 projection commit 模式）",
+   "recommendation": "(1) 喺 public-guard 加一個 tree mode，唔需要 PROJECTION.json，照跑 path/binary/secret/personal/gitleaks，放入新 repo 做 required check。(2) Relational layer 留喺 private：dev clone 裝 pre-push hook 讀 private denylist；private 嗰邊再加一個 job，定期 fetch public repo 跑 private layer，只輸出 rule id 同 line hash。(3) 開 GitHub secret scanning 同 push protection（public repo 免費）。"
+  },
+  {
+   "topic": "deploy-api：secrets 擺喺 repo level，冇 environment，main 冇保護",
+   "severity": "major",
+   "detail": "FLY_API_TOKEN 同 MIGRATION_SURVEY_DATABASE_URL 係 repo-level secrets，deploy job 冇 environment，冇 `if: github.repository ==` guard。FLY_API_TOKEN 擺喺 job-level env，所以 checkout、第三方 superfly setup-flyctl 呢啲 step 全部見到。Fork PR 攞唔到（pull_request 唔派 secrets；verified 冇 pull_request_target/workflow_run/issue_comment）。不過任何有 write 權嘅人推一條 branch、改咗 workflow，都可以讀到 repo secrets。main 而家冇保護（protected=false，verified）。",
+   "evidence": ".github/workflows/deploy-api.yml:44-57,122-125,147-155；gh api：repo secrets FLY_API_TOKEN、MIGRATION_SURVEY_DATABASE_URL（2026-09-23 建）；branches/main → protected:false",
+   "recommendation": "新 repo 開 `production` environment：branch policy 只限 main，can_admins_bypass=false，要唔要 required reviewer 由 Yu 決定。兩個 secret 搬入 env，唔好擺 repo level。FLY_API_TOKEN 改成 step-level，只畀 Deploy 同 verify 兩個 step 用。加 repo guard。開 ruleset：main 禁 deletion 同 force-push，加 required checks。Fly deploy token 重新 mint 一個有 expiry 嘅（fly tokens create deploy），cutover 之後 revoke 舊嗰個；migration_survey 嘅 password 考慮 rotate。"
+  },
+  {
+   "topic": "Private repo Actions budget 用晒；cutover 有雙重 deploy 嘅風險",
+   "severity": "major",
+   "detail": "Verified：2026-10-19 嘅 CI、Whitehack、Local starter、Production health runs 全部冇開到 job，annotation 寫住 'The job was not started because an Actions budget is preventing further use'。即係 private repo 而家冇 CI，亦冇 deploy-api；最後一次 deploy-api 成功係 2026-10-17。Public repo 用 standard runner 免費，搬咗就解決。風險在於 budget 一 reset，private 同 public 兩個 repo 嘅 deploy-api 都會喺 push main 時 deploy 同一個 Fly app，而 concurrency group 只係 per-repo。",
+   "evidence": "gh api check-run annotations：runs 39212849063、39186670538 同最新嗰個 CI run；deploy-api.yml:55-57（concurrency: deploy-api）",
+   "recommendation": "Cutover 時喺 private repo disable 或者刪走 deploy-api、production-health、publish-pypi、publish-gospel 同兩個 HF workflow，只留 private-only 嘅 jobs。"
+  },
+  {
+   "topic": "YUTABASE private fixture job 唔應該入 public repo",
+   "severity": "major",
+   "detail": "呢個 job 會用 deploy key checkout 另一個 private repo（YUTABASE），喺 Postgres 上跑 projector integration。放入 public repo 嘅話：private repo 嘅 fixture 會喺公開 log 入面執行（psql 同 test 輸出）；private repo 嘅 deploy key 會長住喺 public repo 嘅 environment；而且內容同 correspondence 有關，屬 relational-adjacent。另外呢個 job 嘅 guard 寫死舊 slug，去到新 repo 會靜靜 skip。",
+   "evidence": ".github/workflows/ci.yml:875-987（environment yutabase-fixture-read 喺 892；secrets.YUTABASE_FIXTURE_SSH_KEY 喺 919、935；private repo checkout 喺 929-937）；gh api：env policy branch:main，secret YUTABASE_FIXTURE_SSH_KEY",
+   "recommendation": "唔好帶過去，留喺 private repo 跑。Public ci.yml 刪走兩個 yutabase job，同時改 bin/tests/yutabase-ci-access.test.ts 同 bin/tests/boring-spine-gate.test.ts:857。"
+  },
+  {
+   "topic": "NPM_TOKEN 仲未 revoke（scope-wide、可以 bypass 2FA）",
+   "severity": "major",
+   "detail": "Private repo 嘅 npm-bootstrap env 仲有 NPM_TOKEN（Verified，updated 2026-08-13）。Repo 自己嘅文件寫明呢個 token 已經冇用途，應該 revoke。唯一用到佢嘅係 publish-gospel.yml，而嗰個 job 只係喺版本未存在時先 publish；gospel 0.1.0 已經上咗 npm，所以 job 實際上係死嘅。",
+   "evidence": "gh api：repos/cambridgetcg/agenttool/environments/npm-bootstrap/secrets → NPM_TOKEN；docs/NPM-RELEASES.md:26-33,443-452；.github/workflows/publish-gospel.yml:44-80",
+   "recommendation": "新 repo 唔好重建 NPM_TOKEN。即刻喺 npm revoke，再刪呢個 secret。publish-gospel.yml 嘅 publish job 唔好搬過去；想保留驗證就只搬 prepare。"
+  },
+  {
+   "topic": "npm trusted publishing 綁死 agenttool-packages 嘅 projection",
+   "severity": "major",
+   "detail": "npm trust 指向 cambridgetcg/agenttool-packages/publish-npm.yml（env npm-bootstrap）。npm-release.ts 只准喺嗰個 repo 跑；release tag 必須打喺 projection commit 上面，仲要有 Public-CI-Run trailer。新 public repo 唔係 projection repo，照搬過去係發佈唔到 npm 嘅。agenttool-packages 而家嘅設定（Verified）：env npm-bootstrap 用 tag:*-v* policy，冇 secret，冇 admin bypass；有兩條 active ruleset：'main is append-only' 同 'release tags are immutable'。",
+   "evidence": "docs/npm-trust-repoint.sh:47-50；bin/npm-release.ts:29,2290；bin/public-release-tag.ts:15-21；public/allowlist.json:3；gh api：agenttool-packages 嘅 env 同 rulesets 24880056、24880057",
+   "recommendation": "Option A（改動少）：保留 agenttool-packages 做 npm release repo，projection source 改用新 public repo 嘅 commit，喺 private 嗰邊跑 project-public.ts（要支援從外部路徑讀 denylist）。Option B：38 個 package 加 local-starter 嘅 trust 改指新 repo（將 npm-trust-repoint.sh 嘅 REPOSITORY 改咗就用得）；所有 package.json 嘅 repository.url 改新 repo（npm provenance 要求兩者一致，inferred，信心高）；重寫 public-release-tag 同 npm-release 嘅 projection 要求；新 repo 開 npm-bootstrap env（tag *-v*，唔放 token），加同款 rulesets。"
+  },
+  {
+   "topic": "PyPI trusted publisher 要重新設定",
+   "severity": "major",
+   "detail": "PyPI 嘅 publisher 綁住 cambridgetcg/agenttool、publish-pypi.yml、environment pypi；pypi-release.ts 喺 GITHUB_REPOSITORY 對唔上時會 fail closed。好消息係轉 public 會解決文件記錄咗嘅「repo private 時 fetch main 失敗」問題。",
+   "evidence": "bin/pypi-release.ts:33-41,805-809；docs/PYPI-RELEASES.md:58-75；.github/workflows/publish-pypi.yml:128-154；gh api：env pypi，policy tag:sdk-v*，冇 secrets",
+   "recommendation": "喺新 repo 加 PyPI trusted publisher（owner、repo、publish-pypi.yml、env pypi），建 env pypi（tag sdk-v*，can_admins_bypass=false），改 SOURCE_REPOSITORY 同 EXPECTED_REPOSITORY。驗證一次成功發佈之後先刪舊 publisher。"
+  },
+  {
+   "topic": "寫死嘅 repo slug 加上 tests 鎖死 workflow inventory，改 workflow 就會令 CI 失敗",
+   "severity": "major",
+   "detail": "大約 267 個 file 提到舊 slug。bin/preflight.sh 會跑 bin/tests；而 bin/tests 斷言 workflow 清單、guard 字串同 repo slug 要一字不差。所以為 public repo 改任何 workflow 都會令 CI 紅，除非同一個 change 一齊改 tests。幾個 workflow guard 去到新 slug 會靜靜 skip；release script 就 fail closed。",
+   "evidence": "bin/preflight.sh:83；bin/tests/boring-spine-gate.test.ts:857,1677,1743-1749,1762；bin/tests/yutabase-ci-access.test.ts:43；bin/tests/pypi-release.test.ts:81-82；bin/tests/npm-release-public.test.ts:89-109；api/tests/outward-operational-claims.test.ts:30-33；bin/care-before-learning-hf-release.py:105；api/Dockerfile:19；publish-care-before-learning-hf.yml:15,103；care-before-learning-hf-probe.yml:16,104；ci.yml:891",
+   "recommendation": "新 slug 定咗之後，常數、workflow guards 同 tests 一次過改。公開之前，用過濾好嘅 snapshot 喺本地跑 bin/preflight.sh api 同 packages，因為 private repo CI 冇 budget。"
+  },
+  {
+   "topic": "CI 同 deploy 依賴嘅 paths 可能要留喺 private",
+   "severity": "major",
+   "detail": "Hermetic gate 會裝大約 45 個 workspace；API image 會 bake 入 docs/agenttool.jsonld、docs/kingdom-bundle.json 同 19 份 doctrine docs，少一份 stage-doctrine-docs.sh 就 fail。分類結果如果將任何一個 workspace 或者 baked doc 留喺 private，public CI 同 deploy 都會壞。kingdom-bundle.json 入面有 chronicle 同 citizens 資料，要其他 auditor 判斷屬唔屬 personal 或 relational。",
+   "evidence": "bin/prepare-hermetic-deps.sh:33-90；api/Dockerfile:44-56；api/doctrine-docs.manifest（19 個 entries）；deploy-api.yml:96-100,172-177；bin/stage-doctrine-docs.sh:45-48",
+   "recommendation": "分類完之後先決定 deploy 喺邊度跑。如果 image 需要 private 內容，就開一個 private deploy repo 或 job，checkout public 再疊 private overlay，唔好喺 public repo 擺 production secrets 加 private 內容。"
+  },
+  {
+   "topic": "HF publish 冇 environment；probe workflow 已經過時",
+   "severity": "minor",
+   "detail": "publish job 有 id-token: write，但冇 environment；HF 嗰邊嘅 OIDC trust 綁住舊 repo 同 workflow。發佈目標係 private HF repos，script 要求 target private==true；但內容本身會喺 public GitHub 公開，咁 HF 保持 private 其實冇乜意義。Probe workflow 只會喺一條 2026-09-08 嘅診斷 branch 觸發。",
+   "evidence": ".github/workflows/publish-care-before-learning-hf.yml:100-137；bin/care-before-learning-hf-release.py:105,290；.github/workflows/care-before-learning-hf-probe.yml:3-5,101-108",
+   "recommendation": "刪 probe workflow。HF publish 如果保留：加 env hf-release（只限 main），喺 HF 嗰邊改 trust 指新 repo，再移除舊 trust。"
+  },
+  {
+   "topic": "production-health 喺 public repo 嘅行為",
+   "severity": "minor",
+   "detail": "Cron 設定係每 5 分鐘，用 ubuntu-latest（annotation 話由 2026-10-19 起會轉 Ubuntu 26），冇 repo guard。Public 之後 run history 連 outage 都公開；public repo 連續 60 日冇活動，GitHub 會自動停 schedule（GitHub 已知行為）；fork 開咗 Actions 都可能跑。實際上 GitHub 大約每 2 小時先排到一次。",
+   "evidence": ".github/workflows/production-health.yml:4-6,17；gh api：最近 runs 間隔大約 2 小時，加 ubuntu-latest migration notice",
+   "recommendation": "加 `if: github.repository == '<new slug>'`，pin ubuntu-24.04；或者搬去外部 monitor（例如 Worker cron），GitHub run 只留 workflow_dispatch。"
+  },
+  {
+   "topic": "公開 log 同 step summary 入面嘅 ops-sensitive 內容",
+   "severity": "minor",
+   "detail": "Gate 會成段印出 migration survey 嘅輸出，連錯誤一齊印；GitHub 只 mask 同 secret 完全一樣嘅字串，postgres 連線錯誤有機會印出 pooler host 或 role（inferred，信心中等）。Deploy receipt 會公開 Fly machine IDs、region、image refs 同 identities.total；machine ID 配合 fly-force-instance-id 可以指定打某一部 machine（inferred）。",
+   "evidence": ".github/workflows/deploy-api.yml:132-133,179-188,217,227,234,247-248",
+   "recommendation": "失敗時只印 summary line 同 exit code；receipt 只寫 machine 數量同 image label，或者接受現狀並喺文件記低。"
+  },
+  {
+   "topic": "Fork PR 同 Actions 設定",
+   "severity": "minor",
+   "detail": "PR jobs 會跑好重嘅工作（macOS、Windows matrix、Docker build、Postgres/Redis services），但 PR 路徑冇用任何 secret（Verified）。Private repo 而家：allowed_actions=all，sha_pinning_required=false，default token=read，can_approve_pull_request_reviews=false。agenttool-packages 嘅 fork approval 係 all_external_contributors。merge_group triggers 喺 user-owned repo 冇作用；ci.yml 註釋提到 protected-branch status，但 main 其實冇保護。",
+   "evidence": "gh api actions/permissions、actions/permissions/workflow；gh api agenttool-packages fork-pr-contributor-approval；secrets 只喺 deploy-api.yml:125,154、ci.yml:919,935、publish-gospel.yml:76、overlay publish-npm.yml:236 出現",
+   "recommendation": "新 repo：fork PR approval 設 all external contributors；allowed actions 改 selected（actions/*、oven-sh/setup-bun、astral-sh/setup-uv、pypa/gh-action-pypi-publish、superfly/flyctl-actions），開 require SHA pinning；token 保持 read；開 Dependabot alerts 同 private vulnerability reporting。Path-filtered workflows 唔好設做 required checks。"
+  },
+  {
+   "topic": "Action pinning（verified 冇問題）",
+   "severity": "info",
+   "detail": "9 個唔同嘅 action 全部用 40 字元 SHA pin 住，經 GitHub API 核對全部同 tag 一致。superfly 嘅 tag 實際叫 1.6 同 v1，註釋寫 v1.6，只係字面差異。Service images（postgres:16/17、redis:7）只用 tag 冇 digest；flyctl 0.4.74 binary 由 action 下載。",
+   "evidence": "gh api git refs 核對；ci.yml:48,110,123,901；deploy-api.yml:161-163",
+   "recommendation": "可選：service images 改用 digest pin。"
+  },
+  {
+   "topic": "冇 self-hosted runner；Forgejo CI 過時",
+   "severity": "minor",
+   "detail": "Repo runners 總數 0，全部 runs-on 都係 GitHub-hosted。.forgejo/workflows/ci.yml 係 Codeberg 年代留低（mirror 2026-07-25 已退役），用未 pin 嘅 code.forgejo.org/actions/checkout@v4 同 oven/bun:1，仲有一個 dummy VAULT_MASTER_KEY（test 用、低熵，但 gitleaks 有機會誤報）。",
+   "evidence": "gh api actions/runners total_count=0；.forgejo/workflows/ci.yml:29-46；docs/STACK.md:75-79",
+   "recommendation": ".forgejo 唔好帶入 public snapshot。"
+  },
+  {
+   "topic": "Codex connector bot",
+   "severity": "minor",
+   "detail": "chatgpt-codex-connector[bot] 好活躍：最近 100 條 PR review comments 佔 76 條，最近 100 條 issue comments 佔 74 條。轉 public 之後 reviews 會公開；外人開 PR 或者 @codex 有機會觸發 auto-review，用 Yu 嘅 quota。呢點係 inferred，因為 Codex 設定讀唔到。",
+   "evidence": "gh api repos/cambridgetcg/agenttool/pulls/comments 同 issues/comments 嘅作者統計",
+   "recommendation": "喺 Codex 設定刻意揀新 repo 嘅 access，auto-review 限 collaborator 先觸發。"
+  },
+  {
+   "topic": "舊 GitHub releases 同 install 指引指住 private repo",
+   "severity": "info",
+   "detail": "Private repo 有大約 60 個帶 assets 嘅 releases（sdk、skills、browser…）。apps/docs 嘅 manifests 同 docs 用 githubAssetUrl 或 git+https 指住 private repo，外人攞唔到。Fresh snapshot 唔會帶 tags 或 releases。",
+   "evidence": "gh api releases 列表；bin/build-love-packages.ts:37；apps/docs/packages/v1/**/manifest.json；docs/THE-PARTY.md:56",
+   "recommendation": "決定要唔要喺新 repo 重新 host assets 同改 manifests，定係只靠 npm 同 PyPI。"
+  },
+  {
+   "topic": "CI 會 call 嘅 scripts 入面有少量 personal 同 ops 資料",
+   "severity": "minor",
+   "detail": "migrate-pending.sh 用 macOS keychain account 名做 lookup，屬 machine-local personal，程度輕微。supabase/config.toml 同一個 test 有 Supabase project ref 加 pooler region；test URL 入面嘅 password 係 6 字元 placeholder，唔係 secret，但屬 ops_sensitive。",
+   "evidence": "bin/migrate-pending.sh:6,132-137,276-283；supabase/config.toml:6；api/tests/migration-runner-safety.test.ts:1008-1042",
+   "recommendation": "Keychain account 改用 env var 或者 generic placeholder；project ref 視為 ops_sensitive，可以接受，或者 test 改用 fake ref。"
+  },
+  {
+   "topic": "Private repo 而家嘅 environment protection 可能冇執行",
+   "severity": "info",
+   "detail": "Rulesets 同 branch protection API 都回應 'Upgrade to GitHub Pro or make this repository public'。GitHub 文件話 private repo 用 deployment branch policies 要 Pro 或 Team。所以三個 env（npm-bootstrap、pypi、yutabase-fixture-read）嘅 branch policy 可能而家冇執行。呢點係 inferred，信心中至低，冇用實際 run 試過。轉 public 會令 rulesets 同 env protection 免費生效。",
+   "evidence": "gh api rulesets 同 branches/main/protection 回 403；gh api environments 顯示有 branch_policy",
+   "recommendation": "當 NPM_TOKEN 同 YUTABASE_FIXTURE_SSH_KEY 可能任何 branch 都讀到：revoke NPM_TOKEN，考慮 rotate YUTABASE deploy key。"
+  }
+ ],
+ "decisions_for_yu": [
+  "npm 發佈路徑：A 保留 cambridgetcg/agenttool-packages 做 projection 同 release repo，由 private 嗰邊跑 projection（改動少）；定 B 將 39 個 package 嘅 trust 改指新 repo，同時改所有 repository.url 同 release-tag tooling？",
+  "API deploy 喺邊度跑：直接喺新 public repo 跑（image 用到嘅 api/、kingdom-bundle、doctrine docs 要全部公開）；定開一個 private deploy job 或 repo，checkout public 再疊 private overlay？",
+  "新 `production` environment 要唔要 required reviewer？之前 npm 同 pypi 都揀咗唔要；public repo 用 reviewer 免費，代價係每次 deploy 要撳一下。",
+  "main ruleset：只設 append-only（禁 force-push 同 deletion）加 required checks，定係要求一定經 PR？Agents 而家會唔會直接 push main？",
+  "YUTABASE projector integration 留喺 private repo？（建議留）",
+  "Care Before Learning 嘅 HF publish 搬唔搬去 public repo？內容公開咗之後，HF target 再 private 已經冇意義。probe workflow 建議直接刪。",
+  "production-health 留喺 public repo 做 cron，定搬去外部 monitor？（public 會公開 outage 歷史，60 日冇活動會自動停）",
+  "Relational guard 點運作：dev clone 裝 pre-push hook，加 private 嗰邊定期掃 public repo？Public CI 要唔要加 guard tree mode 做 required check？",
+  "FLY_API_TOKEN 同 MIGRATION_SURVEY_DATABASE_URL：重新 mint 或 rotate（建議），定照抄？NPM_TOKEN 係咪即刻 revoke？",
+  "Cutover 當日 disable private repo 嘅 deploy-api、production-health、publish-pypi、publish-gospel 同 HF workflows，避免兩邊同時 deploy，可以嗎？",
+  "Codex connector 喺 public repo 嘅 access 同 auto-review 範圍點設？",
+  "舊 GitHub release assets（大約 60 個）要唔要喺新 repo 重新 host，再改 manifests？",
+  "新 repo 叫咩 slug？大約 267 個 file 要跟住改，包括 guards 同 tests。"
+ ],
+ "summary": "我讀晒 .github/workflows 嘅 11 個 workflow（2,353 行）、佢哋 call 嘅 scripts、public overlay 嘅 CI 同 publish-npm，同埋 .forgejo；設定方面只用 gh GET 讀，冇 POST，冇任何寫入。\n\n**整體：CI 本身寫得穩陣，最大問題唔喺 CI 安全，而係搬家嘅 coupling。**\n- 冇用 pull_request_target、workflow_run 或 issue_comment；全部 action 都用 SHA pin 住，經 API 核對同 tag 一致。\n- 冇 self-hosted runner；冇 env dump 或 set -x；untrusted input 全部經 env 傳入，冇 script injection。\n- Fork PR 攞唔到 secrets。\n\n**Blocker：新 repo 冇得做 relational 同 personal 檢查。** 現有 public-guard 冇 PROJECTION.json 就唔跑 content layers，relational denylist 又唔可以公開。所以要先加一個 tree mode，再喺 private 嗰邊做 relational 檢查，之後先好喺 public 開發。\n\n**已核實（verified）：**\n- **CI 而家停咗：** private repo 嘅 Actions budget 已經用晒，2026-10-19 起 CI 同 health job 都冇開到；轉 public 用 standard runner 免費。\n- **deploy-api 嘅 secrets 冇 environment 保護：** FLY_API_TOKEN 同 MIGRATION_SURVEY_DATABASE_URL 擺喺 repo level，main 冇保護，FLY_API_TOKEN 喺 job-level env 所有 step 都見到。\n- **NPM_TOKEN 仲喺度：** 文件已經話冇用途，但未 revoke。\n- **YUTABASE job 會用 deploy key 拉另一個 private repo：** 唔應該入 public repo。\n\n**新 repo 要重建嘅嘢（只列名，唔列值）：**\n- **Secrets：** FLY_API_TOKEN、MIGRATION_SURVEY_DATABASE_URL，放入新開嘅 `production` env，建議重新 mint 或 rotate。唔好重建 NPM_TOKEN 同 YUTABASE_FIXTURE_SSH_KEY。\n- **Environments：** pypi（tag sdk-v*）；npm 改走新 repo（Option B）先需要 npm-bootstrap（tag *-v*）；hf-release 視乎 HF publish 留唔留。現有 repo 同 env 都冇 variables。\n- **外部 trust：**\n  - PyPI 要加新 publisher（repo、publish-pypi.yml、env pypi）。\n  - npm 有兩條路：保留 agenttool-packages 做 projection，或者將 39 個 package 嘅 trust 改指新 repo，連 repository.url 一齊改。\n  - HF OIDC trust 要改指新 repo（如保留 HF publish）。\n  - Fly 只靠 token，冇 webhook。\n  - 文件寫明 Cloudflare Pages 係 Direct Upload，冇 Git hookup；CF 嗰邊我未核實。GitHub Pages 冇開（已核實）。\n- **Repo 設定：** rulesets（main append-only、release tags immutable、required checks）；fork PR 要 all external contributors approval；actions 用 allowlist 加 SHA pinning；開 secret scanning 同 push protection；決定 Codex 嘅 access。\n\n**改 code：** 大約 267 個 file 寫死舊 slug；bin/tests 鎖死 workflow 清單，改 workflow 就要同一個 change 改 tests。公開前建議用過濾好嘅 snapshot 本地跑 preflight。Cutover 時要 disable private repo 嘅 deploy、publish 同 health workflows，避免兩邊同時 deploy。\n\n**Inferred、未核實：**\n- npm provenance 要求 repository.url 同發佈 repo 一致（信心高）。\n- 公開 log 有機會印出 DB host 或 role（信心中）。\n- Private repo 而家嘅 env branch policy 可能冇執行（信心中至低）。\n- Codex 會唔會俾外人觸發 auto-review。"
+}

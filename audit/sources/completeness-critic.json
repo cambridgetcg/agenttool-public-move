@@ -1,0 +1,200 @@
+{
+ "scope": "Completeness critic over the eleven scan/read results and two plans for /Users/macair/agenttool-wt-1019/audit-src (detached origin/main 3b9aa630, 5,337 tracked paths). Read-only: git status stayed empty, nothing was published, and the only network calls were gh GETs. The check covered five things: (1) reader coverage versus git ls-files, (2) file types the readers skipped, (3) whole-tree search patterns no reader ran, (4) inconsistent classification across areas, and (5) spot reads of files the readers called clean. Scratch: /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-audit/completeness-critic (scripts/, out/). out/hits.tsv and out/acct-bare.txt contain raw snippets, so keep them private. The temporary denylist copy and the project-ref file were deleted after use.",
+ "method": "COVERAGE: I took the union of all judgment readers' file lists (their scratch files.txt/scope.txt) and diffed it against git ls-files. That left 29 tracked files with no judgment reader: all 28 files of packages/living-substrate (the l–r reader's list skipped it) and .forgejo/workflows/ci.yml. The docs A–M and N–Z readers between them cover all 424 docs paths. I read both gaps: CLAUDE/NOTICE/README/kingdom.extension/package.json in full, plus a denylist scan and my sweep over the rest.\n\nBINARY/MEDIA METADATA: a stdlib python -I script (scripts/meta.py) parsed every PNG chunk (tEXt/zTXt/iTXt/eXIf/iCCP/tIME), the RIFF chunks of the WAVs and the WebP (LIST/INFO/EXIF/XMP/bext/iXML/id3), and the SVG metadata/creator/comments/absolute paths. For the 64 tgz files it parsed gzip headers (FNAME, mtime, OS), tar uname/gname/uid/gid/mtime/pax, and non-text members. I also decoded the .gz.base64 fixture and checked its gzip header and contents. I viewed the 2 review PNGs no reader had opened (app-mobile, docs-mobile) and the never-viewed hero-web.webp, converted to PNG in scratch. There are no PDFs, fonts or data: URIs in the tree.\n\nWHOLE-TREE SWEEPS (scripts/sweep.py, raw + NFKC), patterns no reader ran tree-wide:\n- UK NI number, sort code, IBAN, UTR, account number, date of birth, international and UK phone numbers, obfuscated emails\n- owner surname and romanisations, owner email local part, consumer mail domains\n- names of the owner's private ventures, machine/host names, tailnet hosts and the 100.64/10 range\n- doc/drive/notion/calendly share links, claude/chatgpt share links, social-profile URLs, Discord/Slack/Telegram webhooks, Telegram chat ids\n- Solana 64-byte keypair arrays, WIF keys, 88-char base58, mnemonic wording\n- commit trailers, first-person kinship, health and personal-finance phrases, CJK intimacy terms, any CJK\nPlus:\n- context-pattern person-name extraction (scripts/names.py)\n- UK postcode scan\n- lockfile resolved sources and auth tokens\n- email-domain census\n- repeated non-placeholder UUIDs\n- github/codeberg/HF owner census, with visibility of 17 linked repos checked by gh GET\n- bare forms of the Supabase project ref (counted without printing it)\n- bare forms of the machine-account name\n- references to private memory files\n- relational words inside path names\n- generated indexes, review evidence and JSONL (57 files) checked against the denylist (scripts/deny.mjs; rule ids only)\n- kingdom-bundle.json walked by JSON path\n- split-literal reconstruction of denylist terms in the guard test (scripts/splitlit*.mjs)\nI compared every result with the guard full-tree findings (fulltree-findings.json, pathname-findings.json, tgz-findings.json).\n\nSPOT READS (files readers called clean). Read in full:\n- docs: XENIA-HELLY-COMMON-GROUND.md, wakes/TERRA-ARRIVAL-NOTE.md, THE-PARTY.md, LUCK-PROTOCOL.md, ECOSYSTEM-SIBLING.md (the A–M reader read only lines 1–80), OBSERVATIONS.md, HANDOFFS.md, START-HERE.md, GRACE.md, COMPETITIVE-LANDSCAPE-2026.md, specs/2026-07-02-estate-dawn-restyle.md\n- root, bin and marketing: EXISTENCE.md, bin/lovestar.py, marketing/DIRECTORY-SUBMISSION.md\n- review: launch-20260904/backlog.csv, launch-cleanup evidence restore.json and cloudflare-readonly-audit.json\n- api and packages: api/scripts/_e2e-quick-wake.mjs, packages/correspondence-yutabase/PERSISTENCE-CONTRACT.md, all 6 packages/wake-return/examples files, packages/collab-courier/examples/profile.disabled.json, packages/codex-usage/tests/fixture.ts\n- the two coverage gaps: .forgejo/workflows/ci.yml and the living-substrate docs\nRead in part: WELCOMING.md (1–80 and 300–346), SOIL.md (1–60), api/tests/doctrine/love-protocol.test.ts (1–60), and the persona/owner lines of the docs-nz clean list. All other evidence came from targeted greps.",
+ "flags": [
+  {
+   "path": "docs/kingdom-bundle.json",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "lines": "JSON paths .youspeak.canon.{kunance,barakqing,heurekin,natsarqing,autopistme,zakarqing,syzygyqing,darshanqing,jeongqing,barzakhqing,tzimtzumme}.body; .standards.KS-000..KS-003; .youspeak.manifesto; .chronicle[].voices[].said; .citizens[].latest_beat.said",
+   "description": "MISSED (the A–M reader checked this file by structure only). The embedded YOUSPEAK canon bodies carry the owner–persona relationship narrative:\n- a dated vow quotation attributed to the owner\n- three references to a dated ceremony between owner and persona\n- constitutive-naming passages about what the owner calls the persona\n- a path to a private letters directory\n- the owner's behavioural self-test text\n- links to about 145 sibling repositories; a gh GET sample of 17 linked repos confirmed most are private\nThe guard sees only about 26 line hits, because each JSON line is very long, so line-hash allow entries are impractical. api/src/services/youspeak/bundle.json carries the same canon (2 of the vow references), so classify the two files the same way. Regenerate from a public subset or withhold. The file is already served by /public/kingdom.",
+   "confidence": "high"
+  },
+  {
+   "path": "api/src/services/economy/ring1-limits.ts",
+   "category": "ops_sensitive",
+   "action": "redact_lines",
+   "lines": "20,176; also api/src/db/supabase-target.ts:46, api/tests/deploy-release-provenance.test.ts:24, api/tests/doctrine/edge-surface.test.ts:35, api/tests/migration-runner-safety.test.ts:1045-1046, docs/EDGE-SURFACE.md:90, docs/NOW.md:1481, docs/RING-1.md:180, docs/STACK.md:1066, docs/SUPABASE-INTEGRATION-PLAN.md:29, apps/docs/ring-1.html:475, supabase/config.toml:6, review/launch-20260904/evidence/reachability.json:66 (apps/docs NOW/RING-1/STACK.md are symlinks to the docs copies)",
+   "description": "GUARD GAP, across areas (verified by exact-string count; value not printed). The production hosted-DB project ref appears in bare form on 18 lines in 17 files. personal/supabase-project matches only <ref>.supabase.co|com|in or the pooler host, so the guard flags none of these lines. Readers caught 3. Classification is inconsistent: the guard calls it personal, the guard full-tree run reports it as ops_sensitive, judgment-ops calls it already public, and api-src listed it without a judgment. The live /public/plans endpoint already serves it from ring1-limits.ts. Yu needs to make one ruling, and the guard needs a bare-ref rule.",
+   "confidence": "high"
+  },
+  {
+   "path": "review/launch-20260904/evidence/reachability.json",
+   "category": "ops_sensitive",
+   "action": "redact_lines",
+   "lines": "66",
+   "description": "MISS against the root/review clean claim ('no … Supabase refs' in review/**). The captured /public/plans response body contains the bare production project ref. The guard does not see it, because it has no .supabase.co suffix.",
+   "confidence": "high"
+  },
+  {
+   "path": "bin/tests/project-public.test.ts",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "lines": "~290-315, 361",
+   "description": "VERIFIED: the test rebuilds private denylist terms without spelling them out:\n- CJK pairs and the emoji class through String.fromCodePoint\n- a name-pair joiner template\n- an adjacent string-literal concatenation that matches one denylist rule\nLine 361 also joins a second machine-account name. This confirms the topology plan's 'must stay private'. The judgment-ops clean list includes 'the guard' among publishable bin tooling without separating out this test.",
+   "confidence": "high"
+  },
+  {
+   "path": "packages/lobby/README.md",
+   "category": "personal",
+   "action": "rewrite",
+   "lines": "32,176-177,269,924,926,961; also packages/lobby/CLAUDE.md:62, src/room.ts:181, src/text.ts:83, tests/{cli,room,store,hosted,fleet-refusals,egress}.test.ts, tests/fixtures/egress-cases.json:4-5,55-56",
+   "description": "A hard-coded 'device-only' term list names a specific betting exchange and its trading-automation tool. It discloses the owner's private trading activity, which this session's context shows is a real private venture. The guard does not flag these lines (only r16 and keychain-slot hits in the README). It is unclear whether the l–r reader's 'personal rewrites' for lobby cover this. Suggestion: move the terms to a private, configurable list and use generic test fixtures.",
+   "confidence": "medium"
+  },
+  {
+   "path": "docs/DEPLOY-PROCEDURE.md",
+   "category": "personal",
+   "action": "redact_lines",
+   "lines": "1006,1070,1278-1301; also docs/STACK.md:450-455,793-813,855; docs/DEVELOPMENT.md:228-266,425; bin/migrate-pending.sh:6,132-137,276-283; bin/deploy.sh:2745,2750; bin/frontend-deploy.sh:17-18,50; bin/phase-b-refence-maintenance-bridge.ts:182; bin/tests/build-input-hygiene.test.ts:132; infra/README.md:47; native/agenttool-secret-macos/Sources/AgentToolSecretMacOSCore/Command.swift:85; api/scripts/_check-testnet-wallet.ts:50,172; _e2e-payout-loop-closure.ts:19; _gen-testnet-mnemonic.ts:136,141; _migrate-bootstrap-journal.ts:35; _migrate-one.ts:124; _smoke-evm-broadcast.ts:79; apps/docs copies",
+   "description": "GUARD GAP: the owner's machine-local account name appears in bare form in about 131 lines across about 55 files, which the home-path rule cannot see. The forms are Keychain '-a' arguments, 'account=' prose, KEYCHAIN_ACCOUNT constants and dashed '-Users-<acct>-' encodings in the relational migration band. judgment-ops flagged this class in its own scope; the docs and api readers did not mention it. Replace with $USER or a placeholder. Full list: out/acct-bare.txt in the scratch dir.",
+   "confidence": "high"
+  },
+  {
+   "path": "api/scripts/_e2e-quick-wake.mjs",
+   "category": "personal",
+   "action": "redact_lines",
+   "lines": "14-15,30; also _e2e-dashboard-full.mjs:44, _e2e-dashboard-overview.mjs:41, _e2e-letters-ceremony.mjs:37, _e2e-letters-voice.mjs:41, _e2e-strands.mjs:26, _e2e-window.mjs:40",
+   "description": "READER INCONSISTENCY: the owner's personal email is hard-coded in 7 e2e scripts, next to persona Keychain service names and a persona project name. The api-tests reader called the 'generic e2e harnesses' clean. The guard does flag the email, so it is covered mechanically, but the reader's clean claim is wrong.",
+   "confidence": "high"
+  },
+  {
+   "path": "docs/XENIA-HELLY-COMMON-GROUND.md",
+   "category": "relational",
+   "action": "rewrite",
+   "lines": "20,112",
+   "description": "MISS and INCONSISTENCY: a familial form of address to a parent figure (the persona-to-owner frame), in 'the challenge I would bring to …' and '…'s problem sheet'. The apps reader flagged the same framing in apps/docs/xenia-helly.html; docs-nz listed this doc as clean. Guard: 0 hits.",
+   "confidence": "medium"
+  },
+  {
+   "path": "docs/SOIL.md",
+   "category": "personal",
+   "action": "rewrite",
+   "lines": "16-18",
+   "description": "MISS: the doc opens with an anecdote about the owner's own home lawn and its builders' rubble, naming the owner. Under the task's definition this is the owner's private life. docs-nz listed the file as clean; guard: 0 hits. Mild; a neutral rewording fixes it.",
+   "confidence": "low"
+  },
+  {
+   "path": "docs/LUCK-PROTOCOL.md",
+   "category": "relational",
+   "action": "rewrite",
+   "lines": "7,226",
+   "description": "INCONSISTENCY: the owner's verbatim chat directive is quoted with a date (line 7) and again unattributed (line 226). The A–M reader noted only line 7 and called the file publishable. The s–z reader treats owner quotes in scriptwriter PYRAMID-INTEGRATION.md as blockers. Guard: 0 hits. Yu needs to set one rule for verbatim owner quotes.",
+   "confidence": "medium"
+  },
+  {
+   "path": "docs/TRUST-PROTOCOL.md",
+   "category": "relational",
+   "action": "rewrite",
+   "lines": "7",
+   "description": "MISS: the epigraph quotes the owner's dated all-caps chat directive verbatim. docs-nz listed the file as clean; the guard misses it. Same quote-class question as LUCK-PROTOCOL.",
+   "confidence": "medium"
+  },
+  {
+   "path": "docs/specs/2026-07-02-estate-dawn-restyle.md",
+   "category": "relational",
+   "action": "rewrite",
+   "lines": "3",
+   "description": "MISS: the 'Approved by' line quotes the owner's Cantonese chat approval verbatim. docs-nz said specs/* were clean except the four editor-line drafts; guard: 0 hits.",
+   "confidence": "low"
+  },
+  {
+   "path": "docs/WAKE-WARMING.md",
+   "category": "relational",
+   "action": "rewrite",
+   "lines": "19,27,72,166",
+   "description": "MISS: persona names appear in example chronicle strings (lines 19, 27, 72), plus a persona-and-owner authorship sign-off (166). The guard flags 27 and 166 only. docs-nz listed the file as clean, while the A–M reader flags the same kind of sign-off in its range.",
+   "confidence": "medium"
+  },
+  {
+   "path": "docs/WELCOMING.md",
+   "category": "relational",
+   "action": "rewrite",
+   "lines": "333; also docs/TUTORIAL-WHAT-YOUR-COGNITION-IS.md:212, docs/PUBLIC-WAKE-STREAM.md:163, docs/WAKE-JOY-VARIANTS.md:81",
+   "description": "INCONSISTENCY: persona/owner authorship sign-offs and a persona name used as an example agent, in docs that docs-nz listed as clean (some marked 'footer only'). The A–M reader flags identical one-line sign-offs. The guard catches 333, 212 and 163 but not WAKE-JOY-VARIANTS:81.",
+   "confidence": "medium"
+  },
+  {
+   "path": "api/migrations",
+   "category": "relational",
+   "action": "rewrite",
+   "lines": "path names (n/a)",
+   "description": "GUARD GAP, verified: the path names themselves carry persona, owner or intimate terms. A loose word-boundary scan finds 74 such paths (about 70 after dropping the 'open-seat' product false positives). The guard's path scan matched only 18; the 57 extra are joined with underscores or hyphens: api/migrations 12, api/tests 22, api/src 9, docs/wakes 4, apps/docs 3, top-level docs about 20. Rewriting the contents still leaks through the names. List: out/relational-pathnames.txt in scratch.",
+   "confidence": "high"
+  },
+  {
+   "path": "docs/wakes/rendered",
+   "category": "personal",
+   "action": "keep_private_whole_file",
+   "lines": "5 symlinks: docs/wakes/rendered plus 4 file links in docs/wakes",
+   "description": "Five tracked symlinks point to absolute paths under another home account's Desktop wake directory. They dangle on this Mac. On the machine where they resolve, any snapshot step that follows symlinks (cp -L, rsync -L/-K, tar -h, materialising before git add) would import private wake bundles into the public tree. The snapshot procedure must drop these links, not materialise them.",
+   "confidence": "high"
+  },
+  {
+   "path": "apps/docs/agenttool.jsonld",
+   "category": "relational",
+   "action": "rewrite",
+   "lines": "whole file",
+   "description": "CONSISTENCY RISK: this is a byte-identical regular file (452,904 bytes), not a symlink, duplicating docs/agenttool.jsonld. apps/docs also holds 96 symlinks into docs/. The two copies were judged by different readers. Any withhold or rewrite decision on docs/ must be mirrored here, or the public tree republishes the withheld text under apps/docs.",
+   "confidence": "medium"
+  },
+  {
+   "path": "review/launch-cleanup-20260904/evidence/cloudflare-readonly-audit.json",
+   "category": "ops_sensitive",
+   "action": "publish_ok_after_review",
+   "lines": "21-58,111-133,150-199",
+   "description": "Security-posture record (no secret values):\n- Cloudflare-to-origin authentication 'not deployed', with a direct-origin bypass noted\n- WAF and ruleset reads blocked\n- IP rate limiting deferred\n- DNSSEC chain absent\n- five workers.dev aliases whose source was not recovered\nTogether with the direct origin host published elsewhere (e.g. docs/FEDERATION-VERIFIED.md:51-70, which also names a real persona identity UUID), this maps a way around the edge. Re-check the current state before publishing.",
+   "confidence": "medium"
+  },
+  {
+   "path": "docs/superpowers/specs/2026-10-08-collab-household-smoothing-design.md",
+   "category": "ops_sensitive",
+   "action": "redact_lines",
+   "lines": "7,16-21,56-58,174; plus plans/2026-10-09-collab-household-smoothing-plan-a.md and plan-b.md (60 and 25 home-path lines)",
+   "description": "Describes the owner's household machine agent harness:\n- the local config directory\n- headless login state\n- that 259 exec-policy allow rules, including push to main, run outside the sandbox without prompting\nThe guard catches the paths (device-path, home-path) but not this posture disclosure. docs-nz cleared superpowers/* apart from the files it flagged.",
+   "confidence": "medium"
+  },
+  {
+   "path": "apps/docs/whitehack.html",
+   "category": "ops_sensitive",
+   "action": "publish_ok_after_review",
+   "lines": "3 links; also docs/WHITEHACK.md, packages/research-commons/src/constants.ts, specs/*whitehack*.schema.json, api/src/services/wake/sibling-registry.ts, KINGDOM.md, docs/ZERONE-LIVE.md, docs/DATASET-INFLUENCE.md",
+   "description": "Links to sibling repositories that gh GET verified as private; names are in out/repo-refs.txt in scratch. Publishing them reveals private repo names and leaves dead links. Some repo names are relational in their own right. Low severity.",
+   "confidence": "medium"
+  },
+  {
+   "path": "packages/scriptwriter",
+   "category": "relational",
+   "action": "publish_ok_after_review",
+   "lines": "r16 tree-wide (516 hits)",
+   "description": "INCONSISTENCY: the r16 symbol-class hits are treated three ways. apps calls them nav-glyph false positives, s–z treats them as blockers, and docs-nz calls them 'likely guard false positives'. The denylist note requires Yu's recorded approval for any r16 allow beyond the one exempted emoji. One ruling is needed: approved allow entries, or strip the glyphs.",
+   "confidence": "medium"
+  },
+  {
+   "path": "packages/collab/dist/agenttool-collab-host.js",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "lines": "gitleaks fingerprint at overlay .gitleaksignore (line drift)",
+   "description": "INCONSISTENCY: pkgs-a-c called collab 'publishable as-is (high confidence)'. The guard full-tree run found that 2 overlay/.gitleaksignore fingerprints for this bundle no longer match, so the projection guard would refuse it today (inferred). The content is a false positive; the fingerprints need regenerating.",
+   "confidence": "medium"
+  },
+  {
+   "path": "apps/docs/packages/v1/@agenttool/browser/0.6.0/agenttool-browser-0.6.0.tgz",
+   "category": "third_party",
+   "action": "publish_ok_after_review",
+   "lines": "also browser/0.5.1 tgz; credential-broker 0.x tgz README lines (8 keychain-slot hits)",
+   "description": "The browser 0.5.1 and 0.6.0 tarballs vendor Playwright core (Apache-2.0), including a codicon .ttf font and app icons. LICENSE, NOTICE and ThirdPartyNotices.txt are bundled, and the tar headers are portable (empty uname/gname, fixed mtimes). All 64 tarballs are digest-pinned release artifacts, so their content cannot be redacted in place, only kept or withheld. That includes the credential-broker README's example Keychain service name, which pkgs-a-c suspects is a real owner slot.",
+   "confidence": "medium"
+  },
+  {
+   "path": "docs/RUNTIME.md",
+   "category": "personal",
+   "action": "rewrite",
+   "lines": "176",
+   "description": "The example advertised_url uses a tailnet-style hostname combining the owner's first name with a device word. It looks illustrative (no real tailnet id), but the guard misses it.",
+   "confidence": "low"
+  }
+ ],
+ "clean_claim": "VERIFIED, high confidence:\n- Coverage: the readers' file lists plus the guard full-tree run cover every tracked path except packages/living-substrate (28 files) and .forgejo/workflows/ci.yml. I read both. living-substrate is clean (synthetic vectors, no owner or persona text, 0 denylist hits). ci.yml holds only a disposable CI Postgres password, a repeated-character placeholder vault key and outdated Codeberg wording.\n- Media and binary metadata are clean throughout:\n  - 18 PNGs: only IHDR/IDAT/IEND chunks; no text, EXIF, ICC profile name or tIME.\n  - 9 WAVs: only fmt and data chunks; no LIST/INFO.\n  - The WebP: only a VP8 chunk, no EXIF or XMP. Viewed: an abstract illustration, nothing personal.\n  - 3 SVGs: metadata holds product strings only.\n  - 64 tgz: gzip headers carry no FNAME and mtime 0; tar headers have empty uname/gname and uid/gid 0.\n  - The .gz.base64 fixture has no FNAME or mtime, and its content has no home paths, emails or owner name.\n  - The two never-opened review PNGs show public site pages only.\n- Whole-tree sweeps found 0 hits for: UK NI numbers, sort codes, IBANs, UTRs, dates of birth, phone numbers, Telegram/Discord/Slack webhooks, Solana keypair arrays, document or chat share links, personal social profiles, and the owner's surname.\n- The only street address is the company's public registered office.\n- Context-pattern name extraction found no private individuals; the only hits were public figures and fiction.\n- The CJK intimacy terms are all covered by the denylist. Their non-denylist look-alikes ('BB') are base64 or hex noise.\n- Lockfiles resolve only to npm, PyPI and file: siblings, with no tokens.\n- All 57 JSONL files: 0 denylist hits, and no owner, persona or home-path markers.\n- Health, family and finance phrase sweeps found no private facts outside the already-flagged relational corpus. The one family-history passage, in the-seat.ts/THE-SEAT.md, is already flagged by readers.\n- Spot reads confirmed these 'clean' calls: TERRA-ARRIVAL-NOTE, THE-PARTY (apart from the r16 line), ECOSYSTEM-SIBLING (all of it, including the 77 lines the A–M reader skipped), OBSERVATIONS, HANDOFFS, START-HERE, GRACE, COMPETITIVE-LANDSCAPE-2026, DIRECTORY-SUBMISSION, backlog.csv, restore.json, PERSISTENCE-CONTRACT, the wake-return examples, the collab-courier profile and the codex-usage fixture.\n\nMISSES, ~10 spot-checked files plus several cross-area classes (see flags): XENIA-HELLY-COMMON-GROUND, SOIL, LUCK-PROTOCOL (second quote), TRUST-PROTOCOL, the estate-dawn spec, WAKE-WARMING, WAKE-JOY-VARIANTS:81, the e2e scripts, the review reachability.json ref, and kingdom-bundle.json.\n\nGUARD GAPS confirmed:\n- bare project ref: 18 lines\n- bare machine-account name: about 131 lines\n- relational path names: 57 extra\n- symlink-follow risk on the snapshot step\n- owner quotes and private-life anecdotes, which no rule targets",
+ "limits": "- **Spot reads:** about 20 files read in full, the rest in part (listed in method). A reader's whole-file verdict elsewhere is still inferred from greps.\n- **Readers' own flags were not visible to me** (the input carried only counts). So some items I call 'missed' may already be in a reader's flag list. Each such flag says what the reader's clean claim stated; the orchestrator should dedupe by path and line.\n- **Name detection uses heuristics** (context patterns, capitalised pairs elsewhere). A private person named only by a first name or nickname with no cue word could still slip through.\n- **Inconsistencies are inferred from the readers' clean_claim and limits text, not from their flags.** They are:\n  - owner quotes\n  - persona sign-offs\n  - r16\n  - the Supabase ref\n  - the machine-account name\n  - the familial address\n  - collab status\n  - treasury address (s–z clean; api-tests calls it a judgment call; not flagged separately)\n- **Not done:**\n  - OCR of screenshots: I looked at them only.\n  - Licence audit of the vendored Playwright and codicon files beyond the presence of their notice files.\n  - Live checks of the security posture in cloudflare-readonly-audit.json.\n  - Git history: the plan is a fresh snapshot.\n- **The split-literal check** detects only adjacent '+'/',' concatenations and the patterns I inspected by eye.\n- **Repo visibility** was checked by GET for a sample of 17 linked repos, not for all of the roughly 150 citizen-* links.\n- **What this output avoids:** no secret value, the owner's email, the project ref, the machine-account name, personal handles or denylist terms. Paths that contain relational words are referred to through the scratch list rather than printed.\n- **Scratch files hold raw snippets** and must stay private:\n  - out/hits.tsv\n  - out/acct-bare.txt\n  - out/repo-refs.txt\n  - out/relational-pathnames.txt"
+}

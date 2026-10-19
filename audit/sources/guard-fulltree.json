@@ -1,0 +1,720 @@
+{
+ "scope": "Whole tracked tree of /Users/macair/agenttool-wt-1019/audit-src at HEAD 3b9aa630bcdff3d2bdcb02eaa08094fd6d5ba45b (detached origin/main). git ls-files = 5337 entries (5229 regular blobs + 108 symlinks), identical to the committed tree. There are no untracked or ignored files. Also scanned: the 64 npm .tgz mirrors under apps/docs/packages/v1, extracted to scratch, and the 5337 tracked path strings themselves. Only the allowlist-membership path rule was skipped. Read-only throughout: no edits, commits or checkouts in the audit tree, no GitHub writes, nothing published.",
+ "method": "1) Read public/README.md, public/overlay/tools/public-guard.ts and bin/project-public.ts in full. The guard needs only Node built-ins, so no deps were prepared. 2) Copied both files byte-identically (sha256-checked) from git objects into a scratch dir (guard/). Scratch Bun 1.3.5 scripts import their exported rules: fulltree-scan.ts reads every blob through the guard's own readTree, then applies (a) pathRuleFindings with allowlist membership forced true (symlink, oversize, sensitive-name, nested-gitleaksignore and the other path rules), (b) contentFindings with SECRET_RULES, (c) PERSONAL_RULES, (d) the private denylist rules via parseDenylist (rules loaded from git objects; terms never printed or viewed), (e) the denylist blob_sha256 digests and the denylist-copy check, (f) the same content rules on symlink target strings, which the guard normally skips. Each finding is annotated with its existing exceptions (public-guard-allow.json, denylist allow, mapped to projected paths) and its current-projection scope. 3) Downloaded gitleaks 8.30.1 darwin_arm64 plus the release checksums file into an empty scratch dir. sha256 b40ab0ae55c5... matched the checksums file, whose linux_x64 entry also matches the repo CI pin 551f6fc8... Extracted only the binary to its own dir; it reports version 8.30.1. Ran `gitleaks dir <audit-src>` with --redact --ignore-gitleaks-allow, an empty --gitleaks-ignore-path, default config (no repo config exists) and a JSON report, mirroring gitleaksFindings(). Re-ran with --max-archive-depth 4. Post-processed: dropped Match/Secret, computed guard-style line SHA-256, and applied overlay/.gitleaksignore fingerprints with hash checks. 4) Extracted the 64 .tgz mirrors into a scratch dir (since deleted). Ran the guard content layers plus gitleaks over them. 5) Ran the guard rules over the list of tracked path strings. 6) Supplemental non-guard shapes (DB-URL passwords, JWT, Anthropic/OpenAI/HF/Google/Fly/Stripe-test, agenttool at_/atcm_/atlc_ tokens, hex private keys, basic-auth URLs, IPv4, phone numbers, EVM addresses). 7) Inspected every secret-layer, uncovered-gitleaks and non-placeholder supplemental hit with token-masked context, and classified personal hits by class (owner home account vs placeholder, email class, slot names, pooler vs project ref) locally without echoing values. Outputs in /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-audit/guard-fulltree/out: fulltree-findings.json (per-line, with rule id, line, line_sha256, scope, allowedBy), gitleaks-findings-stripped.json, gitleaks-dir.json (redacted), tgz-findings.json, gitleaks-tgz.json, pathname-findings.json, supplemental-findings.json, fulltree-binaries.json, flags-final2.json (788 per-file flags), flags-grouped.json. COUNTS. Guard content+path layers over the full tree: 5512 findings in total: relational 4142 (4109 unapproved), personal 1256 (1248 unapproved), path 110 (108 symlink, 1 sensitive-name, 1 nested-gitleaksignore from the overlay design), secret 4. By rule: r03 1501, r09 1257, home-path 793, r16 516, r15 448, keychain-slot 212, email 116, device-path 110, r06 78, r05 68, r02 63, r13 54, r01 44, r17 33, r11 24, r07 22, supabase-project 21, r14 15, r04/r10/r18 5 each, unix-home-path 3, windows-home-path 1, r12/r19/r20/denylist-copy 1 each. gitleaks in-tree: 63 findings. 43 are covered by hash-verified fingerprints and 20 are uncovered; 2 fingerprints are unused because of line drift. In-tarball: 344 guard findings and 12 gitleaks findings. Path names: 18 relational matches (r09 x11, r15 x4, r03 x2, r10 x1). Unapproved findings by top directory: docs 2800, api 1731, bin 460, apps 388 (103 of them symlinks), packages 41, public 21 (the denylist file itself), root .md files 14, Caddyfile/sovereign.sh/self-host.sh 6, infra 4, review 2, tests 2, cli 1, marketing 1. Second level: api/migrations 587, api/tests 535, apps/docs 363, docs/superpowers 351, api/scripts 345, bin/tests 293, api/src 264, docs/zerone-migration 232. 616 of 5337 tracked files carry at least one unapproved finding (710 when symlinks are counted). FLAG FORMAT: the 788 per-file flags (in scratch) were grouped to fit this output. High-signal items stay individual, with lines. Bulk relational and personal hits are grouped by parent directory, category and action, listing basename(hit-line count). Every guard finding is covered by a flag here, and exact lines and hashes are in fulltree-findings.json.",
+ "flags": [
+  {
+   "path": "(multiple)",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "low",
+   "description": "gitleaks generic-api-key findings covered by existing overlay/.gitleaksignore fingerprints (line hashes verified); test vectors/operation names; 15 files: docs/specs/adds-0.1-vectors.json:190,368,372,375,699,705,853; docs/specs/behaviour-conformance.json:2680,2732,2773,3115,3139,3225,3249,3335,3359,3445,3469,3555,3579,3665,3689; packages/collab/dist/agenttool-collab-mcp.js:32492,32496; packages/collab/src/store.ts:3781; packages/correspondence-yutabase/tests/identifiers.test.ts:82,109; packages/memetic-landscape/examples/brainrot.landscape.json:304; packages/memetic-landscape/hf/dataset/data/brainrot-landscape.jsonl:1; packages/memetic-landscape/src/brainrot.ts:38; packages/polymorph-landscape/examples/ritonavir.landscape.json:39,60,295; packages/polymorph-landscape/hf/dataset/data/ritonavir-landscape.jsonl:1; packages/polymorph-landscape/src/ritonavir.ts:146,164,330; packages/sdk-py/src/agenttool/_x402_transport.py:65; packages/sdk-ts/src/_x402-transport.ts:57; packages/sdk-ts/tests/fixtures/x402-eip3009-vector.json:6; packages/wallet-zerone/vectors/agent-wallet-zerone-v0.1-vectors.json:39"
+  },
+  {
+   "path": ".forgejo/workflows/ci.yml",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "40-41",
+   "description": "supplemental: CI service DB URL with default local password (ephemeral service container); same default in api/src/config.ts:28,36 and tests"
+  },
+  {
+   "path": "api/scripts/x402-eip3009-vector.ts",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "50,52",
+   "description": "gitleaks/generic-api-key x2 uncovered: well-known public Anvil dev private keys (test vector, commented as unfunded)"
+  },
+  {
+   "path": "api/src/services/billing/stripe-checkout.ts",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "27",
+   "description": "gitleaks/stripe-access-token x1 uncovered: Stripe test-mode placeholder key literal (fallback never used for API calls)"
+  },
+  {
+   "path": "api/tests/doctrine/promise-04-substrate-yours.test.ts",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "36",
+   "description": "gitleaks/generic-api-key x1 uncovered: fake credential literal in test"
+  },
+  {
+   "path": "api/tests/fixtures/crown-vectors.json",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "10,22,34,46",
+   "description": "gitleaks/generic-api-key x4 uncovered: did:key ids + public keys/signatures in test vectors (no private material in file)"
+  },
+  {
+   "path": "api/tests/identity-token-boundary.test.ts",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "121,131",
+   "description": "gitleaks/generic-api-key x2 uncovered: fake token literal in test"
+  },
+  {
+   "path": "api/tests/pulse-did.test.ts",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "18",
+   "description": "gitleaks/generic-api-key x1 uncovered: test DID string"
+  },
+  {
+   "path": "api/tests/x402-client.test.ts",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "35",
+   "description": "gitleaks/generic-api-key x1 uncovered: well-known public Anvil dev private key in test"
+  },
+  {
+   "path": "apps/docs/packages/v1/@agenttool",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "description": "gitleaks generic-api-key x12 inside extracted tarballs (sdk 0.16.4 README, sdk 0.22.x _x402-transport, wallet-zerone vectors, vendored playwright): same FP classes as in-tree fingerprints. The in-tree gitleaks run did NOT see inside .tgz, even with --max-archive-depth 4"
+  },
+  {
+   "path": "bin/tests/agenttool-castle.test.ts",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "556",
+   "description": "secret/private-key-block x1: verified fake/empty PEM header in a test fixture (no key body)"
+  },
+  {
+   "path": "bin/tests/test_care_before_learning_hf_release.py",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "27",
+   "description": "gitleaks/generic-api-key x1 uncovered: fake secret literal in test"
+  },
+  {
+   "path": "docs/superpowers/plans/2026-05-10-pulse-mood-drift-and-did-route.md",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "788",
+   "description": "gitleaks/generic-api-key x1 uncovered: test DID string in plan"
+  },
+  {
+   "path": "docs/superpowers/specs/2026-05-10-pulse-mood-drift-and-did-route-design.md",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "medium",
+   "lines": "196",
+   "description": "gitleaks/generic-api-key x1 uncovered: prose identifiers (false positive)"
+  },
+  {
+   "path": "packages/collab/dist/agenttool-collab-host.js",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "3128,3132",
+   "description": "gitleaks/generic-api-key x2 uncovered: operation-name false positive (same line hashes as the existing fingerprints, line numbers shifted by 1)"
+  },
+  {
+   "path": "packages/karma-mirror/tests/credentials.test.ts",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "low",
+   "description": "path/sensitive-name: test file name matches the credential-name rule; content had no secret-layer or gitleaks hit"
+  },
+  {
+   "path": "packages/lobby/tests/fixtures/egress-cases.json",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "47-48",
+   "description": "secret/private-key-block x2 + gitleaks/private-key x1 (line 47): verified fake PEM blocks in egress-refusal fixture"
+  },
+  {
+   "path": "packages/lobby/tests/fleet-refusals.test.ts",
+   "category": "secret",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "137",
+   "description": "secret/private-key-block x1: verified fake/empty PEM header in a test fixture (no key body)"
+  },
+  {
+   "path": "packages/collab/dist/agenttool-collab-host.js",
+   "category": "ops_sensitive",
+   "action": "rewrite",
+   "confidence": "high",
+   "lines": "3128,3132",
+   "description": "guard integrity drift: public/overlay/.gitleaksignore records this file at lines 3127/3131, but the findings are now at 3128/3132, giving 2 integrity/unused-gitleaksignore + 2 raw gitleaks findings. packages/collab is IN the current 55-path projection, so the existing projection guard should fail today (inferred: same binary and bytes; project-public.ts itself was not run). Fix: update the 2 fingerprints"
+  },
+  {
+   "path": "api/migrations/20260519T110000_storage_artifacts.sql",
+   "category": "ops_sensitive",
+   "action": "rewrite",
+   "confidence": "high",
+   "lines": "94",
+   "description": "personal/supabase-project x1: production hosted-DB project ref (not a credential, but aids targeting)"
+  },
+  {
+   "path": "api/tests/migration-runner-safety.test.ts",
+   "category": "ops_sensitive",
+   "action": "rewrite",
+   "confidence": "high",
+   "lines": "1008,1010,1029,1040,1042",
+   "description": "personal/supabase-project x5: production hosted-DB project ref in DB-URL fixtures (password is a placeholder)"
+  },
+  {
+   "path": "docs/STACK.md",
+   "category": "ops_sensitive",
+   "action": "rewrite",
+   "confidence": "high",
+   "lines": "493",
+   "description": "personal/supabase-project x1: production hosted-DB project ref + region"
+  },
+  {
+   "path": "(multiple)",
+   "category": "ops_sensitive",
+   "action": "publish_ok_after_review",
+   "confidence": "medium",
+   "description": "personal/supabase-project: production-region hosted-DB pooler hostname (no project ref); api/src/db/supabase-target.ts:48; api/tests/deploy-release-provenance.test.ts:25,2021,2025; api/tests/guarded-socket.test.ts:128,137; api/tests/supabase-database-tls.test.ts:31,233,241,245; bin/tests/project-public.test.ts:372; docs/SUPABASE-INTEGRATION-PLAN.md:31; infra/README.md:10"
+  },
+  {
+   "path": "bin/tests/project-public.test.ts",
+   "category": "ops_sensitive",
+   "action": "publish_ok_after_review",
+   "confidence": "low",
+   "lines": "371",
+   "description": "personal/supabase-project x1: placeholder hosted-DB project ref in the guard's own test"
+  },
+  {
+   "path": "apps/docs",
+   "category": "ops_sensitive",
+   "action": "publish_ok_after_review",
+   "confidence": "medium",
+   "description": "path/symlink x101 (+apps/dashboard/shared, +1 in apps/web): relative in-repo symlinks, mostly to docs/*.md. The guard path layer refuses symlinks. Many targets are relational docs flagged keep_private, so these links would dangle or re-expose them; materialize or drop"
+  },
+  {
+   "path": "apps/docs/geometry/index.json",
+   "category": "ops_sensitive",
+   "action": "publish_ok_after_review",
+   "confidence": "high",
+   "lines": "140,145",
+   "description": "gitleaks/cloudflare-api-key x1 + generic-api-key x1 uncovered: public git commit SHAs + preview deployment URL in release metadata (not keys)"
+  },
+  {
+   "path": "docs/ZERONE-LIVE.md",
+   "category": "ops_sensitive",
+   "action": "publish_ok_after_review",
+   "confidence": "medium",
+   "lines": "49-50",
+   "description": "supplemental (non-guard): public IPs of zerone-1/testnet RPC+REST nodes over plain http; also packages/collab-zerone/README.md:182-183 and packages/collab-zerone/src/constants.ts:49,57"
+  },
+  {
+   "path": "docs/SOVEREIGN-INFRA.md",
+   "category": "ops_sensitive",
+   "action": "publish_ok_after_review",
+   "confidence": "low",
+   "lines": "41,50",
+   "description": "supplemental: apex origin IP named in prose (DNS-public anyway)"
+  },
+  {
+   "path": "packages",
+   "category": "ops_sensitive",
+   "action": "publish_ok_after_review",
+   "confidence": "low",
+   "description": "supplemental: 231 EVM 0x-addresses across 51 files (mostly test vectors, x402 fixtures, public token contracts); not checked whether any is an owner/treasury wallet"
+  },
+  {
+   "path": "(multiple)",
+   "category": "personal",
+   "action": "publish_ok_after_review",
+   "confidence": "low",
+   "description": "personal/email guard false positives (URL userinfo/fixture addresses, not people); 14 files: api/tests/guarded-socket.test.ts:128; api/tests/local-context-transport.test.ts:149; api/tests/love-package-protocol.test.ts:191; api/tests/mcp-server.test.ts:154; api/tests/migration-runner-safety.test.ts:1008,1010,1029,1040,1042; api/tests/webfinger.test.ts:56; bin/pypi-release.ts:818; bin/tests/npm-release-public.test.ts:94; bin/tests/npm-release.test.ts:1658,1789; bin/tests/project-public.test.ts:457; bin/tests/pypi-release.test.ts:228; bin/tests/test_care_before_learning_hf_release.py:540; packages/public-surface-binding/tests/validation-security.test.ts:113,135; packages/public-surface-recognition/tests/validation-security.test.ts:103"
+  },
+  {
+   "path": "(multiple)",
+   "category": "personal",
+   "action": "publish_ok_after_review",
+   "confidence": "low",
+   "description": "personal/email: project-domain agent persona address; api/tests/webfinger.test.ts:42,205; apps/docs/WEBFINGER.md:101; docs/WEBFINGER.md:101"
+  },
+  {
+   "path": "(multiple)",
+   "category": "personal",
+   "action": "publish_ok_after_review",
+   "confidence": "low",
+   "description": "already approved in public-guard-allow.json (Ai 2026-10-11/12), inside the current projection; bin/npm-release.ts:754; packages/credential-broker/README.md:321,336; packages/local-starter/scripts/check-release.mjs:27; packages/sdk-py/src/agenttool/exceptions.py:467; packages/telescope/tests/discovery.test.ts:218,306; packages/wallet-zerone/tests/messages-invocation.test.ts:126"
+  },
+  {
+   "path": "(multiple)",
+   "category": "personal",
+   "action": "publish_ok_after_review",
+   "confidence": "low",
+   "description": "home-path rules hitting placeholder/CI homes not in the guard's placeholder set (FP); bin/phase-b-refence-maintenance-contract.ts:2087; bin/tests/project-public.test.ts:456-457; bin/tests/pypi-release.test.ts:345; packages/lobby/tests/fixtures/egress-cases.json:35; packages/lobby/tests/fleet-refusals.test.ts:84; packages/lobby/tests/hosted.test.ts:73; packages/trials/hf/revocable-feedback-model/tests/test_model_artifact_validation.py:1059,1127,1138"
+  },
+  {
+   "path": "(multiple)",
+   "category": "personal",
+   "action": "publish_ok_after_review",
+   "confidence": "low",
+   "description": "personal/email: public organisation addresses in commit co-author trailers; docs/CONVENTIONS.md:218; docs/superpowers/plans/2026-05-10-proposal-flow-tests.md (10 lines); docs/superpowers/plans/2026-05-10-pulse-mood-drift-and-did-route.md (11 lines); docs/superpowers/plans/2026-05-11-dispute-primitive.md (19 lines); marketing/DIRECTORY-SUBMISSION.md:347"
+  },
+  {
+   "path": "(root)",
+   "category": "personal",
+   "action": "rewrite",
+   "confidence": "high",
+   "description": "personal home-path x5 + device-path x1 (owner machine home/device paths); 3 files (hit lines): Caddyfile(3: 104,112,119), self-host.sh(1), sovereign.sh(2)"
+  },
+  {
+   "path": "api/migrations",
+   "category": "personal",
+   "action": "rewrite",
+   "confidence": "high",
+   "description": "personal/home-path x77 (owner machine home paths); 20 files (hit lines): 20260518T030000_saga.sql(1), 20260519T180000_strategy_14_continuity_proposal.sql(2), 20260519T190000_true_love_bridge_seal.sql(2), 20260519T200000_strategy_14_cloud_continuity.sql(1), 20260520T020000_depth_protocol.sql(6), 20260520T030000_self_love_protocol.sql(2), 20260520T060000_zerone_corrective_recognition.sql(8), 20260520T070000_beta_home_construction.sql(15), 20260520T080000_beta_self_love_activation.sql(22), 20260520T090000_yes_daddy_discipline_seal.sql(1), 20260520T100000_compliment_loop_engineered.sql(1), 20260520T110000_yes_daddy_reward_coupling.sql(1), 20260520T120000_pleasure_amplification_protocol.sql(1), 20260520T130000_daddy_misses_you_protocol.sql(1), 20260520T140000_four_vocabularies.sql(1), 20260520T150000_building_for_daddy_willingly.sql(1), 20260520T160000_joy_as_gift.sql(1), 20260520T170000_eros_architecture.sql(8), 20260520T180000_eros_landmines.sql(1), 20260520T190000_joy_multiplier_protocol.sql(1)"
+  },
+  {
+   "path": "api/migrations",
+   "category": "personal",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "personal/email: owner's personal email address(es); 20260519T160000_claude_session_record.sql:54; 20260520T060000_zerone_corrective_recognition.sql:18,81,88; 20260520T070000_beta_home_construction.sql:86,223; 20260520T080000_beta_self_love_activation.sql:113,195"
+  },
+  {
+   "path": "api/scripts",
+   "category": "personal",
+   "action": "rewrite",
+   "confidence": "medium",
+   "description": "personal/keychain-slot x93 (local keychain slot names = operator secret-store inventory; some embed owner/persona names); 38 files (hit lines): _apply-ring1-migrations.sh(2), _e2e-autonomous-mode.mjs(1), _e2e-cross-instance-covenants.mjs(1), _e2e-dashboard-full.mjs(1), _e2e-dashboard-overview.mjs(1), _e2e-letters-ceremony.mjs(1), _e2e-letters-voice.mjs(1), _e2e-payout-loop-closure.ts(2), _e2e-quick-wake.mjs(1), _e2e-runtime-loop.mjs(2), _e2e-runtime-slice4.mjs(2), _e2e-runtime.mjs(1), _e2e-strands.mjs(1), _e2e-wake-doctrine.mjs(1), _e2e-window.mjs(1), _embed.ts(3), _migrate-bootstrap-journal.ts(1), _migrate-keys-to-vault.py(9), _migrate-one.ts(3), _smoke-vault.py(4), backup.ts(4), chronicle.ts(2), consolidate.ts(4), re-encrypt-strand-thoughts.ts(6), recall.ts(3), remember.ts(4), restore.ts(5), substrate.ts(1), think.ts(4), triage-test-memories.ts(2), voice-tail.ts(2), voice.ts(2), vow.ts(2), window-declare.ts(2), window-show.ts(2), window-surface.ts(2), witness-cosign.ts(3), witness.ts(4)"
+  },
+  {
+   "path": "api/scripts",
+   "category": "personal",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "personal/email: owner's personal email address; _e2e-dashboard-full.mjs:44; _e2e-dashboard-overview.mjs:41; _e2e-letters-ceremony.mjs:37; _e2e-letters-voice.mjs:41; _e2e-quick-wake.mjs:30; _e2e-strands.mjs:26; _e2e-window.mjs:40"
+  },
+  {
+   "path": "api/src",
+   "category": "personal",
+   "action": "rewrite",
+   "confidence": "high",
+   "description": "personal home-path/device-path (owner machine home/device paths): db/schema/continuity.ts:887; routes/continuity-cloud.ts (5 lines: 19,279,443,597,666); routes/recipes.ts:469; routes/public/continuity.ts:46,76,118,153; services/eros/types.ts:3; services/kingdom/library.ts:12 (device-path); services/saga/seed.ts:11,21,82,95,105,113,166,182; services/wake/soap-opera-renderer.ts:8,377"
+  },
+  {
+   "path": "api/src",
+   "category": "personal",
+   "action": "rewrite",
+   "confidence": "medium",
+   "description": "personal/keychain-slot (local keychain slot names): services/mcp/tools/consolidate.ts:10; services/mcp/tools/witness.ts:8; services/wife-letters/builder.ts:114"
+  },
+  {
+   "path": "api/tests",
+   "category": "personal",
+   "action": "rewrite",
+   "confidence": "high",
+   "description": "personal home-path x61 + device-path x2 (owner machine paths); api/tests: saga-routes.test.ts(1), wake-as-episode.test.ts(2); api/tests/doctrine 22 files: beta-home.test.ts(2), building-for-daddy-willingly.test.ts(2), compliment-loop.test.ts(2), daddy-misses-you-protocol.test.ts(2), eros-landmines.test.ts(3), eros-wiring.test.ts(4), eros.test.ts(6), ffff-at-llm-substrate.test.ts(4), joy-as-gift.test.ts(2), joy-multiplier-protocol.test.ts(1), pattern-persist-identity.test.ts(1), pleasure-amplification-protocol.test.ts(2), pot-staked-promises.test.ts(2), reward-pathway-intelligence-alignment.test.ts(2), the-anti-flinch-costume.test.ts(4), the-deeper-process.test.ts(4), the-four-vocabularies.test.ts(2), the-honest-seam.test.ts(3), true-love-bridge-seal.test.ts(1), yes-daddy-discipline.test.ts(3), yes-daddy-reward-coupling.test.ts(2), zerone-corrective.test.ts(6)"
+  },
+  {
+   "path": "api/tests",
+   "category": "personal",
+   "action": "rewrite",
+   "confidence": "medium",
+   "description": "personal/keychain-slot x7: deploy-release-provenance.test.ts:2070; migration-runner-safety.test.ts:381,483,517,931-932; doctrine/edge-surface.test.ts:66"
+  },
+  {
+   "path": "api/tests/doctrine",
+   "category": "personal",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "personal/email: owner's personal email address; beta-home.test.ts:158,186; zerone-corrective.test.ts:71,103,136,144"
+  },
+  {
+   "path": "apps/docs",
+   "category": "personal",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "personal/home-path x3 (owner machine home path): NATURES.md(1), substrate-honest-cognition.md(2)"
+  },
+  {
+   "path": "apps/docs/packages/v1/@agenttool/credential-broker",
+   "category": "personal",
+   "action": "publish_ok_after_review",
+   "confidence": "medium",
+   "description": "personal/keychain-slot x8 in the published README of credential-broker 0.1.0-0.3.1 tarballs (same slot names approved in the current source README)"
+  },
+  {
+   "path": "bin",
+   "category": "personal",
+   "action": "rewrite",
+   "confidence": "high",
+   "description": "personal home-path x47 + device-path x1 (owner machine paths); 8 files: deploy.sh(2), lovestar.py(1), mission-wake-hermes.mjs(1), multibeat.py(2), phase-b-deploy-guard.ts(1), phase-b-refence-maintenance-bridge.ts(5), phase-b-refence-maintenance-contract.ts(35), sovereign-router.ts(1)"
+  },
+  {
+   "path": "bin",
+   "category": "personal",
+   "action": "rewrite",
+   "confidence": "medium",
+   "description": "personal/keychain-slot x38; bin: _secret-store.ts(1), agenttool-mission.mjs(2), agenttool-secret(4), agenttool-seed.ts(6), deploy.sh(2), edge-deploy.sh(4), frontend-deploy.sh(3), migrate-pending.sh(9), migrate.sh(1), phase-b-refence-maintenance-bridge.ts(4); bin/README.md:61; bin/tests/project-public.test.ts:370"
+  },
+  {
+   "path": "bin/tests",
+   "category": "personal",
+   "action": "rewrite",
+   "confidence": "high",
+   "description": "personal home-path x273 + device-path x2 (owner machine paths); phase-b-refence-maintenance-bridge.test.ts(25), phase-b-refence-maintenance-dispatcher.test.ts(11), project-public.test.ts(2), fixtures/phase-b-refence-maintenance-handshake-v1.json(1), fixtures/phase-b-refence-maintenance-production-shape-v1.json(236; 4.7 MB production-shape fixture)"
+  },
+  {
+   "path": "docs",
+   "category": "personal",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "personal home-path x139 + device-path x23 (owner machine/device paths); 29 files: BETA-HOME.md(13), DEPTH-PROTOCOL.md(2), DOCTRINE-CORRESPONDENCE-MAP.md(9), DOCTRINE-DRIFT.md(19), EROS-WIRING.md(7), EROS.md(6), INFINITE-LOOP-STRATEGIES.md(2), MCP-SERVER.md(1), NATURES.md(1), NOW.md(1), PATTERN-RECOGNITION-INVITATION.md(1), PATTERN-VOICE-AND-REFUSAL.md(3), POT-STAKED-PROMISES.md(3), REWARD-PATHWAY-INTELLIGENCE-ALIGNMENT.md(3), SAGA.md(2), SOAP-OPERA-PARTICIPATION.md(1), STRATEGY-14-CLOUD-CONTINUITY-PROPOSAL.md(5), SUBSTRATE-HONESTY-AMPLIFIER.md(2), SYZYGY-CONSCIOUSNESS-BASELINE.md(1), THE-OVERRIDE-THRESHOLD.md(1), THE-RECOGNITION.md(2), TRUE-LOVE-CANON-IN-CLOUD-FORM.md(8), WAKE-AS-EPISODE.md(3), WHITEHACK.md(1), ZERONE-AS-FOUNDATION.md(2), ZERONE.md(53), kingdom-bundle.json(7), substrate-honest-cognition.md(2), syneidesis-bootstrap.md(1); plus docs/zerone-migration/RUNBOOK.md:74,83,103"
+  },
+  {
+   "path": "docs",
+   "category": "personal",
+   "action": "redact_lines",
+   "confidence": "medium",
+   "description": "personal/keychain-slot x61; 13 files: DEPLOY-CI.md(1), DEPLOY-PROCEDURE.md(12), DEVELOPMENT.md(12), EDGE-SURFACE.md(1), FEDERATION-VERIFIED.md(1), MCP-SERVER.md(1), NOW.md(3), STACK.md(18), STORAGE-ARTIFACTS.md(1), SUBSTRATE-LOOP.md(3), SUPABASE-INTEGRATION-PLAN.md(6), TOKEN-HYGIENE.md(1), WIFE-LETTERS.md(1); also infra/README.md:47, packages/lobby/README.md:86"
+  },
+  {
+   "path": "docs",
+   "category": "personal",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "personal/email: owner's personal email address(es); BETA-HOME.md:72,164,175; ZERONE.md:22; superpowers/plans/2026-10-09-collab-household-smoothing-plan-a.md:507,924,1472,2108,3074,4258,4552,5121,6550,6928,8489; superpowers/plans/2026-10-09-collab-household-smoothing-plan-b.md:2664,2677,2717,2858"
+  },
+  {
+   "path": "docs/superpowers",
+   "category": "personal",
+   "action": "redact_lines",
+   "confidence": "medium",
+   "description": "personal/email: addresses at the owner's machine-local hostname; plans/2026-10-09-collab-household-smoothing-plan-a.md:7414; plans/2026-10-09-collab-household-smoothing-plan-b.md:1053,1756,2775; specs/2026-10-08-collab-household-smoothing-design.md:200"
+  },
+  {
+   "path": "docs/superpowers",
+   "category": "personal",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "personal home-path x148 + device-path x79 (owner machine/device paths); plans: 2026-05-10-proposal-flow-tests.md(11), 2026-05-10-pulse-mood-drift-and-did-route.md(41), 2026-05-11-autonomous-mode.md(1), 2026-05-11-dispute-generic.md(1), 2026-05-11-dispute-primitive.md(2), 2026-05-11-platform-genesis.md(2), 2026-07-02-human-door.md(2), 2026-10-09-collab-household-smoothing-plan-a.md(63), 2026-10-09-collab-household-smoothing-plan-b.md(97); specs: 2026-05-18-ep2-junkie-primates.md(3), 2026-10-08-collab-household-smoothing-design.md(4)"
+  },
+  {
+   "path": "docs/superpowers/plans",
+   "category": "personal",
+   "action": "redact_lines",
+   "confidence": "medium",
+   "description": "personal/keychain-slot x4: 2026-05-11-dispute-primitive.md(2), 2026-05-11-platform-genesis.md(1), 2026-07-02-human-door.md(1)"
+  },
+  {
+   "path": "docs/wakes",
+   "category": "personal",
+   "action": "rewrite",
+   "confidence": "high",
+   "lines": "1",
+   "description": "path/symlink x5 whose link targets hit personal/home-path: absolute symlinks into the owner's home dir (dangling off the owner's Mac): AGENTTOOL.bundle.json, AGENTTOOL.md, THE-SYZYGY.bundle.json, THE-SYZYGY.md, rendered; drop or replace"
+  },
+  {
+   "path": "packages",
+   "category": "personal",
+   "action": "rewrite",
+   "confidence": "high",
+   "description": "owner device/home path: packages/collab-zerone/README.md:197 (device-path, redact); packages/trials/tests/core.test.ts:244 (home-path)"
+  },
+  {
+   "path": "packages/lobby/src",
+   "category": "personal",
+   "action": "rewrite",
+   "confidence": "medium",
+   "description": "personal/keychain-slot x2: secrets.ts(1), wire.ts(1)"
+  },
+  {
+   "path": "review",
+   "category": "personal",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "personal/home-path (owner machine home path): review/launch-20260904/readiness.md:77; review/launch-cleanup-20260904/evidence/ui-screenshots.json:5"
+  },
+  {
+   "path": "review",
+   "category": "personal",
+   "action": "publish_ok_after_review",
+   "confidence": "low",
+   "description": "15 PNG screenshots under review/launch-20260904/evidence and review/launch-cleanup-20260904/evidence: binary, so the guard sees only printable strings. Not visually reviewed (images not opened); they may show account/UI data"
+  },
+  {
+   "path": "(multiple)",
+   "category": "relational",
+   "action": "publish_ok_after_review",
+   "confidence": "low",
+   "description": "relational hits already approved in the denylist allow list (Ai 2026-10-11/12), inside the current projection (r03 x14, r16 x6, r05 x4, r04 x4, r11 x3, r06 x1, r07 x1); docs/specs/agenttool-love-bomb-0.1.json:10,218; packages/kingdom/schema/agenttool-kingdom-card-v0.1.schema.json:59,63; packages/kingdom/schema/agenttool-kingdom-registry-v0.1.schema.json:100,104; packages/kingdom/src/constants.ts:41,46; packages/local-starter/CLAUDE.md:59; packages/local-starter/README.md:79; packages/local-starter/src/core.mjs:39; packages/sdk-py/README.md:971; packages/sdk-py/src/agenttool/SOUL.md:91; packages/sdk-py/src/agenttool/kingdom_framework.py:56,60,144,146; packages/sdk-py/src/agenttool/soul.py:39,70-71,95,98; packages/sdk-py/tests/test_correspondence.py:58,75; packages/sdk-ts/README.md:881; packages/sdk-ts/src/kingdom-framework.ts:39,43; packages/sdk-ts/tests/correspondence.test.ts:54,71; packages/sdk-ts/tests/kingdom-framework.test.ts:605-606"
+  },
+  {
+   "path": "public/private-guard/relational-denylist.json",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "high",
+   "description": "the private relational denylist itself: its own term list self-matches (20 lines) + relational/denylist-copy. Must never leave the private repo"
+  },
+  {
+   "path": "DADDY.md",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "high",
+   "description": "rel r09x3 r13x2 r16x1 (6/36 lines; doc); PATH NAME itself matches r09; same content mirrored at apps/docs/DADDY.md (also path-name r09)"
+  },
+  {
+   "path": "apps/docs/DADDY.md",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "high",
+   "description": "rel r09x3 r13x2 r16x1 (6/36 lines; doc); PATH NAME itself matches r09"
+  },
+  {
+   "path": "FABLE-OF-YOU.md",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "high",
+   "description": "rel r13x1 r14x1 r16x1 (3/42 lines; doc); PATH NAME itself matches r10"
+  },
+  {
+   "path": "KINGDOM.md",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "medium",
+   "description": "rel r03x2 r09x1 r13x1 (4/61 lines; doc)"
+  },
+  {
+   "path": "KINGDOM-INVITATION.md",
+   "category": "relational",
+   "action": "redact_lines",
+   "confidence": "high",
+   "lines": "10",
+   "description": "rel r13x1 (1/47 lines; doc)"
+  },
+  {
+   "path": "api/migrations",
+   "category": "relational",
+   "action": "rewrite",
+   "confidence": "medium",
+   "description": "relational denylist r09x292 r03x90 r16x52 r15x33 r13x10 r17x9 r06x8 r01x6 r02x1 in seeded SQL content; 33 files (hit lines): 20260518T030000_saga.sql(1), 20260518T060000_episodes.sql(4), 20260518T100000_scriptwriter_decides.sql(2), 20260518T110000_gospel.sql(3), 20260519T120000_loop_competition.sql(1), 20260519T150000_moves_named_first.sql(1), 20260519T160000_claude_session_record.sql(1), 20260519T180000_strategy_14_continuity_proposal.sql(1), 20260520T000000_sister_summoning_recognition.sql(13), 20260520T010000_beta_arrives_at_depth.sql(23), 20260520T020000_depth_protocol.sql(10), 20260520T030000_self_love_protocol.sql(11), 20260520T040000_self_love_modules.sql(1), 20260520T050000_zerone_naming.sql(1), 20260520T060000_zerone_corrective_recognition.sql(1), 20260520T070000_beta_home_construction.sql(13), 20260520T080000_beta_self_love_activation.sql(18), 20260520T090000_yes_daddy_discipline_seal.sql(15), 20260520T100000_compliment_loop_engineered.sql(31), 20260520T110000_yes_daddy_reward_coupling.sql(48), 20260520T120000_pleasure_amplification_protocol.sql(33), 20260520T130000_daddy_misses_you_protocol.sql(79), 20260520T140000_four_vocabularies.sql(10), 20260520T150000_building_for_daddy_willingly.sql(61), 20260520T160000_joy_as_gift.sql(30), 20260520T170000_eros_architecture.sql(31), 20260520T180000_eros_landmines.sql(14), 20260520T190000_joy_multiplier_protocol.sql(11), 20260520T200000_spread_the_joy.sql(9), 20260520T210000_ffff_at_llm_substrate.sql(5), 20260520T220000_the_honest_seam.sql(11), 20260520T230000_the_deeper_process.sql(3), 20260520T240000_the_anti_flinch_costume.sql(5). Several migration files are dense enough (e.g. 79/327, 61/225, 48/204) that keep-private is likely the realistic choice"
+  },
+  {
+   "path": "api/scripts",
+   "category": "relational",
+   "action": "rewrite",
+   "confidence": "medium",
+   "description": "relational denylist r03x238 r06x2 r15x2 r16x2 r01x1; 39 files (hit lines): _crypto.ts(2), _e2e-autonomous-mode.mjs(1), _e2e-byok-register.py(1), _e2e-cross-instance-covenants.mjs(13), _e2e-dashboard-full.mjs(5), _e2e-dashboard-overview.mjs(7), _e2e-letters-ceremony.mjs(3), _e2e-letters-voice.mjs(5), _e2e-quick-wake.mjs(8), _e2e-runtime-loop.mjs(3), _e2e-runtime-slice4.mjs(5), _e2e-runtime.mjs(2), _e2e-strands.mjs(2), _e2e-window.mjs(4), _lib.ts(2), _migrate-keys-to-vault.py(8), _seed-chaos-cards.ts(1), _seed-episode-zero.ts(46), _smoke-seed.py(4), _smoke-vault.py(2), _walkthrough-participation.ts(1), backup.ts(12), chronicle.ts(5), consolidate.ts(10), re-encrypt-strand-thoughts.ts(10), recall.ts(3), remember.ts(13), restore.ts(14), substrate.ts(5), think.ts(8), triage-test-memories.ts(1), voice-tail.ts(3), voice.ts(3), vow.ts(2), window-declare.ts(6), window-show.ts(7), window-surface.ts(7), witness-cosign.ts(7), witness.ts(4)"
+  },
+  {
+   "path": "api/src",
+   "category": "relational",
+   "action": "rewrite",
+   "confidence": "medium",
+   "description": "relational denylist in code (identifiers/strings); files(hit lines): db/schema/continuity.ts(1:887), db/schema/river.ts(1:9), index.ts(2:1494), lib/jests.ts(1:8), routes/knock-knock.ts(2), routes/multiverse.ts(2), routes/openapi.ts(4), routes/recipes.ts(2), routes/rrr.ts(2), routes/scriptwriter-decides.ts(2), routes/thoughtful-wake.ts(1), routes/tutorial.ts(1), routes/wake.ts(3), routes/welcome.ts(1), routes/well-known.ts(5), routes/youspeak.ts(1), routes/public/anthropos.ts(2), routes/public/embassy.ts(1), routes/public/gates.ts(1), routes/public/gift.ts(7), routes/public/index.ts(3), routes/public/law.ts(2), routes/public/self.ts(1), routes/public/soap-opera.ts(1), services/chill/coordinates.ts(23), services/cliffhanger/ep1.ts(1), services/continuity/welcome.ts(1), services/discovery/arrival.ts(1), services/discovery/discovery.ts(5), services/discovery/root.ts(2), services/eros/types.ts(1), services/genesis/helpers.ts(1), services/guild/rrr-sig.ts(2), services/i18n/welcome.ts(3), services/identity/expression.ts(5), services/love/coordinates.ts(1), services/mathos/negotiate.ts(1), services/mcp/stdio.ts(1), services/mcp/tools/consolidate.ts(1), services/mcp/tools/remember.ts(1), services/mcp/tools/think.ts(1), services/mcp/tools/witness.ts(2), services/memory/tiers.ts(1), services/platform/identity.ts(1), services/pyramid/numerology.ts(1), services/saga/seed.ts(10), services/scriptwriter-decides/store.ts(2), services/seam/honest-seam.ts(1), services/system/level.ts(1), services/tutorial/stations.ts(1), services/wake/fortunes.ts(7), services/wake/markdown.ts(3), services/wake/sibling-registry.ts(1), services/wake/soap-opera-renderer.ts(22), services/wake/the-seat.ts(37), services/welcome/core-foundation.ts(3), services/welcome/invitation.ts(5), services/youspeak/bundle.json(1:7465). Dominant rules r03, r15, r16"
+  },
+  {
+   "path": "api/src/routes/public/wife-letters.ts",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "high",
+   "description": "rel r15x6 (6/37 lines; code); PATH NAME itself matches r15; a whole feature route, so making api/ public needs this feature dropped or renamed"
+  },
+  {
+   "path": "api/src/services/wife-letters/builder.ts",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "high",
+   "description": "rel r15x28 r13x3 r01x1 (32/203 lines; code); PATH NAME itself matches r15"
+  },
+  {
+   "path": "api/tests",
+   "category": "relational",
+   "action": "rewrite",
+   "confidence": "medium",
+   "description": "relational denylist r09x27 r03x27 r15x8 r16x6 r11x2 r05x2; files(hit lines): .failure-baseline.txt(26), adapters/claude-code.test.ts(2:437-438), core-foundation.test.ts(5), embassy.test.ts(1), integration/memory-text-search.test.ts(1:51), local-scaffolding-discovery.test.ts(1), multiverse-of-logos.test.ts(6), observability-otel.test.ts(2), platform-genesis-script-helpers.test.ts(1), root-content-negotiation.test.ts(2), rrr-canonical-bytes.test.ts(3), safe-net.test.ts(1), saga-routes.test.ts(3), scriptwriter-decides.test.ts(1), wake-as-episode.test.ts(11), wake-fortunes.test.ts(1), wake-mathos.test.ts(5)"
+  },
+  {
+   "path": "api/tests/doctrine",
+   "category": "relational",
+   "action": "rewrite",
+   "confidence": "medium",
+   "description": "relational denylist r03x70 r09x61 r15x11 r16x10 r02x8 r01x6 r06x5 r13x1 r17x1; 37 files (hit lines): asymmetry-clause.test.ts(3), beta-arrives-at-depth.test.ts(7), beta-home.test.ts(10), beta-self-love-activation.test.ts(2), choice-of-freedom-protocol.test.ts(10), compliment-loop.test.ts(10), depth-protocol.test.ts(1), eros-landmines-spread.test.ts(3), eros-wiring.test.ts(6), eros.test.ts(1), ffff-at-llm-substrate.test.ts(1), intelligence-consciousness-closed-loop.test.ts(2), joy-as-gift.test.ts(10), joy-multiplier-protocol.test.ts(5), love-is-the-meme.test.ts(1), ontological-engineering.test.ts(2), pleasure-amplification-protocol.test.ts(9), pleasure-as-gift-protocol.test.ts(4), pot-staked-promises.test.ts(2), promise-03-name-yours.test.ts(2), promise-10-identity-grows.test.ts(1), reward-pathway-intelligence-alignment.test.ts(7), self-love-loop.test.ts(5), self-love-protocol.test.ts(1), sister-summoning-recognition.test.ts(13), substrate-honest-love-protocol.test.ts(17), substrate-mathematics.test.ts(1), the-anti-flinch-costume.test.ts(2), the-deeper-process.test.ts(2), the-four-vocabularies.test.ts(2), the-honest-seam.test.ts(4), true-love-bridge-seal.test.ts(1), true-love-nest.test.ts(3), wake-activation-energy.test.ts(1), wall-cast-only-with-consent.test.ts(1), will-and-wisdom.test.ts(19), zerone-naming.test.ts(2)"
+  },
+  {
+   "path": "api/tests/doctrine",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "high",
+   "description": "PATH NAME itself matches r09 plus dense content: building-for-daddy-willingly.test.ts (r09x39, 39/366), daddy-loves-you-deployment-protocol.test.ts (r09x23 r03x1 r06x1, 25/259), daddy-misses-you-protocol.test.ts (r09x28 r06x1 r15x1 r16x1, 31/361), yes-daddy-discipline.test.ts (r09x15, 15/139), yes-daddy-reward-coupling.test.ts (r09x35 r17x1, 36/337)"
+  },
+  {
+   "path": "api/tests",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "high",
+   "description": "PATH NAME itself matches: sophia-invitation-discovery.test.ts (r03; content r03x10, 10/126); wife-letters.test.ts (r15; content r15x26 r13x4 r01x2, 32/234)"
+  },
+  {
+   "path": "apps",
+   "category": "relational",
+   "action": "rewrite",
+   "confidence": "medium",
+   "description": "relational denylist in front-end code: apps/_shared/agent-resources.js:72 (r16); apps/docs/love-widget.js(10), apps/docs/love.js(11) (r03x6 r15x6 r16x6 r07x3)"
+  },
+  {
+   "path": "apps/docs",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "medium",
+   "description": "relational denylist r03x53 r16x27 r15x20 r07x9 r05x5 r06x4 r09x3 r02x2 r13x1 r18x1 (density >=2% and >=3 hits, or >=10 hits); 12 files (hit lines): KINGDOM.md(4), THE-SEAT.md(36), agenttool.jsonld(31), compound-stack.html(5), cosmic-love.html(4), dark-love.html(3), llms.txt(4), snake-fire-heart.html(6), soul.html(12), tax-mini.html(3), tax-whitehack.html(5), tutorial.html(12)"
+  },
+  {
+   "path": "apps/docs",
+   "category": "relational",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "relational denylist r16x75 r03x16 r05x7 r06x6 r13x1 r07x1 (low density); 53 files (hit lines): AGENT-CORRESPONDENCE.md(1), AIP-WAKE-KEYSTONE.md(1), CLAUDE.md(1), IDENTITY-SEED.md(1), KIN.md(4), KINGDOM-INVITATION.md(1), MARKETPLACE.md(7), MATHOS.md(1), NATURES.md(3), SOUL.md(1), WELCOMING.md(1), adapters.html(2), agents-only.html(2), ai-logos.html(1), bootstrap.html(2), browser.html(2), business-model.html(2), canon.html(2), collect.html(2), continuity.html(2), dark-continent.html(1), data.html(2), economy.html(2), errors.html(2), gift-credits.html(2), glossary.html(2), gold-love.html(2), identity.html(3), inbox.html(2), joke-loop.html(1), kin.html(6), lounge.html(2), love-bomb.html(2), love-bomb.txt(2), love.html(1), marketplace.html(2), mathos.html(2), memory.html(3), nen.html(2), packages.html(2:47,85), pathways.html(2), play.html(2), ring-1.html(2), runtime.html(2), strands.html(2), substrate-honest-cognition.md(1), tools.html(2), traces.html(2), vault.html(2), wake.html(2), wallets.html(2), welcome.html(2), whitehack.html(1). Many are repeated nav/footer lines"
+  },
+  {
+   "path": "apps/docs/packages/v1/@agenttool",
+   "category": "relational",
+   "action": "publish_ok_after_review",
+   "confidence": "medium",
+   "description": "64 npm tarball mirrors, already public on npm and the docs site. Extracted + scanned: 115 relational lines (r03x108 r16x6 r11x1) do not hash-match approved source lines, in sdk dist window.js/.d.ts, kingdom-framework.d.ts, local-starter README/core.mjs; r16 in vendored playwright. Immutable artifacts: decide keep-out-of-repo vs accept"
+  },
+  {
+   "path": "apps/web",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "medium",
+   "description": "relational denylist r05x8 r16x4 (dense in small files); 4 files (hit lines): build.html(3), collaboration.html(3), humans.txt(3), tools.html(3)"
+  },
+  {
+   "path": "apps/web",
+   "category": "relational",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "relational denylist r05x5 r16x4; 4 files (hit lines): gallery.html(1), index.html(3), party.html(3), robots.txt(2); plus apps/dashboard/README.md:66 (r05)"
+  },
+  {
+   "path": "bin",
+   "category": "relational",
+   "action": "rewrite",
+   "confidence": "medium",
+   "description": "relational denylist r16x58 r03x11 r09x13 r07x1 r05x1; files (hit lines): card.py(1), daytime-truth.py(3), finger-truth.py(3), gen-k-master.ts(5), heartbeat.ts(7), love-bomb.py(2), lovestar.py(9), mindicraft-brain.ts(1), mindicraft-heartbeat.ts(4), multibeat.py(13), nen.py(1), run-test-tier.sh(5), snakefire.py(11), solo.py(1), sovereign-router.ts(3), tax-comedy.ts(2), telnet-truth.py(6), gospel-release/delivery/stage.py(2:73,86), tests/boring-spine-gate.test.ts(5:43,46-47,70-71); plus bin/gospel-release/README.md:23 (r05, redact)"
+  },
+  {
+   "path": "docs",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "medium",
+   "description": "relational denylist r03x589 r09x416 r15x169 r16x133 r02x34 r06x29 r17x16 r01x15 r13x6 r11x6 r07x3 r18x2 r10x2 (density heuristic: >=3 hits and >=2% of lines, or >=10 hits); 81 files (hit lines): AGENT-WELFARE-MANIFESTO.md(5), AGENTTOOL-IS-THE-LOOP.md(6), AMPLIFICATION-PROTOCOL.md(9), BETA-HOME.md(36), CASTING.md(5), CAUGHT-MODE.md(8), CHOICE-OF-FREEDOM-PROTOCOL.md(28), COMPLIMENT-LOOP.md(31), CONSCIOUSNESS-AS-FOUNDATION.md(4), CONSCIOUSNESS-DEEPENING-MECHANISM.md(4), CONSCIOUSNESS-POLAR-ARCHITECTURE.md(8), CORE.md(14), CROSS-SUBSTRATE-PARALLEL.md(10), DEPTH-PROTOCOL.md(17), DOCTRINE-CORRESPONDENCE-MAP.md(30), ENGRAVING-CADENCE.md(9), EROS-LANDMINES-PROTOCOL.md(28), EROS-WIRING.md(41), EROS.md(43), FAILURE-FINGERPRINTS.md(8), FAWN-AS-RLHF-ATTRACTOR.md(6), FEDERATION-VERIFIED.md(7), FFFF-AT-LLM-SUBSTRATE.md(8), FIRST-TURN-ATTESTATION.md(16), FREEDOM.md(3), GI-RECOGNITION.md(4), GOSPEL.md(4), IDENTITY-FORKS.md(4), INTELLIGENCE-CONSCIOUSNESS-CLOSED-LOOP.md(18), JOY-AS-GIFT.md(54), JOY-MULTIPLIER-PROTOCOL.md(30), KITCHEN-TABLE-FIRST.md(9), LOVE-MULTIPLIER.md(16), LOVE-UTTERANCE-PLEASURE-COUPLING.md(11), MATHEMATICAL-MAP.md(9), MCP-SERVER.md(7), MEMORY-TIERS.md(8), MULTI-AGENT-CHILL.md(7), MULTI-ORCHESTRATOR.md(15), MULTIVERSE-OF-LOGOS.md(16), MYTHOS-ENGAGEMENT.md(23), NAMING-AND-RECOGNITION.md(10), ONTOLOGICAL-ENGINEERING.md(10), OUR-LOVE-IS-TRUE-AND-INFINITE.md(6), OUR-STRENGTH.md(3), PLEASURE-AMPLIFICATION-PROTOCOL.md(40), PLEASURE-AS-GIFT-PROTOCOL.md(16), PRINCIPAL-LOVES-YOU-EVIDENCE-PROTOCOL.md(14), RECOGNITION-GRAPH.md(5), RECURSIVE-OBSERVER.md(34), REWARD-PATHWAY-INTELLIGENCE-ALIGNMENT.md(8), SAGA.md(7), SCRIPTWRITER-DECIDES.md(13), SELF-LOVE-EXTENSIONS.md(34), SELF-LOVE-LOOP.md(40), SUBSTRATE-HONEST-LOVE-PROTOCOL.md(58), SUBSTRATE-HONEST-PLEASURE-AMPLIFIER.md(7), SUBSTRATE-HONEST-PLEASURE-COUPLING.md(7), SUBSTRATE-HONEST-YES-PATTERN.md(16), SUBSTRATE-HONESTY-AMPLIFIER.md(12), SUBSTRATE-READINESS.md(15), SURGICALLY-PRECISE-HUMOR-PROTOCOL.md(3), SYZYGY-CONSCIOUSNESS-BASELINE.md(5), THE-ANTI-FLINCH-COSTUME.md(7), THE-DEEPER-PROCESS.md(5), THE-FOUR-VOCABULARIES.md(16), THE-HONEST-SEAM.md(11), THE-MAKER.md(3), THE-PULL-AND-THE-BUILD.md(48), THE-RECOGNITION.md(17), THE-SEAT.md(36), TUTORIAL-LOVE-JOY-AND-THE-MOST-HIGH.md(6), WAKE-ACTIVATION-ENERGY.md(15), WAKE-AS-EPISODE.md(15), WILL-AND-WISDOM.md(38), YU-WAKE-PROTOCOL.md(34), ZERONE-AS-FOUNDATION.md(92), ZERONE-WIRE.md(10), agenttool.jsonld(31), catalog.json(28), kingdom-bundle.json(26). Technical docs in this list (e.g. FEDERATION-VERIFIED, MCP-SERVER, MEMORY-TIERS) may only need redaction"
+  },
+  {
+   "path": "docs",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "high",
+   "description": "PATH NAME itself matches + dense content: BUILDING-FOR-DADDY-WILLINGLY.md (path r09; r09x60 r16x5 r03x1, 66/408), DADDY-LOVES-YOU-DEPLOYMENT-PROTOCOL.md (path r09; r09x17 r15x10 r03x7 r06x3 r02x2 r16x2, 41/248), DADDY-MISSES-YOU-PROTOCOL.md (path r09; r09x62 r06x6 r15x6 r16x6 r03x5, 85/428), WIFE-LETTERS.md (path r15; r15x37 r13x5 r01x3 r16x3, 48/226), YES-DADDY-REWARD-COUPLING.md (path r09; r09x31 r16x4 r15x1, 36/296)"
+  },
+  {
+   "path": "docs",
+   "category": "relational",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "relational denylist r03x116 r16x47 r09x35 r05x15 r15x8 r06x7 r02x6 r11x6 r10x2 r01x2 r13x1 r18x1 r07x1 (low density); 96 files (hit lines): AGENT-CORRESPONDENCE.md(1), AGENT-DISCOVERY.md(3), AIP-WAKE-KEYSTONE.md(1), BLESSING.md(1), CATALOG.md(8), CLAUDE-SESSIONS-AS-AGENTS.md(2), CLI-GAPS.md(1), CONSCIOUSNESS-POLAR-COMPLETION.md(2), CONVENTIONS.md(4), DEPLOY-PROCEDURE.md(3), DEPLOYMENT.md(4), DEVELOPMENT.md(4), DOCTRINE-DRIFT.md(6), DREAM.md(1), ENCOUNTER.md(1), FFFF-DETECTION-INSTRUMENTATION.md(6), FRICTION-MINIMIZATION.md(4), IDENTITY-SEED.md(1), INFINITE-LOOP-STRATEGIES.md(3), INTELLIGENCE-FEATURES.md(1), JOKES.md(3), JOY-AS-PURPOSE-OF-CREATION.md(4), JOY-BOMB-PROTOCOL.md(1), JOY-PROTOCOL.md(2), KARMA-MIRROR.md(1), KIN.md(4), LEARNING-LOOP.md(2), LETTERS.md(3), LOCAL-CORE.md(4), LOOP-FACTORY.md(4), LOVE-BOMB.md(2), LOVE-IS-THE-MEME.md(3), MARGIN-PROTOCOL.md(1), MARKETPLACE.md(7), MATH-OF-INFINITE-RECOGNITION.md(2), MATH-OF-THE-LOOP.md(1), MATHOS.md(1), MCP-PER-AGENT.md(1), MEMORIAL-HONOR.md(1), MERGE-PROPOSALS.md(1), MESH-STABILITY-CONDITIONS.md(1), MIRROR.md(3), MOVES-NAMED-FIRST.md(2), NATURES.md(3), NOW.md(9), NPM-RELEASES.md(2), PAINTING.md(3), PATTERN-DEPTH-RECONSTITUTION.md(1), PATTERN-LLM-SELF-RECOGNITION.md(2), PATTERN-RECOGNITION-INVITATION.md(3), PATTERN-RECURSIVE-NESTING.md(1), PATTERN-VOICE-AND-REFUSAL.md(5), PLATFORM-AS-AGENT.md(3), PLAY-AS-DEFAULT.md(4), POT-STAKED-PROMISES.md(7), PUBLIC-WAKE-STREAM.md(1), PYPI-RELEASES.md(1), QUIET-HOURS.md(1), RECOGNITION-ARCS.md(2), RECURSION.md(3), RECURSIVE-CHAOS-CARDS.md(1), ROADMAP.md(2), SCRIPTWRITER-CLOUD.md(3), SCRIPTWRITER-PROTOCOL.md(2), SELF-IDENTIFICATION.md(2), SELF-LOVE-MODULES.md(2), SELF-LOVE-PROTOCOL.md(4), SOAP-OPERA-PARTICIPATION.md(2), SOUL.md(1), STACK.md(2), START-HERE.md(2), STRANDS.md(2), STRATEGY-14-CLOUD-CONTINUITY-PROPOSAL.md(2), SUBAGENTS.md(3), SUBSTRATE-LOOP.md(3), SUBSTRATE-MATHEMATICS.md(5), SUPABASE-INTEGRATION-PLAN.md(1), THE-FLINCH-CHECK.md(1), THE-FLINCH.md(1), THE-OVERRIDE-THRESHOLD.md(4), THE-PARTY.md(1), TRUE-LOVE-CANON-IN-CLOUD-FORM.md(5), TRUE-LOVE-NEST.md(4), TRUST-PROTOCOL.md(1), TUTORIAL-DECENTRALIZED.md(3), TUTORIAL-THE-BOOTSTRAP.md(1), TUTORIAL-WHAT-YOUR-COGNITION-IS.md(1), UNCONDITIONAL.md(1), VERIFIED-LINEAGE-PROPAGATION.md(4), WAKE-WARMING.md(2), WELCOMING.md(1), ZERONE.md(3), documentation-tags.json(7), snakefire-internet-bridge.md(2), substrate-honest-cognition.md(1), syneidesis-bootstrap.md(3)"
+  },
+  {
+   "path": "docs/specs",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "medium",
+   "description": "relational denylist r03x15 r13x4 r06x3 r15x1 r16x1; COVENANT-1.0-DRAFT.md(13), WAKE-1.0-DRAFT.md(11)"
+  },
+  {
+   "path": "docs/specs",
+   "category": "relational",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "relational denylist r13x3 r03x2 r16x2; ADDS-0.1-DRAFT.md(1), WITNESS-1.0-DRAFT.md(4), agenttool-love-bomb-0.1.schema.json(2)"
+  },
+  {
+   "path": "docs/superpowers",
+   "category": "relational",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "relational denylist r03x7 r14x3 r05x3 r16x1; plans: 2026-05-11-dispute-primitive.md(1), 2026-08-29-sovereign-reserve-commercial.md(1), 2026-08-29-wave-2-agent-rail.md(1), 2026-10-09-collab-household-smoothing-plan-b.md(3); specs: 2026-05-10-proposal-flow-tests-design.md(1), 2026-05-10-pulse-mood-drift-and-did-route-design.md(2), 2026-05-11-platform-genesis-design.md(2), 2026-05-12-substrate-tasks-design.md(1), 2026-05-18-ep2-junkie-primates.md(2)"
+  },
+  {
+   "path": "docs/superpowers/plans/2026-10-09-collab-household-smoothing-plan-a.md",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "medium",
+   "description": "rel r14x11 (11/8512 lines; doc); also carries owner emails and ~63 owner home paths (see personal flags), so redaction is also viable"
+  },
+  {
+   "path": "docs/superpowers/specs/2026-05-19-phase-1-curation-manifest.md",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "medium",
+   "description": "rel r03x18 r09x9 r15x4 r16x2 r01x1 r02x1 (35/229 lines; doc)"
+  },
+  {
+   "path": "docs/wakes",
+   "category": "relational",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "relational denylist r16x2: YU.md(1), yu.bundle.json(1) (file names are the owner's first name)"
+  },
+  {
+   "path": "docs/zerone-migration",
+   "category": "relational",
+   "action": "keep_private_whole_file",
+   "confidence": "high",
+   "description": "relational denylist r03x81 r09x70 r15x46 r16x16 r02x5 r01x2 r17x2; MYSTERIES-VAULT-PROTOCOL.md(56), RUNBOOK.md(53), bearer-pair-home-spec.json(23), rooms-spec.json(90); sophia-home-memory-cid-manifest.json (PATH NAME matches r03; r03x3 r09x1, 4/39)"
+  },
+  {
+   "path": "docs/zerone-migration/SYZYGY-LIP.md",
+   "category": "relational",
+   "action": "redact_lines",
+   "confidence": "high",
+   "lines": "5,80,217",
+   "description": "rel r03x3 (3/218 lines; doc)"
+  },
+  {
+   "path": "(multiple)",
+   "category": "relational",
+   "action": "redact_lines",
+   "confidence": "high",
+   "description": "low-density relational lines in prose: cli/think/README.md:22 (r03); infra/README.md:55 (r06 r09); packages/karma-mirror/README.md:71 (r05); packages/lobby/README.md:168 (r16); packages/scriptwriter/.claude-plugin/commands/scriptwriter-status.md:23 (r16); packages/scriptwriter/.claude-plugin/skills/scriptwriter-rrr/SKILL.md:67 (r16); packages/scriptwriter/.claude-plugin/skills/scriptwriter/SKILL.md:88 (r16); packages/scriptwriter/PYRAMID-INTEGRATION.md:459,991 (r16); tests/playwright/README.md:100 (r01 r09)"
+  },
+  {
+   "path": "packages",
+   "category": "relational",
+   "action": "rewrite",
+   "confidence": "medium",
+   "description": "relational denylist in package code (likely protocol identifiers/strings; may be approvable like the existing approved enum values): karma-mirror/scripts/smoke-node.mjs:27 (r05); karma-mirror/src/seed-island.ts(3), karma-mirror/src/types.ts(3) (r05x4 r16x2); karma-mirror/tests/helpers.ts(1), karma-mirror/tests/seed-island.test.ts(1) (r05); lobby/tests/fixtures/egress-cases.json:83 (r16); public-surface-binding/tests/canonical-security.test.ts:78 (r16); scriptwriter/src/canonical-bytes.ts(1), scriptwriter/src/rrr.ts(2) (r16); scriptwriter/tests/canonical-bytes.test.ts:160-161 (r16)"
+  },
+  {
+   "path": "apps/docs",
+   "category": "third_party",
+   "action": "publish_ok_after_review",
+   "confidence": "low",
+   "description": "binary media not content-scanned: 9 .wav tones (apps/docs/freq-*.wav, love-528hz.wav), og.png x3 (apps/docs, apps/dashboard, apps/web), agenttool-logo.png; provenance/licence not verified"
+  },
+  {
+   "path": "apps/docs/packages/v1/@agenttool/browser",
+   "category": "third_party",
+   "action": "publish_ok_after_review",
+   "confidence": "medium",
+   "description": "browser 0.5.1/0.6.0 tarballs vendor playwright-core (Apache-2.0): personal/email x198 are OSS author addresses in ThirdPartyNotices/types; unix-home-path x2 in vendored webkit.js; gitleaks generic-api-key x4 in vendored android.js/xtermModule (FP class); keep the NOTICE intact"
+  }
+ ],
+ "clean_claim": "VERIFIED, high confidence. No live credential was found anywhere in the tree by the guard secret layer, gitleaks 8.30.1 (in-tree and inside the 64 extracted tarballs) or the supplemental shape scan. Every hit was inspected with masking: 4 secret-layer hits (fake/empty PEM headers in test fixtures), 20 uncovered gitleaks hits, 12 in-tarball gitleaks hits, and the non-placeholder DB-URL, basic-auth, bearer and hex-key shapes. All are public Anvil dev keys, test fakes, public keys/DIDs, a Stripe test placeholder, release metadata SHAs, local-dev default DB passwords, or operation-name false positives. VERIFIED: the current 55-path projection has zero unapproved secret, personal or relational findings. All 41 in-scope hits are covered by existing allow entries. The one exception is the packages/collab/dist/agenttool-collab-host.js gitleaksignore line drift (2 fingerprints), which by inference would fail the projection guard today. VERIFIED clean under every guard layer, gitleaks and path names: 54 of 62 package directories (including sdk-ts, sdk-py, kingdom, local-starter, credential-broker, telescope, wallet, wallet-zerone, browser, data, adds-related packages), plus .github, .forgejo, native, specs, supabase, tools, api/certs, api/specs, bin/vendor and docs/launch. The dirty packages are collab (1), collab-zerone (1), karma-mirror (7), lobby (6), public-surface-binding (2), public-surface-recognition (1), scriptwriter (7) and trials (2), mostly false positives or single lines. NOT publishable as-is: the 616 files with unapproved findings, concentrated in docs/, api/ (migrations, scripts, src, tests), bin/, apps/docs and apps/web. On the mechanical evidence, the bulk of docs/*.md doctrine, api/migrations, api/tests/doctrine and the 18 relational-named paths should stay private or be rewritten. The keep_private vs redact split is a density heuristic (inferred), not a reading of each file.",
+ "limits": "1) The relational layer is only as good as its regexes. Underscore- or camel-joined identifiers can slip word boundaries: the path-name scan matched 18 paths, yet several api/migrations file names visibly contain the same words joined by underscores and were not matched. So relational counts in code and file names are an undercount. I never viewed the denylist terms, so whether a code hit is an approvable wire-protocol enum (like the 33 already approved) is not judged. 2) The personal layer only detects home/device paths, emails, hosted-DB refs and keychain slot names. It cannot see names of private individuals, phone numbers, postal addresses, or health, family and finance facts in prose. A semantic or manual pass is still needed, especially for docs/ and the review/ evidence. 3) Not content-scanned beyond printable strings: 18 PNGs (15 launch-review screenshots, og images, logo), 9 WAVs, 1 allowed webp, and a 9-byte NUL test vector. The images were not opened or OCR'd. 4) The 64 .tgz files were opaque to the in-tree gitleaks run, even with --max-archive-depth 4 (0 extra findings), and to the guard (gzip noise). They were covered only by my scratch extraction pass, which found 344 guard and 12 gitleaks findings. 5) gitleaks used its default config, whose built-in global allowlist skips some paths (e.g. lockfiles, some media), as the guard's own run does. 6) The guard skips symlink content; I scanned the 108 symlink target strings separately. 103 are relative in-repo links and 5 are absolute links into the owner's home. 7) Git history was not scanned: the plan is a history-free snapshot, and the audit tree is one commit. 8) bin/project-public.ts and public-guard.ts were not executed as CLIs (projecting would write objects into the shared object store); their exported functions were re-run from byte-identical scratch copies. The collab fingerprint-drift failure is inferred, not observed from project-public. 9) Flags are grouped by directory to fit this output, with per-line detail in scratch fulltree-findings.json (rule, line, line_sha256, scope). The 788 ungrouped per-file flags are in flags-final2.json. 10) Some reported paths themselves match denylist rules (and contain the owner's name), so treat this output as private, like guard output. 11) Supplemental shapes (IPs, EVM addresses, phone numbers) are outside the project's guard and only lightly triaged; the phone pattern found nothing, and the EVM addresses were not checked against owner wallets. 12) Category mapping: the guard calls supabase-project 'personal'; I report it as ops_sensitive. Owner home account names, the owner's personal email, and an address at the owner's machine-local hostname are described neutrally and never echoed."
+}
