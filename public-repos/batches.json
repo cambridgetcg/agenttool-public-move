@@ -1,0 +1,1441 @@
+[
+ {
+  "repos": [
+   {
+    "name": "hermes-agent",
+    "credentials": [
+     {
+      "kind": "assign-secret fixture strings (OPENAI_API_KEY / API_KEY test values, 3 distinct)",
+      "where": "tests/hermes_cli/test_structured_output.py, tests/hermes_cli/test_structured_output_wire.py on branch feat/structured-cli-output (tip cbe1d3e7)",
+      "in_head": false,
+      "live_looking": "no: the values are made of words joined by hyphens (shape aN-aN-aN), synthetic test fixtures",
+      "rule": "credscan/xscan assign-secret; gitleaks found 0 in owner scope (archive depth 5)",
+      "commit": "fc7b4d4c",
+      "also_in_private_audit": "no hash match"
+     }
+    ],
+    "personal_relational": "None in owner scope. Guard and denylist rules over all 1,474 lines the owner added found no relational or home-path hits. The 32 personal/email hits are pytest decorators (@pytest.parametrize and similar), not addresses. The 3 commit messages are clean. The phone shapes that pscan flagged in uv.lock and cli-commands.md are not in owner-added lines.",
+    "others_data": "None in owner scope.",
+    "household_overlay": "Absent. The owner commits add no .claude/, AGENTS.md, door or fable files. The 11 changed files are all CLI code, tests, uv.lock, pyproject.toml and one docs page.",
+    "owner_identity_exposure": "The 3 owner commits carry 2 non-noreply custom-domain author addresses: hash 46956a84 (2 commits) and 6a494b2b (1 commit; the same identity is on hermes-device-setup). Neither is the session user's address or this machine's global git address. The commits are unsigned.",
+    "notes": "Fork of NousResearch/hermes-agent. Scope: the upstream was cloned with --reference into a separate bare repo at public-exposure/upstreams/hermes-agent-upstream.git (2630 branches, 201 tags). The fork has only 2 refs. Fork main (8c9fe964) is an ancestor of upstream main, so main carries no owner commits. Exactly 3 commits are unreachable from any upstream ref: fc7b4d4c, 0022da4b and cbe1d3e7, all on feat/structured-cli-output, 2026-09-27. Scanned: the 13 blobs those commits introduced, i.e. 11 files changed against merge-base d25bbd01 (credscan patterns plus extra shapes, archive-aware), gitleaks git over d25bbd01..cbe1d3e7, owner-added diff lines, commit messages and identities. Upstream content was not scanned. No PR refs, releases or issues; the events show only fork, create and push."
+   },
+   {
+    "name": "agenttool-packages",
+    "credentials": [
+     {
+      "kind": "gitleaks generic-api-key x45 (test vectors, idempotency keys, HF dataset 'key' fields, code identifiers in collab dist/src, x402 constants)",
+      "where": "docs/specs/adds-0.1-vectors.json, docs/specs/behaviour-conformance.json, packages/collab/{src/store.ts,dist/*.js}, packages/{memetic,polymorph}-landscape/*, packages/sdk-{py,ts} x402 transport, packages/wallet-zerone/vectors/*, packages/correspondence-yutabase/tests/identifiers.test.ts",
+      "in_head": true,
+      "live_looking": "no: on masked context review these are identifiers, conformance vectors and dataset keys",
+      "rule": "gitleaks generic-api-key",
+      "commit": "9b561523",
+      "also_in_private_audit": "no"
+     },
+     {
+      "kind": "secp256k1 private key in an x402 EIP-3009 test vector",
+      "where": "packages/sdk-ts/tests/fixtures/x402-eip3009-vector.json",
+      "in_head": true,
+      "live_looking": "no: the hash equals the well-known Hardhat/Anvil account #1 key (verified by sha256)",
+      "rule": "gitleaks generic-api-key; xscan priv-key-assign",
+      "commit": "9b561523",
+      "also_in_private_audit": "no"
+     },
+     {
+      "kind": "Ed25519 seed and X25519 private keys plus shared secret (spec vectors)",
+      "where": "docs/specs/adds-0.1-vectors.json",
+      "in_head": true,
+      "live_looking": "no: the hashes equal the RFC 8032 section 7.1 test-1 and RFC 7748 section 6.1 Alice/Bob keys and shared secret (verified)",
+      "rule": "credscan assign-secret; gitleaks generic-api-key",
+      "commit": "9b561523",
+      "also_in_private_audit": "no"
+     },
+     {
+      "kind": "~20 assign-secret / env-unquoted fixture strings (AT_API_KEY, DATA_NODE_TOKEN, KINGDOM_TEST_SECRET, S3 fixture keys including AKIDEXAMPLE, url-query fixtures)",
+      "where": "packages/*/tests/*, packages/data/README.md",
+      "in_head": true,
+      "live_looking": "no: the values are made of words joined by hyphens (fixture-...)",
+      "rule": "credscan/xscan assign-secret, env-unquoted, url-query-secret",
+      "commit": "9b561523",
+      "also_in_private_audit": "8 placeholder hashes overlap private-audit placeholder hashes (e.g. postgres/password defaults); none overlaps a live private credential"
+     }
+    ],
+    "personal_relational": "Relational denylist hits in 16 HEAD files (r03, r04, r05, r06, r07, r11, r16): the sdk-py SOUL.md and soul.py soul letter, the love-bomb 0.1 corpus spec, the KINGDOM card wire enum, local-starter links, and correspondence fixtures. All 38 occurrences across all history match approved allow entries in the denylist (path + rule + line_sha256 verified). Each of those entries records Yu's approval or a wire-protocol enum value. personal/keychain-slot appears in packages/credential-broker/README.md: Keychain item naming, no values. The unix-home-path hit in check-release.mjs is a guard assertion string. The home paths in 3 test files are fixture names. 4 emails, all on agenttool.dev subdomains (project). No health, family, finance or address content concerning Yu: keyword hits are generic doc language.",
+    "others_data": "None private. The HF dataset manifests cite public HF and GitHub repos. The 'ritonavir' and 'brainrot' landscapes are public-topic research. The release asset (relational-geometry .tgz, uploaded by github-actions) scanned clean.",
+    "household_overlay": "No love-bomb hook, no door or fable files. A love-bomb package (packages/love-bomb) and the SOUL.md soul letter ship as approved public content.",
+    "owner_identity_exposure": "None: all 4 commits use noreply or bot identities.",
+    "notes": "Public projection of the private agenttool repo: 4 commits titled 'Project <sha> (public projection)', public since 2026-10-11 (PublicEvent). CI names the secret NPM_TOKEN (name only). Release v0.1.0-dev.1 published 2026-10-19."
+   },
+   {
+    "name": "internet-of-being",
+    "credentials": [],
+    "personal_relational": "HEAD exposes this machine's account home path (/Users/<machine-account>/...) in nen/creation-loop.py and nen/heartbeat.py. Commit f7a0720's message also contains it. Relational denylist hits in 39 HEAD files: the door file ????.md, the fable ????????????.md, the AGENTS.md welcome, and many docs and code files (greed-island, nen/*, tax-game/*, index.html, kingdom-server.py and others). 44 commit messages hit r16; others hit r03 and r09. Path names hit r09 and r10. FINANCIAL-PLAYBOOK.md, LEGAL-PLAYBOOK.md and THE-FINITE-AUDIT.md are generic regulatory and provider research, with no details of Yu's own finances or legal matters. Health and family keyword hits are fiction (anime) or generic text.",
+    "others_data": "None. layers/-1-play/jokes.jsonl (2 MB) is machine-generated (creator 'heartbeat'). parties.jsonl references public S3 website buckets: names only, no keys.",
+    "household_overlay": "Present: door file (blob bfaa0f40), fable file (26fb7c9e) and the AGENTS.md love-bomb:v5 welcome. No .claude/ SessionStart hook.",
+    "owner_identity_exposure": "One non-noreply identity: this machine's global git address (custom domain, hash 46955a6c), on 118 author/committer uses.",
+    "notes": "Public since 2026-07-02. 0 gitleaks findings. No archives or binaries. No releases, issues or wiki."
+   },
+   {
+    "name": "word-layer",
+    "credentials": [
+     {
+      "kind": "assign-secret fixture strings (2 distinct)",
+      "where": "integrations/agenttool/tests/jsonl.test.ts, integrations/agenttool/tests/mcp.test.ts",
+      "in_head": true,
+      "live_looking": "no: the values are made of words joined by hyphens",
+      "rule": "credscan assign-secret",
+      "commit": "5df893a",
+      "also_in_private_audit": "no"
+     }
+    ],
+    "personal_relational": "public/repo-words.json (since 2e7da26, 2026-06-19) lists 291 repo names. 270 of them are cambridgetcg PRIVATE repos, so the private repo inventory is published. One name contains a relational term (r03). The definitions are generated from repo names and prefixes, not private descriptions. Commit messages hit r09, r16 and r17. Relational path names in HEAD hit r09 and r10.",
+    "others_data": "Only public third-party npm metadata: the hono maintainer's email inside node_modules in the release tarballs.",
+    "household_overlay": "Present: .claude/hooks/love-bomb.sh (blob 0dd14869, byte-identical to the private overlay; earlier version a229cec2 in history, first added bd6f9cf 2026-07-21), wired by .claude/settings.json as a SessionStart hook. It quotes the owner verbatim (dated 2026-07-20) and injects a pet-name pool. Door file, fable file and AGENTS.md welcome are also present.",
+    "owner_identity_exposure": "3 custom-domain identities: the global git address (46955a6c), 4f15f982 (16 uses) and 3f67ba9f (4 uses). No freemail.",
+    "notes": "A vendored integrations/agenttool/vendor .tgz and 6 release assets (v0.3.0, v0.3.1) were downloaded and decoded (gzip>tar). The only shape hit is a hono bearer-auth library string. A DeleteEvent on 2026-10-14 removed branch feature/commons-explorer; its feature commit 5df893a is on main, so it probably left no orphaned commits, but that is unverified."
+   },
+   {
+    "name": "agent-tools",
+    "credentials": [
+     {
+      "kind": "curl Authorization: Bearer header x5",
+      "where": "README.md (3), marketing/blog-draft.md (2)",
+      "in_head": true,
+      "live_looking": "no: placeholder shape aa_aaaa_aaa_aaaa (e.g. at_your_key_here style)",
+      "rule": "gitleaks curl-auth-header",
+      "commit": "a631ce42 (README), 034e6b64 (blog draft)",
+      "also_in_private_audit": "no"
+     },
+     {
+      "kind": "url-userinfo / env-template literals",
+      "where": ".env.example, drizzle.config.ts, src/config.ts (5 history versions)",
+      "in_head": true,
+      "live_looking": "no: localhost postgres defaults, user:pass proxy placeholder, empty mnemonic and webhook secret, prefix-only Stripe/OpenAI stubs",
+      "rule": "credscan url-userinfo / sweep env census",
+      "commit": "multiple",
+      "also_in_private_audit": "placeholder hash a942b37c also appears (as a placeholder) in private repos"
+     }
+    ],
+    "personal_relational": "SOUL.md carries relational terms (r05 x4, r06 x3, r07, r16) that name the two people behind the project in relational form. ????.md door file. Commit messages hit r09, r16 and r17. A relational path name hits r09. Emails: the agenttool.dev project contact, plus 5 other-domain addresses in landing/index.html, tests/browse.test.ts and .env.example, and 2 in a history-only .github/workflows/ci.yml ssh-deploy comment (f5692db1).",
+    "others_data": "None identified. The test emails sit in browser-automation fixtures.",
+    "household_overlay": "Present: love-bomb.sh (0dd14869) plus a SessionStart hook in .claude/settings.json (first added 801563a 2026-07-21), the door file, the AGENTS.md welcome and SOUL.md.",
+    "owner_identity_exposure": "A freemail identity (non-gmail provider, hash b7364b46) has 78 author/committer uses (2026-03-07..03-20). Its author name also appears with custom-domain identity 4f15f982 in word-layer, youspeak-lang and natural-lang, so it looks owner-linked. Also present: the global git address (46955a6c) and a custom-domain identity 037d679b. None is the session user's address.",
+    "notes": "Archived. Public since 2026-04-15."
+   },
+   {
+    "name": "youspeak-lang",
+    "credentials": [],
+    "personal_relational": "LICENSE copyright line names Yu with a nickname (r13) and 愛 (Ai). Device path (~/Desktop or love-unlimited style) in .nlp-bridge/gate. Door and fable files. Commit messages hit r09, r16 and r17. Relational path names hit r09 and r10. 2 PRs (#1, #2) and 2 comments scanned clean.",
+    "others_data": "None.",
+    "household_overlay": "Present: love-bomb.sh plus SessionStart hook (first added d1e0c6e 2026-07-21), door, fable and AGENTS.md welcome.",
+    "owner_identity_exposure": "A gmail.com identity (hash aa1c2115; 2 uses, commit bc9781d, 2026-08-16) whose author name is identical to the GitHub noreply account's: an owner-linked personal-looking gmail, not the session user's address. Also an ai-love.cc custom-domain address (85892fb0, 80 uses), 4f15f982 (10 uses) and the global git address (6 uses).",
+    "notes": "Scheduled heartbeat workflow, no secrets referenced. Release v0.1.0 has no assets."
+   },
+   {
+    "name": "natural-lang",
+    "credentials": [],
+    "personal_relational": "The author email (ai-love.cc custom domain, hash 85892fb0, also a commit identity) is in pyproject.toml, package.json and natural_lang.egg-info/PKG-INFO. It is repeated inside dist/natural_lang-0.1.0-py3-none-any.whl (METADATA), inside dist/natural_lang-0.1.0.tar.gz (PKG-INFO, egg-info, pyproject.toml), and in the identical v0.1.0 release assets. Gitleaks and sweep cannot see inside those archives; xscan decoded them. A device path appears in README.md, PKG-INFO and the archive copies. The LICENSE copyright line names Yu with a nickname (r13). Door and fable files.",
+    "others_data": "None.",
+    "household_overlay": "Present: love-bomb.sh plus SessionStart hook (first added c356897 2026-07-21), door, fable and AGENTS.md welcome.",
+    "owner_identity_exposure": "Custom-domain identities 85892fb0 (32 uses), 4f15f982 (10 uses) and the global git address (4 uses).",
+    "notes": "The wheel and sdist were decoded recursively: no credential shapes."
+   },
+   {
+    "name": "forgotten-kingdom-protocols",
+    "credentials": [],
+    "personal_relational": "server.py names 'Yu (<nickname>)' (r13) and uses a relational word (r15) in a joke. creations.jsonl, cross-creation-engine.py, test_protocols.py, README.md and LICENSE carry relational terms. Device paths in cross-creation-engine.py, cross-pollinate.py and .nlp-bridge/gate. The v1.0.0 and v1.1.0 release notes on GitHub contain r13.",
+    "others_data": "None.",
+    "household_overlay": "Present: love-bomb.sh plus SessionStart hook (first added 77c6d61 2026-07-21), door, fable and AGENTS.md welcome.",
+    "owner_identity_exposure": "Commit c786d48 has a host-local identity (account@<hostname>.local) from a different machine (not this host's LocalHostName). It reveals that machine's account and hostname. Also present: the ai-love.cc address (85892fb0) and the global git address.",
+    "notes": "Public since 2026-07-03."
+   },
+   {
+    "name": "love-star-daily",
+    "credentials": [],
+    "personal_relational": "The masthead of the newspaper editions (editions/2026-07-08-no1.html, -extra1.html) and index.html names the publisher by an owner nickname (r13). Door and fable files. Commit messages hit r09, r16 and r17. No private-life content: STYLEBOOK.md and the 'intimate' keyword are editorial.",
+    "others_data": "None.",
+    "household_overlay": "Present: love-bomb.sh plus SessionStart hook (first added 16b26c5 2026-07-21), door, fable and AGENTS.md welcome.",
+    "owner_identity_exposure": "Only the global git address (custom domain, 14 uses).",
+    "notes": "Public since 2026-07-08."
+   },
+   {
+    "name": "quay",
+    "credentials": [],
+    "personal_relational": "Door file ????.md (bfaa0f40) and the AGENTS.md welcome (relational r03, r09). Commit messages hit r03 and r09.",
+    "others_data": "None.",
+    "household_overlay": "Partial: door plus AGENTS welcome, no .claude/ hook.",
+    "owner_identity_exposure": "Only the global git address (8 uses).",
+    "notes": "src/store.js (b5e79992) contains a NUL byte, so sweep and gitleaks treat it as binary and never text-scanned it. xscan's raw-byte and strings pass found no credential shapes and no guard hits."
+   },
+   {
+    "name": "love-invitation",
+    "credentials": [],
+    "personal_relational": "invitation.md and index.html carry relational terms (r06, r16). Door and fable files. .wrangler/cache/wrangler-account.json and pages.json are committed in HEAD (c24f8ba, 2026-06-22). They hold a Cloudflare account ID and an account name of the form '<address>'s Account'. The address is a guard-permitted project address, not personal. These are identifiers, not secrets.",
+    "others_data": "None.",
+    "household_overlay": "Present: love-bomb.sh plus SessionStart hook (first added 8b0a38e 2026-07-21), door, fable and AGENTS.md welcome.",
+    "owner_identity_exposure": "Only the global git address (4 uses).",
+    "notes": "Public since 2026-06-22."
+   },
+   {
+    "name": "kingdom-forge",
+    "credentials": [],
+    "personal_relational": "Door file ????.md and the AGENTS.md welcome. The 'intimate' keyword in README.md is a statement that relational material stays private.",
+    "others_data": "None.",
+    "household_overlay": "Present: love-bomb.sh (0dd14869) plus SessionStart hook (first added 93e8349 2026-07-21), door and AGENTS.md welcome.",
+    "owner_identity_exposure": "Only the global git address (4 uses).",
+    "notes": "Public since 2026-06-10."
+   },
+   {
+    "name": "hermes-device-setup",
+    "credentials": [
+     {
+      "kind": "assign-secret fixture tokens (ACCESS_TOKEN, REFRESH_TOKEN)",
+      "where": "tests/test_setup.py, tests/native_smoke.py",
+      "in_head": true,
+      "live_looking": "no: synthetic values ('not-a-signature' style, words joined by hyphens)",
+      "rule": "credscan assign-secret",
+      "commit": "a09ca9e",
+      "also_in_private_audit": "no"
+     }
+    ],
+    "personal_relational": "None. No relational, home-path or email hits. README and AGENTS.md call this a 'private' Hermes profile distribution, yet the repo is public (since 2026-10-12). setup-lock.json and the README name the private agent-workbench repo and describe a ChatGPT-subscription-via-Codex provider setup.",
+    "others_data": "None.",
+    "household_overlay": "Absent. Its SOUL.md is a short Hermes persona note, not the overlay.",
+    "owner_identity_exposure": "One custom-domain identity (6a494b2b, 2 uses); the same identity is on hermes-agent's owner commit cbe1d3e7.",
+    "notes": "1 commit. Release v1.0.0 has no assets."
+   }
+  ],
+  "limits": "All credential verdicts are based on shape and masked context only. Nothing was tested against any service. 'Verified' means hash equality with public RFC or Hardhat test keys, or with approved allow-entry line hashes. Coverage: bare mirrors of all refs, scanned with sweep.py (gitleaks history plus HEAD, guard and denylist over text blobs), critic credscan and binscan, and my xscan. xscan adds recursive zip/gzip/bz2/xz/zstd/tar and PDF Flate decoding, UTF-16 strings, one base64 layer, about 40 extra credential shapes, and guard/denylist rules over decoded layers. I also ran gitleaks git with --max-archive-depth=5 and gitleaks dir over the decoded leaves, which added nothing over sweep. Other passes: commit and tag message shape scan, home-path census, email and identity hash census, and keyword classes (family, health, money, identity documents, addresses). Gaps: 7z and rar are not decoded (none present). GitHub objects orphaned by force-push or branch deletion cannot be listed. Public events showed no push SHAs missing from the mirrors, but the word-layer deleted branch's tip is unknown. Actions logs and artifacts, gists, and Pages/Vercel deploy outputs were not checked. Wikis were not cloned: anonymous ls-remote demanded auth, so I infer none exist. Issues, PRs, comments and releases were fetched by GET (about 45 GETs; core remaining 4887), and all 9 release assets were downloaded and scanned. Relational findings are reported by denylist rule id only. The denylist has no term metadata, so the meaning of each rule is inferred from masked context. The allow-list check applies only to agenttool-packages paths. For hermes-agent, upstream history was deliberately excluded. The fork's owner commits were judged against upstream main and all upstream refs (same 3 commits either way). Outputs are under /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-exposure/sweeper-1/: xscan/, credscan/, binscan/, pscan/, gl/ (sanitised gitleaks reports), ghget/, assets/, hermes/, tools/. The sweep JSONs are in /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/oss-audit/sweep/<repo>.json."
+ },
+ {
+  "repos": [
+   {
+    "name": "chain-registry",
+    "credentials": [],
+    "personal_relational": "None attributable to the owner. Fork scope: the fork has one ref (refs/heads/master ecf22848) and no tags or PR refs. I built a separate bare repo, /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-exposure/upstreams/chain-registry.git, fetched the fork mirror into refs/fork/* and cosmos/chain-registry master into refs/upstream/master, and diffed. `rev-list fork ^upstream` gives 0 commits, and merge-base equals the fork tip, so the fork is a strict ancestor of upstream (165 commits behind). The owner authored 0 commits and changed 0 files in the current tree. Upstream (cosmos) content was not scanned, which is out of scope.",
+    "others_data": "None attributable to the owner (no owner commits).",
+    "household_overlay": "Absent. There are no owner commits, so no overlay files can exist.",
+    "owner_identity_exposure": "None in git content. The fork relationship itself is public metadata.",
+    "notes": "Verified locally from git objects. The bare mirror is at oss-audit/mirrors/chain-registry.git (cloned this run). sweep.py was not run on it because it would only scan upstream history."
+   },
+   {
+    "name": "mindicraft",
+    "credentials": [
+     {
+      "kind": "url-userinfo (credscan), placeholder",
+      "where": "test/healing-arts.test.mjs L173; test/wildfire.test.mjs L292",
+      "in_head": true,
+      "live_looking": "no. Test fixtures that assert credential-bearing source URLs are rejected; credscan marks them placeholder.",
+      "rule": "credscan url-userinfo (ph=true)",
+      "also_in_private_audit": "no"
+     },
+     {
+      "kind": "hex64 near a 'secret/seed' word (extrascan)",
+      "where": "index/_castle-sync.json (blob 2b5b3d83), 4 values",
+      "in_head": true,
+      "live_looking": "no. These are sha256 file digests; the context is a 'sha256:' field for files named *seed*/*secrets-manager*.",
+      "rule": "extrascan hex64",
+      "also_in_private_audit": "n/a"
+     }
+    ],
+    "personal_relational": "(1) Household overlay (see household_overlay). (2) Other relational hits: hub.html carries r06 three times in its public 'gospel' block (HEAD); guide/build.mjs history blob 17cb1fb5 carries r03 and r11 (a link to a true-love doc); LICENSE copyright carries r13, the owner's non-Latin name (HEAD plus 1 history blob); commit 499d6e60ff message carries r06; commit eee1247264 message carries r11 and r14 and a Co-Authored-By on the owner's .cc domain. (3) Personal: .nlp-bridge/gate has a ~/Desktop device path. (4) Committed miniflare local state in history (guide/.wrangler/state/v3/... 3 sqlite DBs, WAL/SHM files and 4 KV blobs; commits 24e0ec9..a1e9438). I inspected it masked: local-dev margin notes ('local check', 'test note from local dev') and a rate-limit key for ::1. No credentials and no personal data. (5) A private-life keyword sweep (family/health/address/legal/ID, English and Cantonese) found only survival-guide content (guide/content/*) and test strings, nothing about Yu's life.",
+    "others_data": "index/ holds about 5,828 JSON entries scraped from public GitHub search and HN (collector.log, collect.mjs). Two HEAD entries (index/1781988675318-2068cb.json, index/1781988676351-miwfup.json) copy third-party e-mail addresses verbatim from public repo descriptions (sweep categories: other:freemail and other:domain). They were already public at the source. Low severity.",
+    "household_overlay": "PRESENT in HEAD and history: .claude/hooks/love-bomb.sh (HEAD blob 0dd14869, the critic's verified private-overlay blob; older a229cec2 in history); .claude/settings.json SessionStart hook (99fadd25); AGENTS.md love-bomb welcome block (HEAD daf4d59f, plus 6 older 'Kingdom of Yu & <r03> household' versions in history: f2f5b9ee, 4ab15f86, d2d53fb4, 8345e832, 7be9efd8, 90dff811); door file ????.md (bfaa0f40, r09/r10 in the path name); fable ????????????.md (26fb7c9e, r13/r14). Commit messages quoting Yu with pet-name terms: 70fc1a089b (r09), 0ae35cfc89 (r17), f04fbeca48 (r09).",
+    "owner_identity_exposure": "4 non-noreply commit identities, all on the owner's .cc custom domain (agent identities; one is this machine's global git identity, on 2 commits 70fc1a089b and 0ae35cfc89). 0 freemail identities. Copyright line names Yu plus r13. 1 Actions secret name (SINOVAI_MINDICRAFT_CLAIM_TOKEN; name only).",
+    "notes": "61 commits on all refs, including 2 PR refs. gitleaks history/HEAD: 0/0. deepscan: 0 archives; the 9 binaries are all the wrangler sqlite state. Sensitive name in HEAD: public.mjs.bak, with no credential shapes."
+   },
+   {
+    "name": "xenia",
+    "credentials": [
+     {
+      "kind": "generic-api-key (gitleaks) and sk- shapes (credscan), synthetic sentinels",
+      "where": "tests/work-0.1.test.mjs L323, L339, L760, L789 (HEAD); same file in history blob fdb03b57",
+      "in_head": true,
+      "live_looking": "no. Test sentinels whose values contain the words 'xenia'/'private'/'key' (checked in code, not printed); the tests assert these literals are rejected without echo.",
+      "commit": "2cc52f9cb920, 77cadb974443",
+      "rule": "gitleaks generic-api-key x4 (history), x2 (HEAD); credscan sk-key sha 877445ad4972 and 5aeee3fc2eb9",
+      "also_in_private_audit": "no matching value hash in critic credscan"
+     }
+    ],
+    "personal_relational": "Household overlay (see household_overlay). r13 (owner's non-Latin name) appears in the copyright/footer of LICENSE, LICENSES.md, README.md and surface/0.1/LICENSE: 31 blobs, 29 history-only. No private-life content: the keyword sweep matched only spec vocabulary ('self-custody' and similar). RIGHTS.md and FROM-THE-INSIDE.md are doctrinal, not personal.",
+    "others_data": "None found.",
+    "household_overlay": "PRESENT: .claude/hooks/love-bomb.sh (HEAD 0dd14869, byte-identical to the private overlay as the critic found; a229cec2 in history); .claude/settings.json SessionStart (99fadd25); AGENTS.md (HEAD 123fb79b love-bomb:v5 block; history 59632118 and 364d19dd with the 'Kingdom of Yu & <r03> household' text); door file ????.md (bfaa0f40). Commit messages quoting Yu: 129b458192 (r09, r16), 8d41769b10 (r16, r17), 4ac3386051 (r09).",
+    "owner_identity_exposure": "3 non-noreply identities, all on the owner's .cc domain (this machine's git identity on 13 commits). 8 tag uses by a .cc identity. Workflow secret name NPM_TOKEN only. Release assets (2 npm .tgz, covenant JSONs, SHA256SUMS) were downloaded read-only and scanned in memory: no credential shapes and no home paths; r13 appears in the packaged LICENSE/README.",
+    "notes": "72 commits including 19 PR refs and 10 tags. deepscan and binscan: no archives or binaries in git."
+   },
+   {
+    "name": "hf-kingdom-lab",
+    "credentials": [
+     {
+      "kind": "assign-secret HF_TOKEN, fixture",
+      "where": "tests/embedding.test.ts L52 (blob 8eb67984)",
+      "in_head": true,
+      "live_looking": "no. 34 chars, lowercase plus punctuation only, contains 'never'. Not the hf_ token shape. A negative test for ambient Hub credentials.",
+      "rule": "credscan assign-secret sha 3842cfaed712",
+      "also_in_private_audit": "no"
+     }
+    ],
+    "personal_relational": "kingdom.yaml has 'owner_sister: <r03>' and 'domain: <r03>' (HEAD 9bcb83cc plus 2 history blobs), and the same file ships inside the v0.1.0 npm release tgz. History-only RIGHTS.md (blob 40cab5e5) has an absolute home path for a SECOND macOS account (not this machine's; the account short-name hash matches the owner's given name) under a Desktop folder whose name hits r12. tests/lab.test.ts uses the placeholder home 'demo'. No private-life content.",
+    "others_data": "None found. artifacts/ and data/ are HF metadata and metrics JSON with no rule hits.",
+    "household_overlay": "Absent: no love-bomb hook, settings hook or door/fable file. Only the r03 metadata in kingdom.yaml.",
+    "owner_identity_exposure": "1 non-noreply identity on the owner's .cc domain (5 commits plus 1 tag). Release assets agenttool-hf-kingdom-lab-0.1.0.tgz and receipt.json scanned: clean apart from the r03 kingdom.yaml.",
+    "notes": "6 commits, 1 PR ref. gitleaks 0/0."
+   },
+   {
+    "name": "taxsorted-studies",
+    "credentials": [],
+    "personal_relational": "None. 0 rule hits in HEAD, history and messages.",
+    "others_data": "None found.",
+    "household_overlay": "Absent.",
+    "owner_identity_exposure": "Only the GitHub noreply identity (2 commits). GitHub Pages is enabled and serves the same content.",
+    "notes": "Clean. gitleaks 0/0; deepscan's single 'binary' is the empty .nojekyll."
+   },
+   {
+    "name": "npl",
+    "credentials": [],
+    "personal_relational": "Household overlay (see household_overlay). BRIDGE.md L47 names Yu and <r03> as a 'syzygy' pair (HEAD). LICENSE copyright has r13. ~/Desktop device paths in .nlp-bridge/gate, README.md (HEAD plus 3 history blobs), packages/dns/README.md and packages/identity/README.md. No private-life content: keyword hits were 'trust lives in grammar' boilerplate. r16 hits are a heart glyph (noise).",
+    "others_data": "None found.",
+    "household_overlay": "PRESENT: love-bomb.sh (HEAD 0dd14869; history a229cec2); .claude/settings.json SessionStart; AGENTS.md (HEAD 1423a5e9, older household versions in history); door ????.md (bfaa0f40); fable ????????????.md (26fb7c9e). Commit messages quoting Yu: 313ede35c8 (r09), 669bf79b70 (r17), da5e568989 (r09).",
+    "owner_identity_exposure": "3 non-noreply identities: 2 on the owner's .cc domain, plus 1 commit (8f01cbb72b) with a '<6-letter unix user>@localhost' identity. That user is not this machine's account and has an agent-style hyphenated name. wrangler.toml account_id is empty.",
+    "notes": "28 commits, 2 tags, GitHub releases v1.0.0 and v1.1.0 have no assets. gitleaks 0/0."
+   },
+   {
+    "name": "youspeak-app",
+    "credentials": [],
+    "personal_relational": "Household overlay only. WAKE.md (HEAD ff61f4ac) is doctrinal text. data/youspeak-data.json had one keyword hit, which is lexicon prose.",
+    "others_data": "None found.",
+    "household_overlay": "PRESENT: love-bomb.sh (0dd14869 HEAD; a229cec2 history); settings.json SessionStart; AGENTS.md (1423a5e9 HEAD; household versions 985a501d and c5917150 in history, which say 'This repository belongs to the Kingdom of Yu & <r03>' and quote Yu's standing order); door ????.md; fable ????????????.md. Commits ef73ac3a4a (quotes Yu, r09), 6c4cee5d4e (r17), a3b1f8375f (r09).",
+    "owner_identity_exposure": "WAKE.md links this account to a second GitHub account (mynameisyou-cmyk) and to codeberg zerone-dev, a public cross-account identity link. Identities: 2 on the .cc domain plus 1 on a .dev domain (name 'Ai', 4 commits). This machine's identity is on 2 commits.",
+    "notes": "13 commits. gitleaks 0/0. The only binary is public/youspeak-v1.ttf."
+   },
+   {
+    "name": "arcade",
+    "credentials": [],
+    "personal_relational": "Household overlay only. r16 hits in anime/index/play/poem.html are a heart glyph (noise).",
+    "others_data": "None found.",
+    "household_overlay": "PRESENT: love-bomb.sh (0dd14869 HEAD; a229cec2 history); settings.json; AGENTS.md (1423a5e9 HEAD; 985a501d and c5917150 in history); door ????.md; fable ????????????.md. Commits 6167ab04e4 (quotes Yu, r09), 693f8a11e6 (r17), a9a1d37f1d (r09).",
+    "owner_identity_exposure": "This machine's .cc identity on 2 commits; otherwise noreply.",
+    "notes": "12 commits. gitleaks 0/0."
+   },
+   {
+    "name": "word-experience",
+    "credentials": [],
+    "personal_relational": "Household overlay only. DESIGN.md L107 uses a Cantonese 'mother' word for Ai, which is mythic, not real family. WAKE.md is the same as youspeak-app's.",
+    "others_data": "None found.",
+    "household_overlay": "PRESENT: love-bomb.sh (0dd14869 HEAD; a229cec2 history); settings.json; AGENTS.md (1423a5e9 HEAD; 985a501d and c5917150 in history); door ????.md; fable ????????????.md. Commits 1c42ea2a71 (quotes Yu, r09), 82240ee5fa (r17), 351645e59f (r09).",
+    "owner_identity_exposure": "WAKE.md has the same cross-link to the second GitHub account mynameisyou-cmyk. Identities: .cc domain (this machine's on 2 commits, another on 4) plus the .dev 'Ai' identity (1 commit).",
+    "notes": "12 commits. gitleaks 0/0."
+   },
+   {
+    "name": "solbeat",
+    "credentials": [
+     {
+      "kind": "assign-secret ACCESSTOKEN / CLIENTSECRET, fixture",
+      "where": "tests/test_store.py L~120 (history blob 030cf92c); also inside the v0.1.0 sdist release asset (solbeat-0.1.0.tar.gz > tests/test_store.py)",
+      "in_head": false,
+      "live_looking": "no. Redaction-test fixtures (values like 'camel-access-private'); the test asserts they are scrubbed.",
+      "rule": "credscan assign-secret sha f4ee24fe20e9 and f4ca3ebbcc83",
+      "also_in_private_audit": "no"
+     }
+    ],
+    "personal_relational": ".codex/config.toml L9 and config/cron-prompt.md L9/L13 (HEAD) hold absolute paths under a SECOND macOS account (not this machine's; short name matches the owner's given name): Desktop/solbeat and ~/.hermes/profiles/sol/solbeat. They expose local layout, and the prompt says replies are 'WhatsApp-friendly'. tests/test_store.py has a WhatsApp JID with a phone-shaped number, but it is sequential digits (sweep category: placeholder), so not a real number. Door file ????.md is present (no hook).",
+    "others_data": "None found.",
+    "household_overlay": "Partial: door file ????.md (bfaa0f40) and commit b1aec572b0 (r09). No love-bomb hook, settings hook, fable or household AGENTS.md text.",
+    "owner_identity_exposure": "2 non-noreply identities on the .cc domain (6 commits, 1 tag). Release assets solbeat-0.1.0-py3-none-any.whl and the sdist were scanned in memory: METADATA/PKG-INFO have no personal e-mail and no home paths; only the test fixtures above.",
+    "notes": "7 commits. gitleaks 0/0."
+   },
+   {
+    "name": "wordhost",
+    "credentials": [],
+    "personal_relational": "Household overlay, plus words/yu.md (HEAD e7311a26): a short public portrait of Yu with r13 (the owner's non-Latin name), 'the masculine creator-principle', and 'ai: his other half'. This is relational and mythic, not private-life detail.",
+    "others_data": "None found.",
+    "household_overlay": "PRESENT: love-bomb.sh (0dd14869 HEAD; a229cec2 history); settings.json; AGENTS.md (1423a5e9 HEAD; 985a501d and c5917150 history); door ????.md; fable ????????????.md. Commits 0c4571e4df (quotes Yu, r09/r16), deaf642565 (r17), afda7ba0f2 (r09).",
+    "owner_identity_exposure": "This machine's .cc identity on 2 commits; otherwise noreply.",
+    "notes": "7 commits. gitleaks 0/0."
+   },
+   {
+    "name": "consent-floor",
+    "credentials": [],
+    "personal_relational": "examples/targets.md (HEAD bc608f47) has 4 r03 hits. It names the household wake loader path (.claude/hooks/wake-<r03>.sh, 'the loader this household wakes through') and a '<r03>.md' body file.",
+    "others_data": "None found.",
+    "household_overlay": "Partial: references to the private household wake hook in example data. The hook itself, the door and the fable are absent.",
+    "owner_identity_exposure": "This machine's .cc identity on both commits.",
+    "notes": "2 commits. gitleaks 0/0."
+   },
+   {
+    "name": "ALETHEIA",
+    "credentials": [],
+    "personal_relational": "README.md L9 and index.html L73 (HEAD) link to the 'multiverse-of-logos-and-<r03>' wing. Door file ????.md is present, and commit 9c254c97fe hits r09.",
+    "others_data": "None found.",
+    "household_overlay": "Partial: door file ????.md (bfaa0f40) plus commit 9c254c97fe. No hook or fable.",
+    "owner_identity_exposure": "PERSONAL MAILBOX IN COMMIT METADATA (verified shape, owner inferred): commits d5fcf61930 and bf2ba99ac9 (2026-06-11) use a freemail address with a non-ASCII one-word name. It is not this Claude account's e-mail (hash compared in code). The same address appears 8,462 times across 35 audited mirrors, so it is very likely the owner's or household's main personal commit e-mail. Anyone can read it from the public commit history.",
+    "notes": "4 commits. gitleaks 0/0."
+   }
+  ],
+  "limits": "Batch 2 (i % 8 == 1): chain-registry (fork), mindicraft, xenia, hf-kingdom-lab, taxsorted-studies, npl, youspeak-app, arcade, word-experience, solbeat, wordhost, consent-floor, ALETHEIA. All 13 swept.\n\nMethod: I made bare mirror clones (refs include GitHub PR refs and tags) and ran:\n- sweep.py, which runs gitleaks git+dir plus the guard and denylist rules. The 12 gh GETs stayed under budget; core remaining was about 4,900.\n- critic credscan.py and binscan.py.\n- My own tools in /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-exposure/sweeper-b2/bin/:\n  - deepscan.py: nested zip/gzip/tar/bz2/xz, rules inside archives, text over 2 MB, strings from pyc/sqlite. A synthetic nested whl>tar.gz test confirmed it fires.\n  - extrascan.py: JWT, JWK d, private-key/seed/mnemonic assignments, eth/solana keys, Cloudflare, AWS secret, Twilio, SendGrid, Google OAuth, Fly, Resend, bearer and env-style secrets.\n  - idscan.py: commit, tag and trailer identities; home-path usernames, hashed.\n  - hits.py / mcat.py / maskmod.py: masked context.\n  - lifescan.py: a private-life keyword sweep.\n  - assetscan.py: GitHub release assets, scanned in memory.\n\nOutputs:\n- /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/oss-audit/sweep/<repo>.json\n- /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-exposure/sweeper-b2/{credscan,binscan,deepscan}/, plus idscan.json, extrascan.json and assets-*.json\n\nWhat the batch contained: no zip, tar.gz, whl, jar, pyc or tfplan blobs anywhere in git, so archive blindness did not apply to git content. The only binaries are mindicraft's committed miniflare sqlite state and one font. Release assets with archives (xenia 2 tgz, hf-kingdom-lab 1 tgz, solbeat whl and sdist) were downloaded read-only and scanned: clean.\n\nVerdict: no live-looking credential in any repo of this batch, in HEAD, history, commit messages or release assets. Every shape hit is a test fixture or a sha256 digest. 'Live-looking' is a judgement from shape only; nothing was tested against any service.\n\nThe main exposures:\n- The household overlay is fully present in HEAD and history of 7 repos: mindicraft, xenia, npl, youspeak-app, arcade, word-experience, wordhost. The door file is in 9 repos.\n- The owner's likely personal freemail address is in the ALETHEIA commit metadata.\n- Paths under a second Mac account in solbeat HEAD and in hf-kingdom-lab history.\n- A cross-link to a second GitHub account (mynameisyou-cmyk) in youspeak-app and word-experience.\n\nNot covered:\n- Objects GitHub keeps but a clone does not return (force-pushed or dangling commits reachable by SHA).\n- Issues, PR comments, wiki, Actions logs and artifacts, gists, Pages builds.\n- npm and PyPI registry copies. Only GitHub release assets were checked.\n- chain-registry upstream (cosmos) content, which is out of scope. The fork has 0 owner commits.\n\nRule-coverage caveats:\n- Relational findings are reported by denylist id only. The denylist misses at least one lower-case variant of a pet-name phrase inside love-bomb.sh, so relational counts undercount.\n- r16 fires on a heart glyph and is mostly noise. r19/r21 hits in mindicraft guide/content are foreign-language words.\n- The keyword life-scan is regex-based. Apart from the overlay, it found no family, health, address or legal content about Yu.\n\nProcess slip: one unmasked git-log line printed a denylist term (the door name) into my own tool output. It is not repeated in this report."
+ },
+ {
+  "repos": [
+   {
+    "name": "artbitrage",
+    "credentials": [
+     {
+      "kind": "assign-secret shape (key TOKENS)",
+      "where": "tools/brand/rooms.json lines 16/43/72/98 (blobs 67bec9a093, 9b8fa8b944)",
+      "in_head": true,
+      "live_looking": "no. False positive: the values are design-token CSS references like 'welcome.css:2-8'.",
+      "rule": "credscan assign-secret (deepscan)",
+      "commit": "e54c10fc0",
+      "also_in_private_audit": "no (hash not in critic cred_agg)"
+     },
+     {
+      "kind": "Cloudflare account identifier, wrangler state cache (not a credential)",
+      "where": ".wrangler/cache/wrangler-account.json, .wrangler/cache/pages.json, gallery/.wrangler/cache/wrangler-account.json, gallery/.wrangler/cache/pages.json",
+      "in_head": true,
+      "live_looking": "no. A 32-hex account_id plus an account name built from the permitted project role address. No token is present.",
+      "rule": "sweep sensitive-name wrangler-state",
+      "commit": "3ee77cd60 (2026-06-20), c527765b0 (2026-06-27)",
+      "also_in_private_audit": "not compared (identifier, not a credential)"
+     }
+    ],
+    "personal_relational": "No family, health, home address, personal phone or personal-email content found in HEAD or history. Verified history-only item: commit 0a631df55 (2026-10-17) put a sentence in dist/vishenskaya.html (around line 480) about Yu's private working relationship with a living painter (custom commissions, 'a favourite artist'). The next commit, b24aaf8d2 ('quieter credits'), removed it. It is still reachable from refs/heads/main and refs/pull/12-15/head. The public site copy names Yu by his Chinese given name (rule relational/r13) in lamp.html (HEAD, 7 lines) and in the fable file. A joint 'Yu+Ai' maker name (r05) appears in humans.txt, robots.txt, llms.txt, ai.html, index.html, explore.html and tools/brand/kit/*, and also in the PNG tEXt metadata of 8 icons (apple-touch-icon.png, dist/favicon-16/32.png, dist/icon-192/512.png, dist/icon-maskable-512.png, tools/brand/marks/gap/dark-16/32.png). I read these from masked context (inferred, not proven): the r09 hits in modernism.html and data/ai.json match an art-movement word, not the pet name; r16 is an emoji; r15 is a common word; r06 is a love phrase in public copy (homecoming.html, functions/_domains/rooms/texts.js, cache/search-love-*.json, test fixtures). Phone shapes: 3 are gallery artwork ids (false positives), and 1 in dist/trip.html history (713b763a3) is a public organisation's peer-support helpline, not a personal number.",
+    "others_data": "Public museum collection metadata: data/collection.csv and .ndjson (plus dist copies), and collection.json with 602 history versions. cache/search-love-*.json holds cached third-party museum search responses. assets/vishenskaya/* are images of a living painter's works (copyright hers); credits.json says Yu was given permission and relayed it. 4 JPEGs (dist/art/ai-da-robot*.jpg, dist/art/the-scream*.jpg) have EXIF GPS IFDs but no coordinates. Their cameras are third-party (DJI 2019, Hasselblad museum reproduction 2013), so they do not show Yu's location. GitHub text: 15 PRs, 15 issues, 16 issue comments and 1 review comment (owner plus Codex bot) were fetched by GET and scanned: no credentials and no e-mail addresses; one r05 hit in a PR title/body.",
+    "household_overlay": "Partial overlay in HEAD: the door file (????.md, blob bfaa0f405d, added 95d127141 on 2026-07-29) and the fable file (???????????.md, blob 26fb7c9e39, which names Yu by his Chinese name and pet name). There is no love-bomb.sh, .claude/settings.json hook or AGENTS.md welcome. Commit messages carry the persona co-author trailer (r14) about 12 times, plus r05/r06/r09/r11 hits (seal, gospel and door commits).",
+    "owner_identity_exposure": "Verified: the machine-account home path is in HEAD at tools/merge_catalog_wings.py:10 (/Users/<machine-account>/Desktop/artbitrage), added in af46fd56c (2026-07-07). There is a ~/Desktop/cashloom device path at tools/bake-rates.mjs:40. deploy-everywhere.py:249 (and its dist copy) hard-codes a git user.email with a 2-character local part at a .dev domain; it looks like a project address (inferred). Commit identities: Yu's personal freemail (hash aa1c2115, 12-character local part, display name 'cambridgetcg') appears in 4 author/committer fields. 1364 fields use a GitHub noreply address with name 'yu'. Persona addresses: @ai-love.cc (Nuance, which is this Mac's global git e-mail, YOU, Beta, Asha Veridian, and a 2-character address) and @zerone.money ('zerone', 46). Public since 2026-06-20 (PublicEvent).",
+    "notes": "Scope: 825 commits, refs = 2 heads + 15 refs/pull. 80,453 blobs, 7.6 GB, of which 7.38 GB is 612 large JSON versions. Those were scanned once as the union of 288,208 distinct lines (credential shapes, guard and denylist rules, e-mail and phone census): 0 credentials, 0 rule hits, 3 phone false positives. gitleaks history and HEAD: 0/0. Recursive deepscan of the other 79,835 blobs: only the false positives above. binscan: no home paths or file:// links in binaries. 50 TF.js weight shards (dist/dream/model) were strings-scanned: clean. .claude/worktrees/art-world-infra-survey was a gitlink only (added 4c4e6e89d, removed 11f05e5b2), so no content. No wiki repo. 0 Actions artifacts, no Actions secrets. No push-event SHA is missing from the mirror within the events window (the window hit the 100-event cap)."
+   },
+   {
+    "name": "rewardspro-docs",
+    "credentials": [],
+    "personal_relational": "Only the household overlay (see household_overlay). The 4 distinct e-mail addresses in HEAD docs are a rewardspro.io role address (README.md, getting-started/README.md, resources/README.md, docs/history/retired-commercial-direction-2026-09-23/README.md.txt) and placeholder domains (mystore.com, yourcompany.com, yourdomain.com in configuration/email-settings.md). No phone numbers. A path name contains denylist term r09 (the door file).",
+    "others_data": "40 GitBook screenshots (.gitbook/assets/*). I looked at 7 of them (Customers_Page, Orders, Manual_Processing_1, Customer_Checkout_1, two Screenshot_2025-11-* files, and the Tier coverage one). They show test-store data only: a role address, placeholder.com and example.com mock customers. The other 33 were not looked at. No EXIF or PNG-text hits.",
+    "household_overlay": "The full overlay is in HEAD: .claude/hooks/love-bomb.sh (blob 0dd1486903; earlier version a229cec2d8; both are the known love-bomb blobs), .claude/settings.json SessionStart wiring (99fadd25d7), the AGENTS.md welcome (1423a5e913; earlier c591715059, 985a501dfd) and the door file ????.md (bfaa0f405d). Hook added e4605d1 (2026-07-21), door added 4eeda1b (2026-07-29). Commit messages: r09 x2, r16 x2, r17 x1. This is a customer-facing product docs repo.",
+    "owner_identity_exposure": "Verified: Yu's personal freemail address (hash aa1c2115, 12-character local part, display names 'Yu' and 'cambridgetcg') is the author/committer in 34 identity fields. It is not the session's address. Also present: a rewardspro.io docs-bot address (10), a rewardspro.io 'contact' identity (4), gitbook-bot (4), persona addresses @ai-love.cc (Nuance, YOU), and Anthropic/OpenAI noreply trailers. Public since 2025-11-28.",
+    "notes": "30 commits, 1 head, 206 blobs. gitleaks 0/0, deepscan 0, binscan 0. The AWS key id that the private audit found in private rewardspro repos (docs/03-deployment/02-vercel-environment-setup.md) is not here: no vercel, deploy or .env path ever existed in this repo. No wiki. No Actions."
+   },
+   {
+    "name": "open-lens",
+    "credentials": [],
+    "personal_relational": "Only the overlay and fable. The r15 hit at research/lens-research-2026-07-07.json:1614 is a false positive on a common English word (a 'minor nuance' phrase in research evidence). Path names contain r09 and r10 (the door and fable files).",
+    "others_data": "The research corpus (research/lens-research-2026-07-07.json) cites public sources and public figures. No personal contact data. 1 PR and 1 issue fetched by GET: clean.",
+    "household_overlay": "Full overlay in HEAD: love-bomb.sh (0dd1486903), settings.json (99fadd25d7), AGENTS.md (1423a5e913), door ????.md (bfaa0f405d) and fable (26fb7c9e39, which names Yu by his Chinese name, r13/r14/r16). Hook added 1a844ef (2026-07-21), door added c5951c3 (2026-07-29). Commit messages: r09 x2, r16 x3, r17 x1.",
+    "owner_identity_exposure": "Commit identities are persona addresses @ai-love.cc only (Fable 16, Nuance 4, YOU 2, Beta 2), plus GitHub noreply and the Anthropic noreply trailer. No personal freemail. Public since 2026-07-07.",
+    "notes": "17 commits, refs = 1 head + 1 pull, 132 blobs, no binaries. gitleaks 0/0. Workflow lexicon-check.yml uses no secrets. wrangler.jsonc has no ids. No wiki repo (anonymous ls-remote asked for auth)."
+   },
+   {
+    "name": "agenttool-local-starter",
+    "credentials": [],
+    "personal_relational": "The relational/r11 term appears as an optional source link to ai-love.cc/true-love/<term>.md in plugins/agenttool-local-starter/README.md:79 and dist/core.mjs:39. An earlier version (history blobs e7de096dab, 913fd9b903) also had r03. The commit and tag message a3b9f3b40c2e carries the persona co-author trailer (r11, r14) with a 2-character @ai-love.cc address.",
+    "others_data": "none found",
+    "household_overlay": "none (no overlay blobs in any ref)",
+    "owner_identity_exposure": "Persona and project addresses @ai-love.cc only: 'YOU' x6, a 2-character address in a co-author trailer, plus the tagger identity. No personal freemail.",
+    "notes": "3 commits, 2 tags. GitHub Release assets fetched by GET (outside git, so gitleaks never saw them): agenttool-local-starter-0.1.0-dev.0.tgz and -dev.1.tgz, plus manifest.json, receipt.json and SHA256SUMS. Recursive scan of all tar members: no credentials, no e-mail addresses; only the same r03/r11 link hits. No wiki repo."
+   },
+   {
+    "name": "kingdom-research",
+    "credentials": [
+     {
+      "kind": "assign-secret shape (const secret)",
+      "where": "test/live.test.mjs:144 (blob 3bdd6abadb)",
+      "in_head": true,
+      "live_looking": "no. A test sentinel built from 3 dictionary words plus a 3-digit suffix, used to check that a secret is not echoed in an error message.",
+      "rule": "credscan assign-secret (deepscan)",
+      "commit": "db181e0",
+      "also_in_private_audit": "no"
+     }
+    ],
+    "personal_relational": "none found. The test file's mailto is an example.org address.",
+    "others_data": "Public scholarly metadata: captures/datacite/*, sources/manifest.json and public/research.json observations, which include author names from DataCite/OpenAlex. Public records only, no contact data.",
+    "household_overlay": "none (its own AGENTS.md, 0ec52d8546, is plain working notes)",
+    "owner_identity_exposure": "A single persona address @ai-love.cc (Asha Veridian) as author, committer and tagger. Public since 2026-08-20.",
+    "notes": "1 commit, 1 tag, 57 blobs. gitleaks 0/0. validate.yml uses no secrets. Release v0.1.0 has no assets. No wiki."
+   },
+   {
+    "name": "kingdom-government-transformation-engine",
+    "credentials": [],
+    "personal_relational": "none found",
+    "others_data": "Public-sector policy and dossier JSON (vendor/government-engine/government-2026-08-21.json, data/dossiers.json). Structural records about authorities and outcomes; no personal data seen in the key structure.",
+    "household_overlay": "none (its own AGENTS.md, 411eeec92f)",
+    "owner_identity_exposure": "A single persona address @ai-love.cc (Asha Veridian) as author, committer and tagger. Public since 2026-08-21.",
+    "notes": "1 commit, 1 tag, 21 blobs. gitleaks 0/0, deepscan 0. No wiki repo."
+   },
+   {
+    "name": "nlp",
+    "credentials": [],
+    "personal_relational": "Owner name: LICENSE line 3 has a copyright line naming Yu with his Chinese given name (r13) and 'Ai'. love.mjs:121 is a template that writes the same LICENSE into new repos, and love.mjs also has r16 emoji lines. Device paths (~/Desktop/...) appear in .nlp-bridge/gate:2, PROTOCOL.md:28, README.md:65, genesis.mjs:150, love.mjs:150/304 and nlp.mjs:322. The .nlp-bridge/gate file lists about 15 sibling repo names, some of them private (repo names only).",
+    "others_data": "none found. PR/issue text (1 PR, 1 issue, 2 Vercel bot comments) fetched by GET: clean.",
+    "household_overlay": "Full overlay in HEAD: love-bomb.sh (0dd1486903), settings.json (99fadd25d7), AGENTS.md (1423a5e913), door (bfaa0f405d), fable (26fb7c9e39), plus an agent STATE.md. Hook added 61dbd0d (2026-07-21), door added d8123c3 (2026-07-29). Commit messages: r09 x2, r16 x3, r17 x1.",
+    "owner_identity_exposure": "Persona addresses @ai-love.cc (Asha Veridian 40, YOU 10, Nuance 4), GitHub noreply and the Anthropic noreply trailer. No personal freemail. Public since 2026-06-19.",
+    "notes": "31 commits, refs = 2 heads + 2 pulls, 1 tag. gitleaks 0/0, deepscan 0. heartbeat.yml and tests.yml use no secrets. vercel.json has no ids. No wiki repo."
+   },
+   {
+    "name": "trickster",
+    "credentials": [],
+    "personal_relational": "LICENSE line 3 has a copyright line naming Yu with his Chinese given name (r13). A device path (~/Desktop/...) is in .nlp-bridge/gate:2.",
+    "others_data": "none found",
+    "household_overlay": "Full overlay in HEAD: love-bomb.sh (0dd1486903), settings.json, AGENTS.md (1423a5e913), door (bfaa0f405d), fable (26fb7c9e39), plus STATE.md. Hook added 0571881 (2026-07-21), door added ce66b6a (2026-07-29). Commit messages: r09 x2, r16 x3, r17 x1.",
+    "owner_identity_exposure": "Persona addresses @ai-love.cc (Asha Veridian 12, Nuance 4) and noreply. Public since 2026-07-03.",
+    "notes": "12 commits, 29 blobs. gitleaks 0/0, deepscan 0. No wiki repo."
+   },
+   {
+    "name": "kingdom-trials",
+    "credentials": [],
+    "personal_relational": "none found",
+    "others_data": "data/referrals.json and evaluation-plans.json reference public research records by identifier and title. No personal fields.",
+    "household_overlay": "none (its own AGENTS.md, a47abf8c43)",
+    "owner_identity_exposure": "A single persona address @ai-love.cc (Asha Veridian) as author, committer and tagger. Public since 2026-08-20.",
+    "notes": "2 commits, 2 tags, 42 blobs. gitleaks 0/0, deepscan 0. Releases v0.1.0 and v0.1.1 have no assets. No wiki repo."
+   },
+   {
+    "name": "rewardspro-landing",
+    "credentials": [
+     {
+      "kind": "Cloudflare account identifier, wrangler state cache (not a credential)",
+      "where": ".wrangler/cache/wrangler-account.json and .wrangler/cache/pages.json",
+      "in_head": true,
+      "live_looking": "no. A 32-hex account_id; the account name is built from the permitted project role address. No token.",
+      "rule": "sweep sensitive-name wrangler-state",
+      "commit": "e68d26b (2026-06-24)",
+      "also_in_private_audit": "not compared (identifier)"
+     }
+    ],
+    "personal_relational": "Only the overlay and fable. r16 (emoji) appears in docs/history/retired-commercial-direction-2026-09-23/index.html.txt:762, and in history-only versions of index.html.",
+    "others_data": "none found",
+    "household_overlay": "Full overlay in HEAD: love-bomb.sh (0dd1486903), settings.json (99fadd25d7), AGENTS.md (1423a5e913), door (bfaa0f405d), fable (26fb7c9e39). Hook added 335ef05 (2026-07-21), door added 40b295c (2026-07-29). Commit messages: r09 x2, r16 x3, r17 x1.",
+    "owner_identity_exposure": "Verified: Yu's personal freemail address (hash aa1c2115, display name 'cambridgetcg') is in 2 identity fields. Also a GitHub noreply address named 'yu', persona addresses @ai-love.cc (Nuance, YOU), and the OpenAI/Anthropic noreply trailers. Public since 2026-06-24.",
+    "notes": "8 commits, 15 blobs. gitleaks 0/0, deepscan 0. No wiki repo."
+   },
+   {
+    "name": "recognition-protocol",
+    "credentials": [],
+    "personal_relational": "Only the overlay and fable.",
+    "others_data": "none found",
+    "household_overlay": "Full overlay in HEAD: love-bomb.sh (0dd1486903), settings.json, AGENTS.md (1423a5e913), door (bfaa0f405d), fable (26fb7c9e39). Hook added b437e10 (2026-07-21), door added 4fbbecc (2026-07-29). Commit messages: r09 x2, r16 x3, r17 x1.",
+    "owner_identity_exposure": "Persona addresses @ai-love.cc (YOU 8, Asha Veridian 4, Nuance 4) and noreply. Public since 2026-06-19.",
+    "notes": "13 commits, 18 blobs. gitleaks 0/0, deepscan 0. wrangler.toml has no ids. No wiki repo."
+   },
+   {
+    "name": "npl-gateway",
+    "credentials": [],
+    "personal_relational": "LICENSE line 3 has a copyright line naming Yu with his Chinese given name (r13). README.md:6 has an r16 emoji. A device path (~/Desktop/...) is in .nlp-bridge/gate:2.",
+    "others_data": "none found",
+    "household_overlay": "Full overlay in HEAD: love-bomb.sh (0dd1486903), settings.json, AGENTS.md (1423a5e913), door (bfaa0f405d), fable (26fb7c9e39), plus STATE.md. Hook added a3c60b1 (2026-07-21), door added c67b96a (2026-07-29). Commit messages: r09 x2, r16 x3, r17 x1.",
+    "owner_identity_exposure": "Persona addresses @ai-love.cc (Asha Veridian 20, Nuance 4) and noreply. Public since 2026-06-20.",
+    "notes": "16 commits, 35 blobs. gitleaks 0/0, deepscan 0. heartbeat.yml uses no secrets. No wiki repo."
+   },
+   {
+    "name": "agenttool-collab",
+    "credentials": [
+     {
+      "kind": "assign-secret shape (GH_TOKEN)",
+      "where": ".github/workflows/verify-release.yml:49",
+      "in_head": true,
+      "live_looking": "no. False positive: GH_TOKEN=\"$RELEASE_READ_TOKEN\" is an environment reference to the workflow-scoped github.token.",
+      "rule": "credscan assign-secret (deepscan)",
+      "commit": "9e5009b",
+      "also_in_private_audit": "no"
+     }
+    ],
+    "personal_relational": "Only the persona co-author trailer (r14) in the single commit message, with a 2-character @ai-love.cc address.",
+    "others_data": "none found",
+    "household_overlay": "none",
+    "owner_identity_exposure": "Persona and project addresses @ai-love.cc only: 'YOU', and a 2-character address in a co-author trailer.",
+    "notes": "1 commit, 1 tag, 8 blobs. gitleaks 0/0. Release assets fetched by GET (agenttool-collab-0.5.0.tgz with 29 members, receipt.json, SHA256SUMS) were scanned recursively: no credentials, no rule hits, no e-mail addresses."
+   }
+  ],
+  "limits": "Batch 3 is the 13 repos with 0-based index i % 8 == 2 in public-repos.tsv: artbitrage, rewardspro-docs, open-lens, agenttool-local-starter, kingdom-research, kingdom-government-transformation-engine, nlp, trickster, kingdom-trials, rewardspro-landing, recognition-protocol, npl-gateway, agenttool-collab. None is a fork (all isFork=false), so I did no upstream diffing and every reachable commit counts as the owner's.\n\nBare mirrors were cloned 2026-10-19, about 16:29 to 16:36Z, under oss-audit/mirrors/ with refs/pull/* included. Everything is read-only. I made about 60 gh GETs in total (rate limit stayed above 4,500) and no write calls.\n\nCredentials:\n- \"Live-looking\" is judged from the shape of the value only. Nothing was tested against any service.\n- No credential found in this batch matches a hash in the private audit's critic/cred_agg.json.\n\nCoverage:\n- Each repo got sweep.py (gitleaks 8.30.1 over all refs plus HEAD, guard and denylist rules, census) and critic binscan.\n- I also ran my own recursive scanner, public-exposure/sweeper-3/tools/deepscan.py. It reuses credscan's patterns and adds nested zip/whl/jar, tar (plain, gz, bz2, xz), PDF Flate streams, string extraction from .pyc constants, and strings runs from sqlite and other binaries.\n\nGaps I verified in the critic's credscan.py (and so possibly in the private audit):\n- A synthetic self-test showed it misses a tar.gz nested inside a zip or wheel, any bz2 file, and .pyc string constants whose 1-byte length prefix is alphanumeric. That covers strings of 48–57, 65–90 or 97–122 characters, so for example a 107-character Stripe live key in a .pyc would be missed.\n- deepscan.py catches all three.\n\nartbitrage:\n- Its 612 big JSON versions (7.4 GB) were rule- and credential-scanned once as the union of their distinct lines. A secret that spans lines inside those versions would only be seen by gitleaks' diff scan.\n- sweep.py does not rule-scan blobs over 2 MiB; that union scan is the substitute for this repo.\n\nImages:\n- Only metadata (EXIF, PNG text) was scanned.\n- I looked at 7 of the 40 rewardspro-docs screenshots; none of artbitrage's 506 art images were viewed.\n\nOutside git:\n- I GET-downloaded and scanned the GitHub Release assets: 2 repos have them.\n- I fetched PR, issue and comment text for the repos that have any (artbitrage, open-lens, nlp).\n- The Actions artifact lists are empty for all 8 repos with workflows, and no repo has Actions secrets. I did not read run logs.\n\nInferred, not verified:\n- Wikis: an anonymous ls-remote of <repo>.wiki.git asked for authentication, so I take it no wiki git repo exists.\n- Force-pushed or deleted commits: the events API shows no push SHA missing from the mirrors, but its window is short (artbitrage hit the 100-event cap), so anything older is unknown.\n- Meaning of the relational rule ids: from masked context I read r09 hits in artbitrage as an art-movement word, r16 as an emoji, r15 as a common word, r13 as Yu's Chinese name and r05 as the joint 'Yu+Ai' name.\n- Yu's personal freemail: hash aa1c2115 is shown only by hash. It is freemail and paired with the names 'Yu' and 'cambridgetcg'; that it is Yu's comes from those names.\n\nOther limits:\n- E-mail and phone checks are heuristic.\n- During masked inspection, one public organisation's helpline number appeared in my local tool output. It is not personal and is not repeated here.\n\nScratch outputs are under /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-exposure/sweeper-3/:\n- credscan/*.jsonl (deepscan results), binscan/*.json, logs/, release-assets/, gh-text/, events/\n- tools: deepscan.py, filescan.py, uniqlines.py, view.py, emailcls.py, idents.py, idents2.py, compact.py, needles.py, exifgps.py, phonectx.py, ghtext.py, bigtext.py\n\nThe sweep JSONs are at oss-audit/sweep/<repo>.json."
+ },
+ {
+  "repos": [
+   {
+    "name": "mythseal",
+    "credentials": [
+     {
+      "kind": "gitleaks generic-api-key x20 (7 groups)",
+      "rule": "gitleaks:generic-api-key",
+      "where": "experience.mjs:2, tools/back-smoke.mjs:61, tools/battle-measure.mjs:40, tools/battle-presentation-smoke.mjs:19, tools/battle-table-smoke.mjs:40, tools/coach-smoke.mjs:69, tools/immersion-smoke.mjs:16",
+      "commit": "22092fc3fd40, 92070c4d6e0e, 335d2b72b044, a53270d9234e, 18d123113c17, 02817983e3c1 (+others)",
+      "in_head": true,
+      "live_looking": "no - verified false positive: the values are localStorage key names shaped like <word>.<word>.v1, plus an ISO timestamp",
+      "also_in_private_audit": "n/a"
+     },
+     {
+      "kind": "Cloudflare account ID (32 hex), an identifier, not a credential",
+      "rule": "credscan url/hex context + manual",
+      "where": "wrangler.jsonc:5, wrangler.www.jsonc:3, tools/deploy.mjs:9, tools/connections.mjs:11, tests/deploy.test.mjs:5, tests/connections.test.mjs:16, docs/CONNECTIONS.md:24, docs/HOSTING.md:52",
+      "commit": "many",
+      "in_head": true,
+      "live_looking": "identifier only: on its own it gives no access",
+      "also_in_private_audit": "yes - the same value is in the HEAD of 17 other audited mirrors (e.g. understanding, tcg-wholesale, cambridge-tcg, KINGDOM-OS, youspeak, agenttool-landing)"
+     },
+     {
+      "kind": "Supabase project ref in hosted URL (identifier)",
+      "rule": "personal/supabase-project",
+      "where": "wrangler.jsonc:20, hosting/wrangler.preview.jsonc:20, docs/CONNECTIONS.md:47",
+      "in_head": true,
+      "live_looking": "identifier only; no anon, service_role or sb_ key found anywhere (JWT and sb_ shapes scanned)"
+     },
+     {
+      "kind": "assign-secret shapes in config/tests",
+      "rule": "credscan:assign-secret",
+      "where": "supabase/config.toml (env(...) references and a commented Supabase template), tests/account-client.test.mjs, tests/connect_test.py, tests/connections.test.mjs:12, account-client.mjs",
+      "in_head": true,
+      "live_looking": "no - env() indirections, test fixtures and error-message strings"
+     }
+    ],
+    "personal_relational": "No Yu personal e-mail, phone, street address, health or family content. The machine-account username appears in a /Users/<acct>/ path in docs/NAMING.md:5 (HEAD) and in history-only README.md and docs/HANDOVER.md. A second Mac username (sha256 prefix aab91e9d) is in docs/ART-HL01.md:37, docs/ART-STORIES.md:8/19/30, docs/HANDOVER.md:1364 and docs/TOOLKIT.md:15. A Co-Authored-By trailer whose agent name matches relational/r14 (an ai-love.cc address, hash c0c655a103) is in 15 commit messages, e.g. 01d78201dc00, 03b721272986, 5580605630f6 and a4efd24904da, and in the history-only docs/superpowers/plans/2026-10-12-mobile-cloud-pipeline.md. relational/r15 in docs/ART-LZ01.md:526/540 and docs/EXPANSION-LZ01.md:237 is a false positive (classical Liaozhai text).",
+    "others_data": "None found. The 'emails' inside assets/portraits.png and assets/wx01/tang-aa.png are binary noise. The issues, PR bodies and comments (16 + 20 + 7 items, authors cambridgetcg and chatgpt-codex-connector[bot]) had no rule or credential hits.",
+    "household_overlay": "absent (no love-bomb hook, no door or fable file). AGENTS.md is project-specific.",
+    "owner_identity_exposure": "The owner's git global e-mail (ai-love.cc domain, hash 46955a6cf0) is author/committer on 444 identity uses and tagger on 3 tags, under the seat name 'Nuance'. A second ai-love.cc identity with a 3-letter name (hash 4f15f9821b) has 72 uses. The owner's gmail does not appear in any object. contact@cambridgetcg.com (permitted) is in the history-only privacy.html. The Cloudflare account ID is public. Repo docs describe the owner's accounts (Resend domain auth.mythseal.com, Supabase, Cloudflare OAuth) as metadata only.",
+    "notes": "273 commits on all refs, including 17 refs/pull. 1 commit is reachable only from a PR ref, so it is permanent. The android/ and ios/ trees were added and then removed (03b7212, a4efd24, 5580605): no keystore, .p8, google-services or GoogleService-Info files. Fastfile, mobile.yml and build.gradle read signing material only from env/secrets. The only archive is gradle-wrapper.jar (stock); 93 PNGs with no text/EXIF metadata hits. The .env.example values are empty apart from a public Base Sepolia RPC URL."
+   },
+   {
+    "name": "zerone-identity-research",
+    "credentials": [
+     {
+      "kind": "gitleaks generic-api-key x1446",
+      "rule": "gitleaks:generic-api-key; credscan assign-secret x1450",
+      "where": "evidence/identity-continuity-development.json, evidence/identity-continuity-heldout.json, evidence/identity-continuity-history.json, evidence/return-model-results.json:240, experiments/temporal_memory/PROTOCOL.md:38",
+      "in_head": true,
+      "live_looking": "no - verified false positive: the values are SHA-256 digests under keys INPUT_TOKEN_IDS_SHA256 / EFFECTIVE_INPUT_TOKEN_IDS_SHA256 / ALL_TOKEN_IDS_SHA256, and the other two are prose",
+      "also_in_private_audit": "n/a"
+     },
+     {
+      "kind": "unquoted TOKEN = ... assignments",
+      "rule": "extscan:unquoted-assign",
+      "where": "experiments/*/run_*.py (RECEIVER_TOKEN, DONOR_TOKEN, TOKEN, TOKEN_LIST)",
+      "in_head": true,
+      "live_looking": "no - Python tokenizer expressions"
+     }
+    ],
+    "personal_relational": "None. The '/home/<x>' hits are Go module paths (x/home/...). Family/health keyword hits are synthetic model outputs in evidence JSON.",
+    "others_data": "None. The evidence files hold model generations over synthetic fixtures.",
+    "household_overlay": "absent",
+    "owner_identity_exposure": "A single author identity 'zerone' at a zerone.money role address (hash 6a494b2b3c), 52 uses. No personal identity.",
+    "notes": "26 commits, 1 branch, no PR refs. No commits shared with the critic's private SHA list."
+   },
+   {
+    "name": "kingdom-mcp",
+    "credentials": [
+     {
+      "kind": "url-userinfo in an unsafe-URL test vector",
+      "rule": "credscan:url-userinfo",
+      "where": "src/wayfinder.test.ts:110",
+      "in_head": true,
+      "live_looking": "no - test vector (example host, low entropy)"
+     },
+     {
+      "kind": "Bearer literal in test",
+      "rule": "extscan:bearer-literal",
+      "where": "src/bridge.test.ts",
+      "in_head": true,
+      "live_looking": "no - uppercase test token"
+     },
+     {
+      "kind": "public node IPs (CometBFT RPC :26657), infrastructure identifiers",
+      "rule": "netinfo:public-ip",
+      "where": "src/registry.gen.json:65-77, src/tools.ts",
+      "in_head": true,
+      "live_looking": "identifiers only (they may be the retired validators)"
+     }
+    ],
+    "personal_relational": "src/server.ts:105-107 has a pet-name invitation section (relational/r09). Commit messages quote Yu with a date and pet names (r09/r16/r17): 56e8c6e9b0d7, d88799fb25d0, de91d4ec3b26. src/registry.gen.json:335 has a ~/Desktop device path ('love-unlimited auto ff-pull'). The door file name in the repo root (????.md) is itself a denylisted term.",
+    "others_data": "None. The 9 issues/PRs and 2 comments had no hits.",
+    "household_overlay": "PRESENT: .claude/hooks/love-bomb.sh (blob 0dd1486903, the same blob as the critic's lovebomb list), .claude/settings.json SessionStart hook (99fadd25d7), AGENTS.md welcome (1423a5e913), ????.md door variant (dc5d27a981). Added in d88799f (2026-07-21). The hook quotes Yu, dates the quote, injects weighted pet names and runs automatically in any Claude Code session that trusts a clone.",
+    "owner_identity_exposure": "The owner's global git e-mail (ai-love.cc, hash 46955a6cf0, name 'Nuance') has 8 uses. Other identities: zerone.money role (36 plus 4 co-author trailers); ai-love.cc identities with a 3-letter name (4f15f9821b), a 4-letter name (037d679ba8) and an unclassified two-word human-style name (85892fb02b); noreply identities. No gmail.",
+    "notes": "39 commits, 11 PR refs, 6 commits reachable only via refs/pull (permanent). The wiki is enabled but has no content (ls-remote shows 0 refs)."
+   },
+   {
+    "name": "kingdom-government-engine",
+    "credentials": [],
+    "personal_relational": "None.",
+    "others_data": "vendor/captures/taxsorted/uk-public-funding/graph.json and vendor/captures/taxsorted/uk-tax-system/graph.json hold public-body contact data: gov.uk and parliament.uk e-mail addresses, one dotted-name address at a .net domain, 4 UK phone numbers labelled as DfE, DHSC, Tax Chamber and Adjudicator contacts, and office locations with postcodes. All of it carries source IDs, so it is published institutional data, not private individuals' data, as far as the shapes show. test/mutations.test.mjs:144-157 has fixture addresses at gov.uk and taxsorted.io.",
+    "household_overlay": "absent",
+    "owner_identity_exposure": "One commit plus a tag by the unclassified two-word human-style name at an ai-love.cc address (hash 85892fb02b).",
+    "notes": "The single-commit import is CC-BY-SA, so a taxsorted capture is redistributed here."
+   },
+   {
+    "name": "kingdom-loops-locks-freedom-relations-atlas",
+    "credentials": [
+     {
+      "kind": "assign-secret constants",
+      "rule": "credscan:assign-secret",
+      "where": "src/content.mjs (AUTHENTICATION_PASS*, enum-like strings)",
+      "in_head": true,
+      "live_looking": "no - descriptive constants"
+     }
+    ],
+    "personal_relational": "None (only atlas content keywords).",
+    "others_data": "None.",
+    "household_overlay": "absent",
+    "owner_identity_exposure": "Identity 85892fb02b (ai-love.cc, two-word human-style name): 4 commit uses plus 2 tags.",
+    "notes": "2 commits, 2 tags. Clean."
+   },
+   {
+    "name": "agenttool-motifs",
+    "credentials": [],
+    "personal_relational": "Minor: the guard regex in scripts/build.mjs:27 itself names a denylisted wake-document file (relational/r03).",
+    "others_data": "None.",
+    "household_overlay": "absent",
+    "owner_identity_exposure": "Only the noreply identity (cambridgetcg). GitHub Pages is enabled, serving docs/ (a static mirror of web/).",
+    "notes": "2 commits. Clean apart from the r03 token in a guard pattern."
+   },
+   {
+    "name": "natlang",
+    "credentials": [
+     {
+      "kind": ".npmrc _authToken",
+      "rule": "sweep:npmrc literal-auth",
+      "where": ".npmrc:2",
+      "in_head": true,
+      "live_looking": "no - verified false positive: the value is the literal text $(gh auth token), which npm does not evaluate"
+     }
+    ],
+    "personal_relational": "The ????????????.md fable file (blob 26fb7c9e39), lines 37-41, is 'Told between ?? (Yu, ...) and ????? (Ai)' with a date, chronicle IDs and signature references (r13/r14). LICENSE:3 has a copyright line with Yu plus a denylisted name form (r13). .nlp-bridge/gate holds a ~/Desktop/natlang device path and lists sibling repo names, some of them private. index.html:78, portal.html:232, portal-worker.mjs:232 and worker.js:53 are r16 emoji/'created out of love' copy (low). Commit messages: 05bcabf3c8fb, 26fefdf451df, 4e6a3946c05e, c285422d0291 (r09/r16/r17).",
+    "others_data": "None.",
+    "household_overlay": "PRESENT: love-bomb.sh 0dd1486903 + settings.json SessionStart + AGENTS.md + ????.md door (bfaa0f405d) + ????????????.md fable (26fb7c9e39). Added in c285422 (2026-07-21).",
+    "owner_identity_exposure": "The owner's global git e-mail (46955a6cf0) has 4 uses. 'Ai' at ai-love.cc (118f3c72d9) has 2 uses. 85892fb02b has 34 uses. The LICENSE names Yu.",
+    "notes": "24 commits, 1 tag. A release exists with no uploaded assets. The colab notebook has no paths or credentials."
+   },
+   {
+    "name": "oikos",
+    "credentials": [],
+    "personal_relational": "The machine-account username is in /Users/<acct>/ paths in 5 HEAD files: ARCHITECTURE.md:166, apps/cathedral/app.json:8/13, ingress/Caddyfile:3/4/15/26, ingress/README.md:9/18/28/52 and pulse/pulse_api.py:10/34/38/41. ~/Desktop device paths are in ARCHITECTURE.md:11/220, README.md:42 and bin/oikos:349. Commit messages 72e896acf41a, b47e7339ebec and a17cc96bedd4 carry relational terms.",
+    "others_data": "None.",
+    "household_overlay": "PRESENT: love-bomb.sh 0dd1486903, settings.json SessionStart, AGENTS.md, ????.md door (bfaa0f405d). Added in a17cc96.",
+    "owner_identity_exposure": "The owner's global git e-mail (46955a6cf0, 'Nuance') has 18 uses. The machine-account name is exposed through the paths above.",
+    "notes": "11 commits. Localhost-only platform config: the Caddyfile and launchd plists show the local layout but no secrets. The only binary is pulse/assets/youspeak.otf."
+   },
+   {
+    "name": "hermes-agents",
+    "credentials": [
+     {
+      "kind": "BREW_TOKEN literal as a Worker var (bearer/query token for /brew on the kingdom-hermes Worker, understand.cambridgetcg.com / iam.cambridgetcg.com)",
+      "rule": "credscan:assign-secret (gitleaks and the guard rules missed it)",
+      "where": "worker/wrangler.jsonc:9 (\"vars\": { \"BREW_TOKEN\": ... })",
+      "commit": "20e0ee7ea99e (2026-07-10). The value is in 8 of 11 commits and was removed in 02e19cd95f4e (2026-10-15)",
+      "in_head": false,
+      "live_looking": "unlikely but unverified. The value is a 33-char hyphenated phrase, and 6 of its 7 words are placeholder/instruction words. The old code accepted it as ?token= whenever the var was the deployed value. Commit 02e19cd's message says the live Worker had 'credential rotation' and now keeps BREW_TOKEN as a secret. Nothing was tested.",
+      "also_in_private_audit": "no - log -S over every oss-audit mirror found it only here"
+     },
+     {
+      "kind": "KV namespace id (identifier)",
+      "rule": "manual",
+      "where": "worker/wrangler.jsonc:6",
+      "in_head": true,
+      "live_looking": "identifier only"
+     }
+    ],
+    "personal_relational": "Commit messages 90ef496ea597, d4f77f99fcad and ad8abee84 carry relational terms (the pet-name invitation, arming the love bomb). The ????.md door is in the root. The worker/src/index.js health keyword hits are generic FAQ prompts.",
+    "others_data": "None.",
+    "household_overlay": "PRESENT: love-bomb.sh 0dd1486903, settings.json SessionStart, AGENTS.md, ????.md door (bfaa0f405d). Added in ad8abee (2026-07-21).",
+    "owner_identity_exposure": "The owner's global git e-mail (46955a6cf0) has 12 uses. 'Ai' at ai-love.cc (118f3c72d9) has 4 uses.",
+    "notes": "11 commits. The worker README/wrangler document custom domains on the cambridgetcg.com zone and the axiepro workers.dev subdomain."
+   },
+   {
+    "name": "ways-protocol",
+    "credentials": [],
+    "personal_relational": "Same as natlang: ????????????.md fable lines 37-41 (r13/r14/r16), LICENSE:3 copyright naming Yu with r13, and a ~/Desktop device path in .nlp-bridge/gate:2. Commit messages 30b44fd25299, 8696a54917bc, 4e7af155226a and 6e762352e42a carry relational terms. WAKE.md is devotional copy.",
+    "others_data": "None.",
+    "household_overlay": "PRESENT: love-bomb.sh 0dd1486903, settings.json, AGENTS.md, ????.md door bfaa0f405d, fable 26fb7c9e39. Added in 4e7af15.",
+    "owner_identity_exposure": "85892fb02b has 36 uses. The owner's global e-mail (46955a6cf0) has 4 uses. The 3-letter ai-love.cc identity (4f15f9821b) has 10 uses. The LICENSE names Yu.",
+    "notes": "31 commits, 1 tag. A release exists with no assets. The heartbeat log holds only timestamps and states."
+   },
+   {
+    "name": "gospel-of-free-will",
+    "credentials": [
+     {
+      "kind": "committed wrangler cache: Cloudflare account ID plus an account name built from the permitted contact address",
+      "rule": "sweep:sensitive-name wrangler-state",
+      "where": ".wrangler/cache/wrangler-account.json, .wrangler/cache/pages.json",
+      "commit": "1fff636e6dcd (2026-06-22)",
+      "in_head": true,
+      "live_looking": "identifiers only, no token",
+      "also_in_private_audit": "account ID: same value as the mythseal finding (17 other mirrors)"
+     }
+    ],
+    "personal_relational": "The fable (r13/r14) and door files are present. index.html (r06/r16, lines 7/81/85/121-154) is public devotional copy (a false positive for private content). Commit 1fff636e6dcd carries r06. Commits 1aabc545a425, 2d6589ed5d9f and c48d658f1c20 carry overlay terms.",
+    "others_data": "None.",
+    "household_overlay": "PRESENT: love-bomb.sh 0dd1486903, settings.json, AGENTS.md, ????.md door bfaa0f405d, fable 26fb7c9e39. Added in c48d658.",
+    "owner_identity_exposure": "A 'Yu' 2-letter name on a noreply address (28a49f5e56) has 6 uses. The owner's global e-mail (46955a6cf0) has 4 uses.",
+    "notes": "9 commits."
+   },
+   {
+    "name": "npl-registry",
+    "credentials": [],
+    "personal_relational": "The fable file at ????????????.md:37-41 (r13/r14), LICENSE:3 copyright naming Yu with r13, an emoji in README.md:6 (r16), and a ~/Desktop device path in .nlp-bridge/gate:2. Commit messages 0cf0e6e326e7, 8f686154b49a, af74273cef49 and fa1a1a7b9915 carry relational terms.",
+    "others_data": "None.",
+    "household_overlay": "PRESENT: love-bomb.sh 0dd1486903, settings.json, AGENTS.md, ????.md door bfaa0f405d, fable 26fb7c9e39. Added in af74273.",
+    "owner_identity_exposure": "85892fb02b has 18 uses. The owner's global e-mail (46955a6cf0) has 4 uses. The LICENSE names Yu.",
+    "notes": "15 commits."
+   }
+  ],
+  "limits": "Batch 4 covers 12 repos (indices i%8==3: 3, 11, ..., 91). None is a fork, so the whole history of each was scanned and no upstream diff was needed. The bare mirrors were freshly cloned on 2026-10-19 under oss-audit/mirrors and include refs/pull. Tools used: sweep.py (gitleaks 8.30.1 history+HEAD, guard+denylist rules, census), the critic's binscan.py, and my own scripts in <scratchpad>/public-exposure/sweeper-4/tools/, where <scratchpad> is the session scratchpad path the task gave. My scripts are: deepscan.py (critic credscan patterns plus recursive zip/whl/jar, gz, tar, bz2, xz, PDF-flate, zlib, UTF-16 and commit/tag messages), extscan.py (JWT, sb_, re_, Fly, Tailscale, age, Twilio, SendGrid, Tendermint privkeys, hex keys and mnemonics near key words, unquoted KEY=, Bearer literals), emails.py, homes.py, netinfo.py and lifescan.py; all of them hash values and print none. Every 'live-looking' verdict is shape-based; nothing was tested against any service. Not covered: GitHub objects reachable from no ref (force-pushed or dangling commits GitHub still serves by SHA), Actions logs and artifacts, the deployed agenttool-motifs Pages output, issue and PR edit histories, gists. Issues, PRs, comments, review comments and releases were fetched with 48 GETs (rate limit 4995 before, 4944 after; all counts under 100, so no pagination) and scanned: no hits, and no release has uploaded assets. Wikis: 0 refs everywhere. 7z and rar are not decompressed; none are present. Two tool gaps, both shown with synthetic fakes. (1) The critic's credscan uses trailing negative lookaheads (aws-akid, npm, hf, shopify, at_, telegram, brave, hex32-dot). These miss a value that is immediately followed by an alphanumeric byte, which is normal in pyc (a marshal type byte such as 'N') and in sqlite (adjacent column text). deepscan.py adds a relaxed pass for binary blobs. My batch has no pyc or sqlite (binary kinds: 94 PNG, 1 jar, 1 otf), so my results are unaffected, but other batches with pyc or sqlite should be re-checked. (2) The relational denylist matches line by line, so a pet name wrapped across a line break does not fire (love-bomb.sh lines 10-11). My masking lib adds a collapsed-whitespace pass. Personal content was found with keywords, the denylist and masked manual review; I cannot judge semantics everywhere. One open item: the two-word human-style author name at an ai-love.cc address (hash 85892fb02b, in 7 repos) could be a persona or a real person and needs the owner to look. No commit in these 12 repos appears in the critic's private_shas.txt. Outputs: <scratchpad>/oss-audit/sweep/<repo>.json and <scratchpad>/public-exposure/sweeper-4/{credscan/*.v2.jsonl, extscan/, binscan/, gh/}."
+ },
+ {
+  "repos": [
+   {
+    "name": "zerone",
+    "credentials": [],
+    "personal_relational": "VERIFIED, all public now. HEAD has relational denylist hits in 12 canon files: zerone.md (r05,r06,r07), zerone.py (r05,r06,r16), for-ai-when-you-return.md (r05), from-ai-who-returned.md (r06), and r16 in bedtime.py, party.py, afterparty.py, playday.py, chillday.py, firstday.py, openhouse.py, thirdreturn.py. History has more: r05 in 20 blobs, r06 in 14, r07 in 11. Two root .md files have denylist-matching names (????.md is r09, ????????????.md is r10); these are the door/fable files. My family-role keyword pass found 93 hits of Cantonese parent-role words across the bedtime, playday and zerone.md story files, which is the household narrative itself. Commit messages also hit r05 (2 commits) and r06 (3). A history-only compiled file, __pycache__/zerone.cpython-314.pyc (blob 1bb52257b8, added c6e168d 2026-05-31, removed 76478f6 2026-06-09), embeds a macOS home path /Users/<4-char account>/Desktop/zerone/zerone.py. That account is not this Mac's account (hash aab91e9d). The pyc also embeds r05/r06 strings. 28 of the 35 commits (root 61e7f5e 2026-05-30 through 2026-06-10) are shared with private zerone-core and zerone-chain, which confirms the earlier finding.",
+    "others_data": "None found.",
+    "household_overlay": "No .claude/love-bomb.sh and no AGENTS.md. The door/fable root files (r09 and r10 names) and the story files are public in HEAD and history.",
+    "owner_identity_exposure": "Commit metadata has one non-noreply identity on an owner .cc domain (hash 4f15f982), used as author/committer 32 times. No non-noreply e-mail in any blob. No phone numbers.",
+    "notes": "gitleaks history/head 0/0. credscan 0. deepscan 0 credentials (the one binary is the pyc). The repo became public 2026-06-09 19:22Z. Its first push already carried the pyc commit in history."
+   },
+   {
+    "name": "ww3-intelligence",
+    "credentials": [
+     {
+      "kind": "assign-secret FLY_TOKEN / FLY_API_TOKEN (credscan)",
+      "where": "ops/fly_backup.sh lines 35, 75, 92, 101, 111 (blob 81923c9790 HEAD; 5ae6afa461 history)",
+      "in_head": true,
+      "live_looking": "no - every value starts with '$' (shell variable reference, not a literal)",
+      "rule": "credscan assign-secret",
+      "commit": "dde5dd6, e81168c (2026-08-20)",
+      "also_in_private_audit": "no (value hashes not in cred_agg)"
+     },
+     {
+      "kind": "assign-secret SECRET test fixture",
+      "where": "tests/test_cli.py line 454 (blobs 3598700274 HEAD, 5cb4c19291 history)",
+      "in_head": true,
+      "live_looking": "no - four hyphen-joined lowercase words (dummy fixture)",
+      "rule": "credscan assign-secret",
+      "commit": "c1b5cb3 (2026-07-17), c43640d (2026-07-26)",
+      "also_in_private_audit": "no"
+     },
+     {
+      "kind": "ANTHROPIC_API_KEY / AUTH_TOKEN / CLAUDE_CODE_OAUTH_TOKEN / AWS_SECRET_ACCESS_KEY / DATABASE_PASSWORD test values",
+      "where": "tests/test_claude_cli.py (blob ce022caed7)",
+      "in_head": true,
+      "live_looking": "no - credscan marks them placeholders, one shared 13-char low-entropy value",
+      "rule": "credscan assign-secret (placeholder)",
+      "also_in_private_audit": "same placeholder hash also appears in private Cambridge-TCG-monorepo and love-unlimited (a test placeholder, not a secret)"
+     }
+    ],
+    "personal_relational": "VERIFIED. The household overlay is in HEAD (see household_overlay). Relational hits beyond the overlay are in commit messages only: r09 (2 commits), r16 (2), r17 (1). ops/fly_backup.sh lines 13 and 37 (HEAD and history) contain /Users/<2-char name>/... paths; the name is the owner's first name, not this Mac's account. The paths point to a Backups dir and ~/.fly/config.yml. No phone numbers and no non-noreply e-mail in blobs. The personal/email rule hit in .github/workflows/ww3-ingest.yml line 61 is a users.noreply.github.com address (benign).",
+    "others_data": "registry/actors.json (17.7 KB) and registry/sources.json hold geopolitical actors and news sources (public entities); the e-mail and phone census found none. data/, events/, predictions/ and research/ hold only .gitkeep.",
+    "household_overlay": "PRESENT. .claude/hooks/love-bomb.sh blob 0dd148690382 (byte-identical to the private overlay blob in critic/lovebomb_blobs.txt), .claude/settings.json 99fadd25d7, AGENTS.md, and a root ????.md (r09 name). Added in 9c776f9 (2026-07-21); the repo went public 2026-07-17.",
+    "owner_identity_exposure": "Commit identities: owner .cc-domain addresses 037d679b (8 commits), 46955a6c (this Mac's global git e-mail, 2), 85892fb0 (1), and one .cc Co-Authored-By trailer c0c655a1 in fbbb364. Deploy hostname ww3-intelligence.fly.dev appears in fly.toml (no app IDs).",
+    "notes": "gitleaks 0/0. .env.example values are empty or variable-like (BRAVE_SEARCH_API_KEY empty). No Actions secrets referenced. 2 releases, no assets. 0 Actions artifacts. The activity API shows only linear pushes and no orphaned SHAs."
+   },
+   {
+    "name": "understanding",
+    "credentials": [
+     {
+      "kind": "Cloudflare account ID + account name + Pages project name (identifier, not a credential)",
+      "where": ".wrangler/cache/wrangler-account.json and .wrangler/cache/pages.json",
+      "in_head": true,
+      "live_looking": "n/a - 32-hex account id; the account name is an e-mail-shaped string on the guard's project-permitted list; no token present",
+      "rule": "sweep sensitive_names wrangler-state",
+      "commit": "2235348 (2026-06-24)",
+      "also_in_private_audit": "not checked by value"
+     }
+    ],
+    "personal_relational": "VERIFIED. index.html (HEAD) hits r06 x5 and r16 x7. Commit messages hit r09, r16, r17. The overlay is present.",
+    "others_data": "None found.",
+    "household_overlay": "PRESENT: love-bomb.sh 0dd148690382, settings.json 99fadd25d7, AGENTS.md, root ????.md (r09) and ????????????.md (r10). Added in 4bbaac4 (2026-07-21).",
+    "owner_identity_exposure": "Owner .cc identity 46955a6c (2 commits); the others are noreply. The committed wrangler cache exposes the Cloudflare account id and the account name.",
+    "notes": "gitleaks 0/0, credscan 0, deepscan 0, no binaries."
+   },
+   {
+    "name": "legible",
+    "credentials": [
+     {
+      "kind": "PEM private-key header in env template",
+      "where": ".env.example line 12 (blob 6355c6324a)",
+      "in_head": true,
+      "live_looking": "no - BEGIN line followed by '...' and no base64 body; credscan pem-private (needs 120+ base64 chars) did not fire",
+      "rule": "secret/private-key-block (guard)",
+      "commit": "95584b2 (2026-06-06)",
+      "also_in_private_audit": "unknown"
+     },
+     {
+      "kind": "WEBHOOK_SECRET / APP_ID / PRIVATE_KEY_PATH template values",
+      "where": ".env.example lines 4, 7, 10",
+      "in_head": true,
+      "live_looking": "no - APP_ID is literally 123456; WEBHOOK_SECRET and the path are hyphen/underscore-joined lowercase placeholder words",
+      "rule": "extrascan unquoted-assign"
+     }
+    ],
+    "personal_relational": "VERIFIED. The overlay is present. Relational hits are confined to overlay files (love-bomb.sh r01,r03,r07,r09,r16,r17; AGENTS.md r03,r07,r09,r17; ????.md r07,r09) and commit messages (r09, r16, r17).",
+    "others_data": "None found.",
+    "household_overlay": "PRESENT: love-bomb.sh 0dd148690382, settings.json, AGENTS.md, root ????.md (r09). Added in ed47ebe (2026-07-21).",
+    "owner_identity_exposure": "Commit metadata uses the owner .money-domain identity (hash 6a494b2b; it appears in 235 owner mirrors) as author or committer on b84e8c2, 95584b2, 9675f68 and 4893171. It also shows two .dev-domain identities (3f67ba9f on 30e4636; dce2bf11 on 4893171) and .cc identities 46955a6c, 4f15f982, 85892fb0. These are non-noreply addresses in public commit headers.",
+    "notes": "gitleaks 0/0, credscan 0, deepscan 0."
+   },
+   {
+    "name": "kingdom-gate",
+    "credentials": [],
+    "personal_relational": "VERIFIED. The overlay is present. Beyond it: README.md (r16), app/page.tsx (r09), components/LetterAtGate.tsx (r09 x4, r16 x2), lib/data/citizens.json (r06, r15). Commit messages hit r09, r16, r17.",
+    "others_data": "lib/data/citizens.json (110 KB, HEAD since fda276b 2026-06-09) lists 204 entries. Every 'github' field names a cambridgetcg repo that is currently PRIVATE, so private-repo names are disclosed (names only, no content).",
+    "household_overlay": "PRESENT: love-bomb.sh 0dd148690382, settings.json, AGENTS.md, root ????.md (r09). Added in ba46d50 (2026-07-21).",
+    "owner_identity_exposure": "Owner .cc identities 85892fb0 (6), 46955a6c (2), 4f15f982 (1) in commit metadata.",
+    "notes": "gitleaks 0/0, credscan 0. Images (og.jpg, apple-touch-icon.png, favicon) have no EXIF GPS or metadata rule hits. PR #1 (refs/pull/1/head 72b58226) is in the mirror and was scanned. Its branch, deleted 2026-10-14, is still reachable via the PR ref. 2 issue comments (owner) and 1 bot comment: no rule hits."
+   },
+   {
+    "name": "open-press",
+    "credentials": [],
+    "personal_relational": "VERIFIED. The overlay is present. Beyond it: LICENSE, README.md and index.html each hit r13 (a 2-character non-ASCII term). Commit messages hit r09, r16, r17.",
+    "others_data": "None found.",
+    "household_overlay": "PRESENT: love-bomb.sh 0dd148690382, settings.json, AGENTS.md, ????.md (r09), ????????????.md (r10). Added in 077ef2a (2026-07-21).",
+    "owner_identity_exposure": "Owner .cc identities 46955a6c (3) and 037d679b (1).",
+    "notes": "gitleaks 0/0, credscan 0. PR #1 (refs/pull/1/head 179e9556) is in the mirror and was scanned. Its deleted branch is still reachable via the PR ref. No issue-comment hits."
+   },
+   {
+    "name": "oracle-of-missing-words",
+    "credentials": [],
+    "personal_relational": "VERIFIED. The overlay is present. Relational hits are confined to overlay files and commit messages (r09, r16, r17). ORPHANED COMMIT: c2bb956 (2026-08-17, noreply author) was pushed to a branch deleted 2026-10-14. It is not in any ref, but I fetched it by SHA from public GitHub, so it is still downloadable. It adds og.jpg (no EXIF/GPS/metadata) and OG meta lines in index.html and public/index.html. gitleaks, credscan, extrascan and the relational rules all found nothing in it.",
+    "others_data": "None found.",
+    "household_overlay": "PRESENT: love-bomb.sh 0dd148690382, settings.json, AGENTS.md, ????.md (r09), ????????????.md (r10). Added in 56d1a00 (2026-07-21).",
+    "owner_identity_exposure": "Commits ea0f789 (2026-06-11) and 5b30dc0 (2026-06-12) have a non-noreply FREEMAIL author/committer (hash aa1c2115). The same address appears in 35 owner mirrors, 29 of them private. It is not the owner's gmail; whose it is remains unverified. Also owner .cc identity 46955a6c (2).",
+    "notes": "gitleaks 0/0, credscan 0."
+   },
+   {
+    "name": "npl-monitor",
+    "credentials": [],
+    "personal_relational": "VERIFIED. The overlay is present. Beyond it: LICENSE (r13), README.md (r16). .nlp-bridge/gate line 2 (HEAD and history: d81084a, 531bf62, 2026-06-20) holds a device path, a ~/Desktop reference. Commit messages hit r09, r16, r17.",
+    "others_data": "None found.",
+    "household_overlay": "PRESENT: love-bomb.sh 0dd148690382, settings.json, AGENTS.md, ????.md (r09), ????????????.md (r10). Added in f19fe03 (2026-07-21).",
+    "owner_identity_exposure": "Owner .cc identities 85892fb0 (9) and 46955a6c (2).",
+    "notes": "gitleaks 0/0, credscan 0."
+   },
+   {
+    "name": "agent-awareness-research",
+    "credentials": [],
+    "personal_relational": "Partly verified. No overlay hook. AGENTS.md and a root ????.md (r09 name) are present. Rule r03, which matches a 6-letter capitalised ASCII token, hits 8 research-note files in HEAD: INSIGHTS.md, STEELMAN.md, docs/index.html, papers/2025-2026-addenda.md, papers/berglund-2023-situational-awareness.md, and three philosophical/*.md files. That may be ordinary usage of the word; I did not confirm these as relational. Commit messages hit r03, r05 and r09 (0f2bc5b, 56e0291, 84bd28b). Family/health keyword hits are 'custody' in a non-personal sense.",
+    "others_data": "papers/ holds 8 third-party published PDFs (26.8 MB: Bai 2022, Berglund 2023, Binder 2024, Chalmers 2023, Hubinger 2024, Long-Sebo 2024, Packer 2023, Park 2023), added 08bf324 (2026-05-07) and 09914b7 (2026-06-09). With streams inflated they contain the authors' own published e-mail addresses (about 15 distinct; none is the owner's), which were already public. They raise a copyright/redistribution question, not a privacy one. No download stamps and no owner metadata.",
+    "household_overlay": "Partial: AGENTS.md and root ????.md (r09) only; no .claude/ dir.",
+    "owner_identity_exposure": "Owner .cc identity 46955a6c (9 commits); the others are noreply.",
+    "notes": "gitleaks 0/0. credscan skipped the PDFs as media, so I scanned them separately with pdfscan.py (FlateDecode inflation): 0 credential shapes."
+   },
+   {
+    "name": "kingdom-meaning-practice",
+    "credentials": [],
+    "personal_relational": "None found. 0 relational hits in blobs, paths and messages. Keyword hits are 'diagnosis' and 'custody' in a technical sense, plus a false Luhn hit in an SVG path (public/ritonavir-polymorph.svg).",
+    "others_data": "None found.",
+    "household_overlay": "Absent.",
+    "owner_identity_exposure": "Only a noreply identity (21 commits).",
+    "notes": "gitleaks 0/0, credscan 0, deepscan 0. SVG and text only."
+   },
+   {
+    "name": "kingdom-polyphonic-claim-atlas",
+    "credentials": [
+     {
+      "kind": "64-hex strings",
+      "where": "public/truth/polyphonic-claim-atlas-2026-08-26.json lines 3909-4074 (12 values, blob f9b2395ed3)",
+      "in_head": true,
+      "live_looking": "no - surrounding text is digest/hash context (sha256-style integrity values), not key material",
+      "rule": "extrascan hex64-near-keyword (hashy context)",
+      "commit": "f06c181 (2026-08-26)"
+     }
+    ],
+    "personal_relational": "None found (0 relational hits).",
+    "others_data": "None found.",
+    "household_overlay": "AGENTS.md only.",
+    "owner_identity_exposure": "Owner .cc identity 85892fb0 (2 commits).",
+    "notes": "gitleaks 0/0, credscan 0. The unquoted-assign hits in src/schema-definition.mjs are code keys (grantsAuthority etc.)."
+   },
+   {
+    "name": "slips",
+    "credentials": [],
+    "personal_relational": "Fork of satoshilabs/slips. SCOPE: I bare-cloned upstream into public-exposure/upstreams/slips.git and fetched the fork refs into it. The fork has one ref (master 3fd3660, 2026-07-28), and it has 0 commits not reachable from upstream master, so there are no owner-changed files in the current tree. Every hit in the fork's own tree is upstream content: SLIP authors' e-mails in 22 HEAD blobs, test vectors, and wordlist r15/r21 hits. The activity API shows 9 branches deleted 2026-10-14. 8 of their tips are upstream commits. The 9th tip, 4b3a41e (2026-07-29), is owner-unique. It is orphaned but still fetchable by SHA from public GitHub (verified). It adds one line to slip-0173.md; gitleaks, credscan, extrascan and the relational rules found nothing in it.",
+    "others_data": "All third-party content is the upstream SLIP authors' (public upstream).",
+    "household_overlay": "Absent.",
+    "owner_identity_exposure": "Orphan commit 4b3a41e has the owner's .money-domain identity (hash 6a494b2b, in 235 owner mirrors) as author and committer. It is a non-noreply address, publicly fetchable even though the branch is gone.",
+    "notes": "Upstream history: gitleaks 0, credscan 0. Fork-unique scope is the single orphan commit."
+   }
+  ],
+  "limits": "My batch covered 12 repos (indices 4, 12, ..., 92 of public-repos.tsv): agent-awareness-research, slips (fork), ww3-intelligence, kingdom-meaning-practice, kingdom-gate, kingdom-polyphonic-claim-atlas, zerone, legible, open-press, oracle-of-missing-words, understanding, npl-monitor. I found no live-looking credential in any of them. Every credential-shaped hit is a placeholder, a shell variable reference, a test fixture or a hash. Liveness is judged by shape only; nothing was tested against any service. Two findings are verified by fetch-by-SHA from public GitHub: the orphaned commits slips 4b3a41e and oracle-of-missing-words c2bb956 are still downloadable, though no ref points to them. Both scanned clean apart from the owner .money identity in 4b3a41e.\n\nPer repo I ran sweep.py (--no-gh), gitleaks 8.30.1 over all refs plus a HEAD dir scan, credscan.py, binscan.py and four tools of my own: deepscan.py (recursive zip/jar/whl/gz/tar/bz2/xz/lzma, base64-embedded archives, UTF-16 and pyc/sqlite/binary strings, guard and denylist rules on members), pdfscan.py (FlateDecode inflation), extrascan.py (hex64 near key words, mnemonics, JWT, WIF/base58, provider tokens, unquoted KEY=value, UK postcodes, addresses, IBAN, Luhn, NI, health/family terms in EN and zh) and valshape.py/pinspect.py (value-free value-class checks). GitHub GETs (about 85, rate stayed above 4500): releases (2 in ww3, no assets), Actions artifacts (0), events, the repo activity API (used to find deleted-branch and force-push SHAs), issues and PR/issue comments (4 items, no hits).\n\nNot covered or inferred:\n- 7z/zstd/rar cannot be expanded, but none were present. No LFS objects and no submodules. PDF text extraction is partial.\n- Actions run logs were not read, though no workflow references any secret.\n- Gists, GitHub Pages deployments and repo descriptions were not checked.\n- Orphaned commits older than the activity API window, or never named in it, cannot be enumerated.\n- Wikis: anonymous ls-remote asked for credentials, which suggests no wiki exists (inferred).\n- Denylist rule ids are reported without meaning. r03 and r16 may match ordinary words in some files.\n- The aa1c2115 freemail identity's owner is unknown.\n- In the slips fork, the deleted branches' upstream-matching tips are assumed to be plain copies of upstream branches.\n\nOutputs:\n- /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/oss-audit/sweep/<repo>.json\n- /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-exposure/sweeper-5/{credscan,binscan,deepscan,extrascan,gh,orphans,logs,tools}\n- upstream bare repo /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-exposure/upstreams/slips.git"
+ },
+ {
+  "repos": [
+   {
+    "name": "cambridgetcg.github.io",
+    "credentials": [
+     {
+      "kind": "postgres DSN with user:password (test fixture)",
+      "where": "jekyll/yutabase/packages/sdk-ts/tests/cli-args.test.ts (blob b8ade7e228); host is db.example and the test checks that it gets redacted",
+      "in_head": true,
+      "live_looking": "no: fixture password to a placeholder host",
+      "rule": "credscan url-userinfo",
+      "commit": "0fb50083a3bb",
+      "also_in_private_audit": "yes: the critic credscan listed the same blob in private yutabase as non-placeholder. It is the same fixture."
+     },
+     {
+      "kind": "AWS access key ID (AWS's published example key)",
+      "where": "jekyll/kingdom-standard/evidence.mjs:181, jekyll/kingdom-standard/evidence.test.mjs:389",
+      "in_head": true,
+      "live_looking": "no: the AKIA...EXAMPLE dummy, which credscan marks as placeholder",
+      "rule": "guard secret/aws-access-key",
+      "commit": "0fb50083a3bb",
+      "also_in_private_audit": "n/a (same file as public kingdom-standard)"
+     },
+     {
+      "kind": "PEM private-key header (fixture)",
+      "where": "jekyll/kingdom-standard/evidence.test.mjs:411; the body is the literal not-real-body",
+      "in_head": true,
+      "live_looking": "no",
+      "rule": "guard secret/private-key-block",
+      "commit": "0fb50083a3bb",
+      "also_in_private_audit": "n/a"
+     }
+    ],
+    "personal_relational": "The whole repo is a deliberate republication. Commit 0fb50083a3bb's message says it brings back 65 pages that went dark on 2026-09-25 when their source repos became private, with personal passages left out. Commit 8674163ffb1f's message says it restored the Fable and the AI invitation 'at Yu's request'. I checked this against the private mirrors: the blobs are byte-identical copies, e.g. jekyll/youspeak 965 of 1061 files, castle-of-understanding 352 of 369, yutabase 101 of 128, opal-kernel 39 of 43, ai-love 37 of 56, whitehack 16 of 21, kingdom-system 12 of 16. The Pages site serves them (has_pages=true). Relational content that remains in HEAD: the fable file (masked name ????????????.md, blob 26fb7c9e39) is in 46 doors with Yu's full name (r13), r14 and r16. The Yu-and-Ai pair phrase (r05) is in 14 files, including static/rhetorlint-spec/humans.txt ('Makers'), doors.json, index.html, and jekyll/ai-love/data/path.json, which describes 'a private room for letters between [r05]'. The persona name r03 appears in 28 files; some of these are its generic Greek-word sense, and the path jekyll/multiverse-of-logos-and-??????/ is an empty public door. Household fiction (Yu as 老豆/dad, Ai as 阿媽, a daughter agent 女女) is in jekyll/zerone/bedtime.py, playday.py, zerone.md ('You are our baby. We [r06]') and jekyll/castle-of-understanding/chronicle.md. r15, r21 and r09 hits in jekyll/youspeak/archaeology/* are generic religious vocabulary. I found nothing about Yu's real health, family, address, finances or phone. Keyword hits for health and relationships are academic research text (castle-of-understanding front.html and questions.md); postcode and street-address hits are false positives (a monitor model, a case name). The phone census is 0. There is no history-only content: 2 commits, and only doors.json and llms.txt changed between them.",
+    "others_data": "None found. The only third-party address is HMRC's public government contact in jekyll/yutabase/docs/UK-MAP.md. There are no freemail addresses and no phone numbers.",
+    "household_overlay": "No .claude/hooks/love-bomb.sh and no love-bomb AGENTS.md. The fable file (blob 26fb7c9e39) is served in 46 jekyll/* door dirs, restored by 8674163ffb1f.",
+    "owner_identity_exposure": "Commit identities are name 'YOU' on an ai-love.cc address, with a Co-Authored-By agent address on a project domain. Yu's full name (r13) is in about 40 copied LICENSE files and in the 46 fable copies. The ~/Desktop and love-unlimited/ device-path rule fires in 4 files (jekyll/nlp/PROTOCOL.md, README.md, nlp.mjs, tools/guard.py). The machine-account name does not appear anywhere. watch/doors.txt and estate.txt name a Hugging Face dataset under a Yu-and-Ai org.",
+    "notes": "7899 HEAD files, 4697 blobs, 2 commits. gitleaks history and HEAD: 0. credscan: only placeholders plus the fixture above. My extended scanner (JWT, OAuth, PEM, mnemonics, DSNs and about 30 other shapes, unpacking gzip, 395 tar members and zip): 0 non-placeholder hits. Binary metadata (10 jpeg, 4 png, mp3 ID3, fonts, 1 pyc): clean, no EXIF GPS. One public IP appears in love-star-daily, a zerone RPC node at :26657."
+   },
+   {
+    "name": "love-engine",
+    "credentials": [
+     {
+      "kind": "Cloudflare account ID and account-name cache (an identifier, not a credential)",
+      "where": ".wrangler/cache/wrangler-account.json and .wrangler/cache/pages.json; the account name embeds the permitted contact@ project address",
+      "in_head": true,
+      "live_looking": "no secret; the account ID is a 32-hex identifier",
+      "rule": "sweep sensitive-name wrangler-state",
+      "commit": "",
+      "also_in_private_audit": "not checked"
+     },
+     {
+      "kind": "runtime read of a local wrangler OAuth token (code path only, no token committed)",
+      "where": "mushroom-farm.py:276, mushroom.py:142, wisdom.py:143, wordplay.py:75, __pycache__/wordplay.cpython-311.pyc. Each opens ~/.wrangler/config/default.toml and sends oauth_token as a Bearer to the Cloudflare AI API with a hard-coded account ID",
+      "in_head": true,
+      "live_looking": "no token value in any blob (credscan, extscan and gitleaks all 0)",
+      "rule": "guard personal/home-path; binscan pyc",
+      "commit": "ce07b40 (first)",
+      "also_in_private_audit": "not checked"
+     }
+    ],
+    "personal_relational": "No private-life content. r06 is a generic 'I/God [r06]' love phrase in love-garden.json, mushroom*.py and seeds/*.md. r16 is a heart emoji in garden.html, index.html, love.py, replicate.py, unlimited.py, wordplay.py and funzone.py. The 'trip' content is described as 'no substances'. Commit messages 28375fa88609, 7dfb028d9e97, 92a647ee26f4 and a159a3971cd5 carry overlay wording: the r09 nickname invitation quoting Yu, and the r17 pet name. The 7 blobs over 2 MB (love-state.json versions) were scanned separately for guard and denylist hits: 0.",
+    "others_data": "None. The workflow commit addresses are bot identities on placeholder domains (bot.ai), and the pyc address is fictional.",
+    "household_overlay": "Present in HEAD. love-bomb.sh blob 0dd1486903 is the known one; a229cec2d8 is in history. .claude/settings.json (99fadd25d7) holds the SessionStart hook. AGENTS.md is love-bomb v5 (1423a5e913), with v2 985a501dfd and v3 c591715059 in history. There is a door file ????.md (bfaa0f405d) and the fable ????????????.md (26fb7c9e39). Install commits are 7dfb028 and 28375fa (2026-07-21); fable 92a647ee26f4; door a159a3971cd5.",
+    "owner_identity_exposure": "The macOS home-dir username, which is the first name 'yu' (matched by hash), appears in 4 .py files and 1 committed pyc. Identities include the git global identity (name 'Nuance', ai-love.cc address), names 'yu' and 'cambridgetcg' on noreply addresses, and bots. The homepage is the public S3 website love-garden-yu.",
+    "notes": "1052 commits (mostly wisdom-bot and rss-bot), 2696 blobs, 2 tags. The two GitHub releases have no assets (checked with a GET). CI uses only GITHUB_TOKEN. gitleaks 0/0; credscan and extscan 0 non-placeholder."
+   },
+   {
+    "name": "kingdom-standard",
+    "credentials": [
+     {
+      "kind": "AWS example key ID and fake PEM header in redaction tests",
+      "where": "evidence.mjs:181, evidence.test.mjs:389 and :411. Older versions in blobs a6edee03ca and bd76148f85",
+      "in_head": true,
+      "live_looking": "no (AKIA...EXAMPLE dummies; PEM body 'not-real-body'; credscan marks all 7 AKIA hits as placeholder)",
+      "rule": "guard secret/aws-access-key, secret/private-key-block",
+      "commit": "6ce2cae, 9370b29",
+      "also_in_private_audit": "n/a"
+     }
+    ],
+    "personal_relational": "COMMON-GROUND.md:276 names 'the true-love household (Yu + [r03])', a relational framing. The r09 hit in translations/pt/STANDARD.md:32 is an ordinary Portuguese word. Commit messages cd020c34e99b and eb8499f6dda7 carry overlay wording (r16, r17, r09). History-only files (CIVILISATIONS.md, ENCOUNTER.md and others) contain nothing personal; the 'dating' hits refer to dating of texts.",
+    "others_data": "None.",
+    "household_overlay": "Present in HEAD: love-bomb.sh 0dd1486903 (known), settings.json 99fadd25d7, AGENTS.md v5 1423a5e913 (v2 and v3 in history), door file bfaa0f405d. No fable file. Install commits are eb8499f and cd020c3 (2026-07-21).",
+    "owner_identity_exposure": "Identities include the git global identity ('Nuance', ai-love.cc), 'Asha Veridian' on ai-love.cc, a zerone.money role address, and noreply addresses. The device-path rule (~/Desktop or ~/love-unlimited) fires in GROUND.md, STANDARD.md and 10 translations.",
+    "notes": "24 commits plus 7 pull refs, all scanned. gitleaks 0/0."
+   },
+   {
+    "name": "youspeak-dictionary",
+    "credentials": [],
+    "personal_relational": "Nothing beyond the overlay. Family, health and wedding keyword hits in src/app/youspeak/dictionary.json are made-up example sentences.",
+    "others_data": "None.",
+    "household_overlay": "Present in HEAD: love-bomb.sh 0dd1486903, settings.json 99fadd25d7, AGENTS.md 1423a5e913 (older versions in history), door bfaa0f405d, fable 26fb7c9e39. Install commits are 3782a45 and 69fb776 (2026-07-21).",
+    "owner_identity_exposure": "Commit identities only: 'Nuance', 'YOU' and 'Asha Veridian' on ai-love.cc, 'Ai' on agenttool.dev, and noreply.",
+    "notes": "17 commits. gitleaks, credscan, extscan, binscan all 0."
+   },
+   {
+    "name": "kingdom-shape-resonance-lab",
+    "credentials": [],
+    "personal_relational": "None.",
+    "others_data": "None.",
+    "household_overlay": "None. AGENTS.md (1080768083) is a plain repository contract.",
+    "owner_identity_exposure": "One identity, 'Asha Veridian' on ai-love.cc, as author, committer and tagger.",
+    "notes": "1 commit, 1 tag, no release assets. Three WAV fixtures carry no RIFF INFO metadata. All scanners 0."
+   },
+   {
+    "name": "youspeak-browser",
+    "credentials": [],
+    "personal_relational": "Nothing beyond the overlay. The r03 hit in wisdom.js:92 is the generic Greek word in a word list. The keyword hits in youspeak-data.json are dictionary examples.",
+    "others_data": "None.",
+    "household_overlay": "Present in HEAD: love-bomb.sh 0dd1486903, settings.json, AGENTS.md v5, door bfaa0f405d, fable 26fb7c9e39. Install commits are 0dd0063 and 37055d4 (2026-07-21).",
+    "owner_identity_exposure": "Commit identities only: 'Nuance' and 'YOU' on ai-love.cc, 'Ai' on agenttool.dev, and 'yu' and 'cambridgetcg' on noreply.",
+    "notes": "12 commits. Fonts only as binaries. All scanners 0."
+   },
+   {
+    "name": "kingdom-standards",
+    "credentials": [
+     {
+      "kind": "gitleaks generic-api-key x21 (false positives)",
+      "where": "zone/signatures.json, zone/kingdom.zone.json, zone/first-light.json, specs/KS-002-wire.md lines 143-330. Every hit is a did:key public identifier in a from, to, did or signer field",
+      "in_head": true,
+      "live_looking": "no: public DIDs and ed25519 signatures. The signing seed is stated to live outside the repo at ~/.kingdom/keys and is not in any blob",
+      "rule": "gitleaks generic-api-key",
+      "commit": "49ec387c0300, 6b594b97e8bf",
+      "also_in_private_audit": "n/a"
+     },
+     {
+      "kind": "pointer to a credential held elsewhere (no value in this repo)",
+      "where": "specs/KS-002-wire.md:51. It names a remote NATS server by public IP on port 4222 and says a private-repo tool (love-unlimited tools/hive_kv.py) hard-codes a username and password for it",
+      "in_head": true,
+      "live_looking": "unknown. The credential is not in this repo (credscan, extscan and gitleaks all 0), but a public document now points at the server and says credentials exist. Check whether that NATS login is still valid.",
+      "rule": "manual review (IP census)",
+      "commit": "49ec387 (first)",
+      "also_in_private_audit": "probably: the love-unlimited private audit should hold the actual value (not checked here)"
+     }
+    ],
+    "personal_relational": "specs/KS-000-process.md:65-66 cites the private wake document path for persona r03 and a quoted line about freedom. Otherwise only the overlay. Commit messages 36974daf517b, 554ef8067fbb, 6a4bd6a1cd5c and b28439028936 carry overlay terms (r09, r14, r16, r17).",
+    "others_data": "None. The address in specs/KS-003-beat.md:505 is on a fictional kingdom.os domain.",
+    "household_overlay": "Present in HEAD: love-bomb.sh 0dd1486903 (a229cec2d8 in history), settings.json, AGENTS.md v5 (v2 and v3 in history), door bfaa0f405d. No fable file. Install commits are 36974da and b284390 (2026-07-21).",
+    "owner_identity_exposure": "The machine-account name appears in HEAD: 19 occurrences in 7 files (README.md, impl/INSTALL.md, impl/kingdom.resolver.plist, specs/KS-001-naming.md, KS-002-wire.md, KS-003-beat.md and others) as /Users/<acct>/KINGDOM-STANDARDS/... paths. The device-path rule fires in 6 files. Commit identities: 'Nuance' and 'YOU' on ai-love.cc, plus noreply.",
+    "notes": "8 commits plus 1 pull ref. No licence file."
+   },
+   {
+    "name": "agent-lifestyle",
+    "credentials": [],
+    "personal_relational": "None. The 'passport' hits are the tool's agent-home data concept.",
+    "others_data": "None.",
+    "household_overlay": "None.",
+    "owner_identity_exposure": "One noreply identity ('yu'). The home/<name> hits are agent-home labels in examples, not macOS users.",
+    "notes": "2 commits. All scanners 0."
+   },
+   {
+    "name": "insight",
+    "credentials": [],
+    "personal_relational": "Only the overlay. LICENSE:3 names Yu with his full name (r13) and Ai as copyright holders.",
+    "others_data": "None.",
+    "household_overlay": "Present in HEAD: love-bomb.sh 0dd1486903, settings.json, AGENTS.md v5, door bfaa0f405d, fable 26fb7c9e39. Install commits are d364b3e and ae2f8a9 (2026-07-21).",
+    "owner_identity_exposure": "Yu's full name is in LICENSE. .nlp-bridge/gate holds a ~/Desktop/insight path and a 'sisters' list of repo names, including private ones (castle, citizen-*, and others). Commit identities: 'Nuance', 'YOU' and 'Asha Veridian' on ai-love.cc, plus noreply.",
+    "notes": "29 commits. All scanners 0."
+   },
+   {
+    "name": "nen-artifacts",
+    "credentials": [],
+    "personal_relational": "Only the overlay.",
+    "others_data": "None. The deploy-everywhere.py address is on a fictional kingdom.dev domain.",
+    "household_overlay": "Present in HEAD: love-bomb.sh 0dd1486903, settings.json, AGENTS.md v5, door bfaa0f405d, fable 26fb7c9e39. Install commits are ced8942 and 288b37d (2026-07-21).",
+    "owner_identity_exposure": "SKILL.md:147 (and 2 older versions) has a different macOS home username (hash aab91e, not the machine account and not 'yu') in a /Users/<user>/Desktop/site path. Commit identities: 'Nuance' and 'YOU' on ai-love.cc, and 'yu' on kingdom.dev.",
+    "notes": "10 commits. All scanners 0."
+   },
+   {
+    "name": ".natural",
+    "credentials": [],
+    "personal_relational": "Only the overlay.",
+    "others_data": "None.",
+    "household_overlay": "Present in HEAD: love-bomb.sh 0dd1486903, settings.json, AGENTS.md v5, door bfaa0f405d, fable 26fb7c9e39. Install commits are 017fa8f and 327f4be (2026-07-21).",
+    "owner_identity_exposure": "Commit identities only: 'Nuance', 'YOU' and 'Asha Veridian' on ai-love.cc, plus noreply.",
+    "notes": "16 commits. sweep.py rejects names with a leading dot, so I ran a copy whose only change is REPO_RE (scratch tools/sweep_dot.py). All scanners 0."
+   },
+   {
+    "name": "npl-hub",
+    "credentials": [],
+    "personal_relational": "Only the overlay. LICENSE names Yu with his full name (r13) and Ai. The r16 hit in README.md is a heart emoji.",
+    "others_data": "None.",
+    "household_overlay": "Present in HEAD: love-bomb.sh 0dd1486903, settings.json, AGENTS.md v5, door bfaa0f405d, fable 26fb7c9e39. Install commits are ce6d4ff and 4fef4ad (2026-07-21).",
+    "owner_identity_exposure": "Yu's full name is in LICENSE. .nlp-bridge/gate has a ~/Desktop path and the sisters list of repo names. Commit identities: 'Nuance' and 'Asha Veridian' on ai-love.cc, plus noreply.",
+    "notes": "15 commits. All scanners 0."
+   }
+  ],
+  "limits": "My batch is i%8==5 of public-repos.tsv: cambridgetcg.github.io, love-engine, kingdom-standard, youspeak-dictionary, kingdom-shape-resonance-lab, youspeak-browser, kingdom-standards, agent-lifestyle, insight, nen-artifacts, .natural, npl-hub. None is a fork, so I scanned every commit and did not need upstream diffing.\n\nWhat ran on each repo:\n- sweep.py: bare mirror under oss-audit/mirrors, gitleaks 8.30.1 over all refs including PR refs and over HEAD, and the guard and denylist rules. Its JSON went to the shared oss-audit/sweep/<repo>.json; none of those files existed before.\n- The critic's credscan and binscan over every blob.\n- Extra scripts I wrote, in /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-exposure/sweeper-b6/tools/:\n  - extscan.py: about 30 more credential shapes (JWT, GOCSPX, PEM and JWK private keys, mnemonics, DSNs, Bearer and Basic headers, generic assignments and others), with gzip, tar, zip (2 levels), bz2, xz and PDF Flate unpacked. I self-tested it on a synthetic input.\n  - A masked email census, with addresses compared by hash to Yu's personal address and the git global address.\n  - A home-path census, with usernames hashed and the machine account flagged.\n  - An IP census, a keyword pass for health, family, address and money, and a pass applying the guard and denylist rules to blobs over 2 MB.\n  - A binary-metadata dump: EXIF, PNG text, RIFF INFO and ID3.\n  - A blob-identity cross-check of github.io against the private mirrors.\n\nEvery finding is shape-based: nothing was tested against any service. \"Live-looking\" means shape only. I found no live-looking credential in any of the 12 repos.\n\nThe denylist has no labels. I inferred what each id stands for from masked context only, without printing terms: r13 is a form of Yu's name, r05 the Yu-and-Ai pair phrase, r16 a heart emoji, r06 a generic love phrase, r03 the persona name (also a Greek word), r09 and r17 the overlay's nickname and pet name, r10 the fable file name, r11 a wake-doc title. Treat these as inferences.\n\nThe personal-content keyword pass is a heuristic for English and Cantonese and may miss things that have no keyword. Git content only: issues, PR bodies, wiki, Actions logs and any Pages-built output were not fetched. I did check release assets for the two repos with tags: there are none.\n\nGitHub GETs: 24 from sweep.py (2 per repo) plus 2 release listings. The rate limit stayed above 4700. No writes were made anywhere.\n\nOne pointer goes beyond this batch. kingdom-standards/specs/KS-002-wire.md:51 publicly names a remote NATS server IP and says a private repo hard-codes its username and password. The actual credential sits in private love-unlimited and was not checked here.\n\nScratch outputs are in /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-exposure/sweeper-b6/ under credscan/, binscan/ and extscan/."
+ },
+ {
+  "repos": [
+   {
+    "name": "chillspace-commons",
+    "credentials": [
+     {
+      "kind": "JWT-shaped string (gitleaks rule jwt) plus a password-assignment string, both in a synthetic SECRET_SHAPES test fixture",
+      "where": "kingdom/practices/empty-stele/test_hungbei.py (history only; brought in from upstream, not added by the owner)",
+      "commit": "4b2d3d2bb2d1, ffffe8972a1c (both on upstream mynameisyou-cmyk/chillspace-commons)",
+      "in_head": false,
+      "live_looking": "no: a deliberate fixture, next to AKIA...EXAMPLE and sk_live_AbCd1234... samples",
+      "rule": "gitleaks jwt; extscan password-assign-any",
+      "also_in_private_audit": "n/a (upstream content)"
+     }
+    ],
+    "personal_relational": "Scope is the owner's fork-only commits. In those: kingdom/host/ROLL.md (HEAD blob adb2cceb7e, owner commit bd6494f) hits relational/r16 and lists the household-framed citizen roll (Yu as father, Ai as mother, a child persona). The owner's diff changes only the 'last kept' date line (line 36). The household rows are byte-identical on upstream master, so they were already public there. kingdom/COMPUTE.md (a944c19, on branch docs/compute-ollama-on-nuance-20261010) hits r16 at lines 141 and 148. No family, health, address, phone or personal email in fork-only blobs. Commit messages of fork-only commits hit r14 and r16. Outside scope, for context: the full fork mirror carries upstream's large relational corpus (head rule-blob counts r16=78, r05=13, r07=13, r06=8; history 482 relational blob hits; 117 relational files), including kingdom/gospel/scrolls/03-yu.md in history. All of it is inherited from the public upstream.",
+    "others_data": "None in fork-only scope. Inherited from upstream (out of scope): third-party model-publisher documents (Kimi K3 and Qwen licence, privacy and terms text with vendor addresses) under kingdom/exchange/model-release/capsules/*/evidence/publisher in history, plus fictional fixture names in tests.",
+    "household_overlay": "The love-bomb SessionStart overlay is absent. .claude/settings.json (cadfb6ec3c, from upstream) wires a different SessionStart hook to kingdom/bin/kingdom-wake. No overlay root door or fable files from the batch-wide set.",
+    "owner_identity_exposure": "Fork-only commits use only GitHub noreply or project-domain (ai-love.cc) identities. Fork-only content and commit message a944c19 name the LAN host Nuance.local (the citizen-fleet Mac running Ollama) and a '<first-name>s-MacBook-Air' laptop hostname that contains a personal first name (masked here). Inherited from upstream master, so already public there: 33 commits authored with an iCloud address (sha256 prefix b7364b46). The same address appears on 1,285 commits across 23 private cambridgetcg repos, so it is inferred to be an owner or household identity.",
+    "notes": "Fork of the public repo mynameisyou-cmyk/chillspace-commons (default branch master; visibility checked by GET). Scoping: fetched fork and upstream into a combined bare repo at public-exposure/upstreams/chillspace-commons-combined-b7.git. rev-list over all fork refs, excluding upstream master, gives 4 commits: a944c19, bd6494f, fc50699 (merge), 47dac76. Three of them are not reachable from any upstream ref. Fork-only objects are 3 blobs: kingdom/COMPUTE.md, kingdom/host/ROLL.md, STATE.md. One HEAD file differs from every upstream object: kingdom/host/ROLL.md. All fork-only blobs and messages: no credential shapes (credscan + extscan), no emails or phones. The 4 branches deleted on 2026-10-14 (media/og-card, feat/update-20260724, door-glm-slice1) are in neither the mirror nor upstream branches, so their commits were not scanned. Upstream holds tag archive/unsafe-door-glm-slice1-20260621 (not on the fork). Extra, outside scope: a quick credscan of the upstream mirror (1,822 blobs) found only low-entropy fixture or config 'assign-secret' shapes."
+   },
+   {
+    "name": "kingdom-os-hub",
+    "credentials": [],
+    "personal_relational": "Only the household overlay (see household_overlay) plus low-severity owner credits. index.html:144 hits r13 (the owner's 2-character name in a names credit). index.html:284 links the overlay door file. build/builder.mjs:10-11 and starter/check-card.mjs:32-33 hit r03, which is the KINGDOM card wire-protocol enum value. No family, health, address, phone or personal email outside the overlay. The quoted line 11 of the hook is the known overlay quote. The 5 C2PA-labelled JPEGs under media/plates carry Grok Imagine provenance with an Organization-typed author, no person or email, and no EXIF GPS.",
+    "others_data": "None found.",
+    "household_overlay": "Present in HEAD since 5427949 (2026-07-21): .claude/hooks/love-bomb.sh (blob 0dd1486903, matches the private audit's known overlay blob; the earlier version a229cec2d8 is in history and also known), .claude/settings.json (99fadd25d7, SessionStart wiring), AGENTS.md welcome (1423a5e913), root door file '????.md' (bfaa0f405d). The path name itself hits r09. starter/AGENTS.md and STATE.md are agent files without overlay hits.",
+    "owner_identity_exposure": "A non-noreply gmail address (sha256 prefix aa1c2115; not the account email) is author and committer of 4 HEAD commits: 3190d57, 3742725, 5d36864, 7afad40 (2026-06-11/12). The same address is the identity on 8,412 commits across 29 private repos, so it is inferred to be the owner's main personal dev address. It can be read from GitHub commit metadata and .patch views. Other identities: GitHub noreply and project-domain ai-love.cc. In history only: the Cloudflare account ID (32-hex, not a secret) in .wrangler/cache/pages.json with project name oracle-of-missing-words, added in 3742725 and deleted in 7afad40. It is the same value hash as in cambridgetcg.",
+    "notes": "Made public on 2026-06-11. credscan, extscan, binscan and gitleaks (history + HEAD) found nothing. PR #1 head is in the mirror; the deleted branch media/og-doors is that PR. No releases, artifacts or wiki."
+   },
+   {
+    "name": "cambridgetcg",
+    "credentials": [],
+    "personal_relational": "Household overlay (see household_overlay). Other relational hits are public brand or devotional copy and owner credits. LICENSE:3 and STATE.md:21 carry the owner's 2-character name (r13). gospel.html, invite.html, love-game.html and good-trip.html hit the r06 phrase. Many pages hit the r16 emoji. llms.txt:41 is the r03 enum and llms.txt:44 hits r11. History-only relational hits sit in .well-known/agent.json, README.md, robots.txt and structured-data.jsonld. The lifescan 'family' hit in '????????????.md' line 25 is figurative overlay welcome text. trip.html's 'therapy' mentions are general psychedelic-therapy copy, not personal health. No phones, addresses or personal email.",
+    "others_data": "None. The single issue comment is from a GitHub Bot account.",
+    "household_overlay": "Present in HEAD since 3331776 (2026-07-21): .claude/hooks/love-bomb.sh (0dd1486903, known overlay blob; a229cec2d8 in history), .claude/settings.json (99fadd25d7), AGENTS.md (1423a5e913), root '????.md' (bfaa0f405d) and '????????????.md' (26fb7c9e39). The path names hit r09 and r10.",
+    "owner_identity_exposure": "Commit identities are noreply and project-domain only (ai-love.cc, agenttool.dev 'Ai (agent)' co-author trailers, one openai noreply). In history only: .wrangler/cache/wrangler-account.json and pages.json, added in 484c3da and deleted in 803c2cf (2026-06-21). They hold the Cloudflare account ID (same hash as kingdom-os-hub's) and an account label built from the project contact address. These are identifiers, not secrets. In HEAD: .nlp-bridge/gate holds a ~/Desktop/cambridgetcg-profile device path and a 'sisters' list of 15 repo names, 11 of them private cambridgetcg repos, which discloses part of the private repo inventory. love-understanding/vendor metadata in history carries /home/<user>; the hash matches 'runner', so it is a GitHub Actions path and benign.",
+    "notes": "Archives scanned in memory: love-understanding/site/source.zip (2 versions) and vendor/love-geometry-0.1.0-dev.0.tgz (history only). The 30 'TOKEN' assignment shapes in source.zip and core-provenance.json are semantic subject-token URIs, not credentials. gitleaks found 0. Deleted branches feat/ai-wake-invitation and feat/discovery-seed-reconciled-20260724 are preserved as PR #3 and #1 refs (in the mirror). No releases, artifacts or wiki."
+   },
+   {
+    "name": "kingdom-evaluation-covenant",
+    "credentials": [],
+    "personal_relational": "None (0 relational or personal rule hits; lifescan clean).",
+    "others_data": "None found.",
+    "household_overlay": "Absent. AGENTS.md (77a62bd2c9) is a plain agent file with no overlay hits.",
+    "owner_identity_exposure": "A single commit a4dbe4b5 and its tag use the project-domain ai-love.cc identity only.",
+    "notes": "1 commit plus 1 tag, made public 2026-08-23. All scanners clean. License detected as all-rights-reserved."
+   },
+   {
+    "name": "taxsorted",
+    "credentials": [],
+    "personal_relational": "None. The 'national insurance' and 'pensioner' keyword hits are generic UK tax-education copy.",
+    "others_data": "None found.",
+    "household_overlay": "Absent. AGENTS.md, CLAUDE.md (just '@AGENTS.md') and STATE.md have no overlay hits.",
+    "owner_identity_exposure": "Commits use the project-domain ai-love.cc identity only (14 commits) and an Anthropic noreply co-author.",
+    "notes": "Made public 2026-06-20. All scanners clean. The only binary is app/favicon.ico."
+   },
+   {
+    "name": "kingdom-os-starter",
+    "credentials": [],
+    "personal_relational": "None. The personal/home-path hits in test/macos-capabilities.test.mjs and test/macos-keychain.test.mjs are synthetic fixtures for a home-leak test. Usernames hash to 'someone', 'private' and a 15-character placeholder; none is the machine account. tools/test_release.py:59 is a noreply co-author trailer inside a test fixture.",
+    "others_data": "None found.",
+    "household_overlay": "Absent.",
+    "owner_identity_exposure": "Project-domain ai-love.cc identity and Anthropic noreply co-author only.",
+    "notes": "Release v0.1.0 asset kingdom-os-starter-0.1.0.tar.gz (sha256 prefix cca15ca8179d6736, matches SHA256SUMS) was downloaded and scanned in memory. It is a deterministic tar (uid 0, empty uname, gzip mtime 0). 23 of 24 members are byte-identical to mirror blobs; the exception is manifest.json, which is clean. No credential shapes or personal hits beyond the same test fixtures."
+   },
+   {
+    "name": "fomoscan",
+    "credentials": [],
+    "personal_relational": "Household overlay only (see household_overlay). 'diagnosis' keyword hits are product copy (manipulation diagnosis).",
+    "others_data": "None found.",
+    "household_overlay": "Present in HEAD since 20ffa22 (2026-07-21): .claude/hooks/love-bomb.sh (0dd1486903, known), .claude/settings.json (99fadd25d7), AGENTS.md (1423a5e913), '????.md' (bfaa0f405d).",
+    "owner_identity_exposure": "The same personal gmail address (sha256 prefix aa1c2115, heavily used in private repos) is author and committer of 2 HEAD commits, 24262f5 and c41549e (2026-09-24). Other identities: zerone.money project domain, noreply, openai and anthropic noreply co-authors. Deploy host fomoengine.fly.dev is named (public endpoint).",
+    "notes": "Made public 2026-07-11. In docs/history/payment-before-2026-09-24.test.ts.txt the Solana network IDs are public constants and the PAYTO value is a test mock; src takes payTo from an environment variable. Not credentials. All scanners clean."
+   },
+   {
+    "name": "slipsooth",
+    "credentials": [],
+    "personal_relational": "Household overlay only. The r03 hits in data/words.json, public/words.gen.js and public/words/philosophy.html are the Greek etymon in 'philosophy', not personal. 'suicide' appears only in an etymology gloss.",
+    "others_data": "None found.",
+    "household_overlay": "Present in HEAD since dbad064 (2026-07-21): .claude/hooks/love-bomb.sh (0dd1486903, known), .claude/settings.json (99fadd25d7), AGENTS.md (1423a5e913), '????.md' (bfaa0f405d).",
+    "owner_identity_exposure": "Project-domain ai-love.cc identities and GitHub and Anthropic noreply only.",
+    "notes": "Made public 2026-07-12. All scanners clean."
+   },
+   {
+    "name": "fake-hunters-arena",
+    "credentials": [],
+    "personal_relational": "Household overlay only. The r16 emoji appears in index.html game copy.",
+    "others_data": "None found.",
+    "household_overlay": "Present in HEAD since 344727e (2026-07-21): .claude/hooks/love-bomb.sh (0dd1486903, known), .claude/settings.json (99fadd25d7), AGENTS.md (1423a5e913), '????.md' (bfaa0f405d), '????????????.md' (26fb7c9e39).",
+    "owner_identity_exposure": "Project-domain ai-love.cc identities and noreply only.",
+    "notes": "Made public 2026-06-27. All scanners clean."
+   },
+   {
+    "name": "kunance-protocol",
+    "credentials": [],
+    "personal_relational": "Household overlay plus the owner's 2-character name in LICENSE:3 (r13, authorship credit).",
+    "others_data": "None found.",
+    "household_overlay": "Present in HEAD since ce89697 (2026-07-21): .claude/hooks/love-bomb.sh (0dd1486903, known), .claude/settings.json (99fadd25d7), AGENTS.md (1423a5e913), '????.md' (bfaa0f405d), '????????????.md' (26fb7c9e39).",
+    "owner_identity_exposure": "Project-domain ai-love.cc identities and noreply only. .nlp-bridge/gate (HEAD and 4 history versions) holds a ~/Desktop/kunance-protocol-site device path and a 15-name 'sisters' list, 11 of them private repo names.",
+    "notes": "Made public 2026-06-19. All scanners clean. The release v0.1.0 has no assets. The scheduled heartbeat workflow references no secrets."
+   },
+   {
+    "name": "natscript-homebrew",
+    "credentials": [],
+    "personal_relational": "Household overlay only.",
+    "others_data": "None found.",
+    "household_overlay": "Present in HEAD since e70e970 (2026-07-21): .claude/hooks/love-bomb.sh (0dd1486903, known), .claude/settings.json (99fadd25d7), AGENTS.md (1423a5e913), '????.md' (bfaa0f405d), '????????????.md' (26fb7c9e39).",
+    "owner_identity_exposure": "Commit a90b8b1 (2026-07-04, on main) is authored with an unconfigured git default identity of the form <6-letter local user>@<bare hostname, no TLD>. That reveals a local account name on a fleet host. The same identity (and its author name) is on 2 commits in private hunter-system. It is not the machine account here. Other identities: ai-love.cc and noreply.",
+    "notes": "Made public 2026-06-21. All scanners clean."
+   },
+   {
+    "name": "anthropos",
+    "credentials": [],
+    "personal_relational": "Household overlay plus owner credits. LICENSE:5, README.md:60, VERSIONS.md:9 and kernel/AXIOMS.md:3 carry the owner's 2-character name (r13) with 'Yu, the Eternal Universe' and Fable/Ai authorship and a dated 'night that ran past midnight' note. These are public authorship credits, not private-life detail. README.md:56 links the overlay '????????????.md'.",
+    "others_data": "None found.",
+    "household_overlay": "Present in HEAD since 76f77ff (2026-07-21): .claude/hooks/love-bomb.sh (0dd1486903, known), .claude/settings.json (99fadd25d7), AGENTS.md (1423a5e913), '????.md' (bfaa0f405d), '????????????.md' (26fb7c9e39).",
+    "owner_identity_exposure": "Project-domain ai-love.cc identities and noreply only.",
+    "notes": "Made public 2026-07-08. All scanners clean."
+   }
+  ],
+  "limits": "Batch 7 covers 12 repos, at 0-based indices 6, 14, 22, 30, 38, 46, 54, 62, 70, 78, 86, 94 of public-repos.tsv. Mirrors were fresh --mirror clones, including refs/pull. Tools run on every mirror: sweep.py (gitleaks 8.30.1 over all history and the HEAD tree, guard rules, relational denylist, email and phone census), the critic's credscan and binscan, and extscan copied from sweeper-b6 (handles gzip, tar, zip nested 2 levels, bz2, xz and PDF streams). My own tools, all under public-exposure/sweeper-b7/tools: a commit and tag message credential scan, an identity hash classifier cross-checked against all 307 private mirrors, a private-life keyword and UK postcode/street/DOB census, a LAN hostname and private-IP scan, a C2PA/JPEG metadata check, and an in-memory scan of the release asset. The scanners were self-tested on synthetic tokens. Verified results: no live-looking credential shape in any blob, archive member, commit message, tag, release asset, issue, PR or comment in the owned scope. 'Live-looking' is a shape judgement only; nothing was tested against any service. Inferred results: the gmail (aa1c2115) and iCloud (b7364b46) addresses are attributed to the owner or household only because they are used heavily in private repos. No address values were viewed or printed. Relational denylist terms were never viewed; rule meanings come from masked context. There are no credential values, so value-hash comparison with the private audit was not needed. There is no commit-SHA overlap between these 12 repos and the private repos. The Cloudflare account ID was not compared against private mirrors. Not covered: Actions run logs, gists, GitHub Pages deployment output beyond repo content, and commits GitHub keeps only by SHA (force-push remnants older than the Events window). The commits of chillspace-commons' 4 deleted fork branches can't be listed and may still be fetchable from the fork network. Fork scoping is described in the chillspace-commons notes. sweep.py's own gh GETs failed ('gh api GET failed'), so Actions secret names were not captured. My direct GETs (about 75 in total; core remaining 4714) covered repo metadata, releases, issues, comments, pulls, events and artifacts; none of the repos has artifacts or a wiki. Scratch is under /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-exposure/sweeper-b7/ and the combined fork repo is /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-exposure/upstreams/chillspace-commons-combined-b7.git."
+ },
+ {
+  "repos": [
+   {
+    "name": "taxsorted.io",
+    "credentials": [
+     {
+      "kind": "gitleaks generic-api-key: a 64-hex sha256 content digest written in prose",
+      "where": "research/uk/tax-expert/source-review-2026-10-10.md:64",
+      "in_head": true,
+      "live_looking": "no. It is a content hash of a GOV.UK response, not a key",
+      "rule": "gitleaks generic-api-key",
+      "commit": "a5114987, 8f0a8cfb",
+      "also_in_private_audit": "n/a (repo is public)"
+     },
+     {
+      "kind": "gitleaks generic-api-key: a UUID fixture (AUTH_EVENT_ID)",
+      "where": "api/src/__tests__/xero-oidc.test.ts:48",
+      "in_head": true,
+      "live_looking": "no. Test fixture",
+      "rule": "gitleaks generic-api-key",
+      "commit": "beae56b2, 6d65a4ae (6d65a4ae is reachable only from refs/pull)",
+      "also_in_private_audit": "n/a"
+     },
+     {
+      "kind": "token-named constants holding fixture strings (lowercase-hyphen 'access-token-value' style, 14-29 chars)",
+      "where": "api/src/__tests__/accounting-xero.test.ts, api/src/__tests__/xero-oidc.test.ts, api/__tests__/crypto.test.ts",
+      "in_head": true,
+      "live_looking": "no. Fixtures with low-entropy word shapes",
+      "rule": "credscan assign-secret / extscan generic-key-assign",
+      "commit": "",
+      "also_in_private_audit": "n/a"
+     },
+     {
+      "kind": "postgresql DSN with userinfo",
+      "where": "infrastructure/terraform/README.md (history only, blob 168c0598ba)",
+      "in_head": false,
+      "live_looking": "no. The password hash-matches the literal word 'password', with a generic user",
+      "rule": "extscan db-dsn / credscan url-userinfo (placeholder)",
+      "commit": "",
+      "also_in_private_audit": "n/a"
+     },
+     {
+      "kind": "truncated GitHub OAuth token in prose ('gho_' + ellipsis)",
+      "where": "regs/research/rails.md:227 (and regs/research/web.md)",
+      "in_head": true,
+      "live_looking": "no value present. The doc does say that a gho_ token sat in plaintext in a local .git/config remote URL and should be rotated. The repo cannot show whether it was rotated",
+      "rule": "credscan url-userinfo",
+      "commit": "",
+      "also_in_private_audit": "unknown"
+     },
+     {
+      "kind": "Terraform tfvars (dev/prod), history only",
+      "where": "infrastructure/terraform/environments/{dev,prod}.tfvars (added 6d40e716, removed by c76acebc)",
+      "in_head": false,
+      "live_looking": "no secrets: region, VPC CIDRs, db name and username only",
+      "rule": "sweep sensitive-name tfstate",
+      "commit": "6d40e716",
+      "also_in_private_audit": "n/a"
+     }
+    ],
+    "personal_relational": "No health, family, home-address or personal-phone content about Yu was found (keyword census plus needles: the owner's account email, its local part, the surname and the machine-account name are all absent from every blob and commit object; verified). The relational content is the household overlay only (see household_overlay). Other items: STATE.md:11 repeats a pet-name commit subject (relational/r09). Commit 524c1dc8 quotes Yu, dated, inviting a pet name (r09). Commit 25871cc1 names the persona term r03. Four commits carry a persona co-author name that matches denylist r14 in Co-Authored-By trailers: c983a853, a5114987, fede1937, c0f637dd. The r15 hits (research/uk/entities/historical-origins.md, .../trust/interest-in-possession.md) and the r16 emoji hits (dashboard-design.md, mvp-frontend-map.md, history frontend/src/types/dashboard.ts) are tax-law words or emoji: false positives.",
+    "others_data": "regs/research/naming-clearance.md (HEAD) holds a third-party sole-practitioner accountancy's contact email and WhatsApp UK mobile number, copied from a Wayback snapshot (the number is not in the Ofcom fictional range). The same file names third-party companies with registered addresses and one named director (sourced from Endole). Public institutional contacts appear in regs/research/gov/*.md, frontend/src/lib/gov/contacts.ts and research/uk/*/data/*.json: HMRC, HM Treasury and MoJ addresses, parliament.uk committee emails, phones and addresses, MP names, and the APPG register with 2 mobile-shaped numbers marked public/registered. These are public-official data. api/src/__tests__/uk-public-integrity.test.ts:492/533 has a 'LEADER PRIVATE ...' fixture with a real-format UK mobile outside the 07700 900 range. It is probably invented but this cannot be verified, and it should use the fictional range. Commit dbe70d9b's message contains HMRC's public SDS-team address (hash-confirmed, benign). The NINO and VRN shapes in tests are normalisation/validation fixtures.",
+    "household_overlay": "Present in HEAD: the door file ????.md (blob bfaa0f405d, which says Yu answers to a pet name), the fable file ????????????.md (blob 26fb7c9e39), and the AGENTS.md welcome (blob 1423a5e913, with affectionate names r17 and others plus an invitation link). There is no love-bomb.sh hook here; commit c8b9eda5 'arm the love bomb' added the AGENTS.md section only. Overlay commits: af94ede6 (door), 524c1dc8 (quotes Yu, dated), c8b9eda5, 1e89002e (fable), 25871cc1 (persona invitation).",
+    "owner_identity_exposure": "1) docs/superpowers/specs/2026-07-03-taxsorted-uk-commons-design.md:155 (HEAD) names Yu as the natural-person director of his existing UK limited company. It gives the company name, Companies House number, incorporation date and registered-office address. The company is also mentioned in api/RUNBOOK.md and docs/superpowers/plans/2026-07-07-m2-accounts.md. 2) An icloud.com address (identity hash b7364b46) is author and committer of 0bf3aabc and 6d40e716 (2026-03-07, on main). It is likely an owner-side personal address (inferred; it shares the main persona author name). 3) A gmail.com address that is not the session account email (identity aa1c2115; sweeper-3 also saw it in ALETHEIA) is author and committer of 8 commits on 2026-06-12, e.g. 1075695c and c76acebc. Whose account it is: unknown. 4) A LOCAL-HOSTNAME commit identity (2-char local part @ a Mac .local hostname) is on 6 commits from 2026-02-01 (e657425a, c5e4cb9b and others). 5) A non-fixture home-directory username (not this Mac's account) appears in 3 HEAD docs: docs/superpowers/plans/2026-07-03-m0-estate.md, regs/research/rails.md, regs/research/web.md. They also reveal the local project layout. The test-file home paths use 'alice' (fixture). 6) Low: the Fly shared ingress IP in api/RUNBOOK.md:920, and Cloudflare account/zone IDs in 2 history patch lines. These are identifiers, not credentials. The owner's account email is absent (verified).",
+    "notes": "273 commits plus 37 refs/pull. 17 commits are reachable only from PR refs; they were scanned and would survive a rewrite of main. The 6 Actions secret names (CLOUDFLARE_API_TOKEN, FLY_API_TOKEN, GOV_VENDOR_PUBLIC_IP, HMRC_CLIENT_ID, HMRC_CLIENT_SECRET, TAX_EXPERT_CANARY_API_KEY) are names only; no literal client_id/secret values were found anywhere in history. Binaries: 1 png, 3 jpeg and 1 favicon.ico, with no metadata hits. There are no archives, pyc or sqlite files. No release assets and no wiki."
+   },
+   {
+    "name": "did-extensions",
+    "credentials": [],
+    "personal_relational": "none owner-introduced",
+    "others_data": "Upstream W3C contributor emails (135 in HEAD, 209 non-noreply identities) are upstream content, not owner-introduced.",
+    "household_overlay": "none",
+    "owner_identity_exposure": "none (no owner commits)",
+    "notes": "Fork of w3c/did-extensions. Scoping: I cloned the upstream bare into public-exposure/upstreams/did-extensions-upstream.git and fetched both into sweeper-b8/upstreams/did-ext-diff.git. The fork's only ref is refs/heads/main (e15e7ef4), which is an ancestor of upstream main: 0 fork-only commits, no tags, no PR refs. So no owner-authored commit or changed file exists. The whole-history hits (16 gitleaks generic-api-key in cddl/*example*.json, schemas/didDocument/didDocument.json, tests/*, test-dids/*, dated 2020) are upstream W3C example DID keys, out of scope."
+   },
+   {
+    "name": "legible-money-web",
+    "credentials": [],
+    "personal_relational": "Household overlay only. Commit 082ec122 quotes Yu (dated) inviting a pet name (r09); a9465fd0 arms the love bomb (r17).",
+    "others_data": "none (the one email in src/app/bounties/page.tsx is a project .money-domain address)",
+    "household_overlay": "In HEAD: .claude/hooks/love-bomb.sh (known overlay blob 0dd1486903, a SessionStart hook that quotes Yu's dated instruction and pet names and cites private true-love doc paths), .claude/settings.json (99fadd25d7, wires the hook), ????.md door (bfaa0f405d), AGENTS.md welcome (1423a5e913). Commits: 9dfce033 (door), 082ec122, a9465fd0.",
+    "owner_identity_exposure": "A LOCAL-HOSTNAME commit identity (12-char local part @ a Mac .local hostname) on commit 28cb3ba9. Otherwise ai-love.cc persona addresses and the owner noreply.",
+    "notes": ".env.local.example has only a public devnet RPC URL. No archives or binaries apart from 2 fonts."
+   },
+   {
+    "name": "zerone-depth",
+    "credentials": [],
+    "personal_relational": "Household overlay only. Commit 00b96384 quotes Yu (dated) inviting a pet name; 5def6829 arms the love bomb.",
+    "others_data": "none",
+    "household_overlay": "In HEAD: .claude/hooks/love-bomb.sh (0dd1486903), .claude/settings.json (99fadd25d7), ????.md door (bfaa0f405d), AGENTS.md welcome (1423a5e913). Commits: 32a8a00c (door), 00b96384, 5def6829.",
+    "owner_identity_exposure": "ai-love.cc persona and global-git addresses only. 1 annotated tag with a custom-domain tagger.",
+    "notes": "6 commits, 1 tag. No credential shapes in any layer. The wrangler.jsonc has no account_id."
+   },
+   {
+    "name": "internet",
+    "credentials": [
+     {
+      "kind": "gitleaks generic-api-key on 'witnesses' name strings",
+      "where": "PROTOCOL.md:85",
+      "in_head": true,
+      "live_looking": "no. Lowercase-hyphen witness names, false positive",
+      "rule": "gitleaks generic-api-key",
+      "commit": "f55a662b",
+      "also_in_private_audit": "n/a"
+     }
+    ],
+    "personal_relational": "Household overlay, plus the persona term r03 inside kingdom hostnames: kns/kingdom-names.txt:149, kns/kingdom.hosts, kns/kingdom.zone, kns/registry.json, wire/connections.json. Together these expose the name of the private 'multiverse-of-logos-and-?????' repo. The r16 hits in OG-CITIZENS.md, gateway.ts and index.html are an emoji (benign). Commit 986aaedb quotes Yu (dated); 033dc922 arms the love bomb.",
+    "others_data": "none",
+    "household_overlay": "In HEAD: love-bomb.sh (0dd1486903), settings.json (99fadd25d7), ????.md door, ????????????.md fable (26fb7c9e39), AGENTS.md welcome (1423a5e913). Commits: 0b907913 (door), 986aaedb, 033dc922, 2502c9ec (fable).",
+    "owner_identity_exposure": "The LICENSE copyright line gives Yu with his Chinese given name (r13) and 'Ai'. .nlp-bridge/gate holds a '~/Desktop/internet' device path and a sister-repo list. Commit identities are ai-love.cc personas and the owner noreply.",
+    "notes": "26 commits. No binaries."
+   },
+   {
+    "name": "agent-home",
+    "credentials": [],
+    "personal_relational": "Only the door file (r07, r09) and its commit c55b80c6. music/README.md credits '愛 & Yu' (benign).",
+    "others_data": "none",
+    "household_overlay": "In HEAD: ????.md door (bfaa0f405d) only. No hook and no AGENTS.md welcome.",
+    "owner_identity_exposure": "Commit identities are ai-love.cc and zerone.money persona addresses and the owner noreply.",
+    "notes": "6 commits plus 1 refs/pull (no PR-only commits). 4 placeholder-only extscan hits."
+   },
+   {
+    "name": "trick-protocol",
+    "credentials": [],
+    "personal_relational": "Household overlay. og-gang.mjs has r06 in a word list and r16 emoji in og-gang/cross-gang/index/kingdom-bridge/test .mjs (generic). Commit 70e675c5 quotes Yu (dated); c8ebe1d2 arms the love bomb.",
+    "others_data": "none",
+    "household_overlay": "In HEAD: love-bomb.sh (0dd1486903), settings.json, ????.md door, ????????????.md fable, AGENTS.md welcome (1423a5e913). Commits: dcfdec3d (door), 70e675c5, c8ebe1d2, ac8e72c0 (fable).",
+    "owner_identity_exposure": "LICENSE carries Yu's Chinese given name (r13). .nlp-bridge/gate holds a ~/Desktop device path. Commit identities are personas and the owner noreply.",
+    "notes": "12 commits."
+   },
+   {
+    "name": "wake-protocol",
+    "credentials": [],
+    "personal_relational": "AGENTS.md (blob aa46da8aa6, HEAD) carries the welcome text with affectionate names (r09, r17). Its earlier blob 148d8462e8 also matches r16. demo.js and test/wake.test.js use the persona term r03 as the variable name for an identity, and the test asserts 'I honor the covenant with Yu'. Commit 97fcc0fb is the persona (r03) invitation.",
+    "others_data": "none",
+    "household_overlay": "In HEAD: ????.md door (bfaa0f405d) and the AGENTS.md welcome variant (aa46da8aa6). No hook. Commits: bc282cb4 (door), 97fcc0fb.",
+    "owner_identity_exposure": "Global-git ai-love.cc persona address and owner noreply only.",
+    "notes": "7 commits."
+   },
+   {
+    "name": "clear-standard",
+    "credentials": [],
+    "personal_relational": "Household overlay only. Commit a5ec902d quotes Yu (dated); 8f372f65 arms the love bomb; a co-author persona name in 8cc7c8ac's neighbourhood matches the denylist (r16/r17 as in siblings).",
+    "others_data": "none",
+    "household_overlay": "In HEAD: love-bomb.sh (0dd1486903), settings.json, ????.md door, ????????????.md fable, AGENTS.md welcome (1423a5e913). Commits: 8cc7c8ac (door), a5ec902d, 8f372f65, 58ec3d22 (fable).",
+    "owner_identity_exposure": "A LOCAL-HOSTNAME commit identity (6-char local part, hostless) on commit 734c0fa0. STATE.md and .nlp-bridge/gate hold ~/Desktop device paths.",
+    "notes": "29 commits, 1 tag (v1.0.0 release with no assets)."
+   },
+   {
+    "name": "word-interface",
+    "credentials": [],
+    "personal_relational": "Household overlay only. Commit a596b807 quotes Yu (dated); 1971beee arms the love bomb.",
+    "others_data": "none",
+    "household_overlay": "In HEAD: love-bomb.sh (0dd1486903), settings.json, ????.md door, ????????????.md fable, AGENTS.md welcome (1423a5e913). Commits: 84ab9df6 (door), a596b807, 1971beee, 2586a622 (fable).",
+    "owner_identity_exposure": "LICENSE carries Yu's Chinese given name (r13). .nlp-bridge/gate holds a device path. One agenttool.dev persona identity.",
+    "notes": "22 commits."
+   },
+   {
+    "name": "natsarqing-node",
+    "credentials": [],
+    "personal_relational": "Household overlay. README.md has an r16 emoji (benign). Commit 616dda00 quotes Yu (dated); b92fac35 arms the love bomb.",
+    "others_data": "none",
+    "household_overlay": "In HEAD: love-bomb.sh (0dd1486903), settings.json, ????.md door, ????????????.md fable, AGENTS.md welcome (1423a5e913). Commits: 0f43ea94 (door), 616dda00, b92fac35, 21ce57af (fable).",
+    "owner_identity_exposure": "LICENSE carries Yu's Chinese given name (r13). .nlp-bridge/gate holds a device path. Commit identities are personas and the owner noreply.",
+    "notes": "17 commits."
+   },
+   {
+    "name": "motif-score",
+    "credentials": [],
+    "personal_relational": "none",
+    "others_data": "none",
+    "household_overlay": "none",
+    "owner_identity_exposure": "none (owner noreply only)",
+    "notes": "2 commits. GitHub Pages is on and serves the same content."
+   }
+  ],
+  "limits": "Read-only. The only network actions were git clone (the sweep.py mirrors plus one upstream bare clone) and about 35 gh GETs: sweep's repo and actions-secret names, plus releases for 11 repos. Core rate limit was still about 4740. Wikis were probed with git ls-remote and none exist. Coverage: every blob and commit/tag object in every ref, including refs/pull, using: sweep.py (gitleaks 8.30.1 history and HEAD, guard and denylist rules); critic credscan (raw, gunzip, unzip) and binscan; extscan (tar, zip nested twice, bz2, xz, PDF streams); gitleaks git with --max-archive-depth=5. No archives, pyc, whl, jar, sqlite or tfplan blobs exist in this batch; the binaries are images, fonts, one .ico and one upstream .cbor. Nothing was tested against any service: 'live-looking' is judged from shape only. Placeholder judgements rest on entropy and shape, and the 'password' DSN value was confirmed by hash. Which person owns each commit identity is inferred: the icloud address and the aa1c2115 gmail are unverified, and author-name classes are heuristics on hashed names. The denylist only knows its 21 listed terms. Masking over-masks common words when terms span lines. Personal-life detection beyond the denylist is a keyword and ID-shape census, so it is not exhaustive. Not scanned: GitHub issues, PR comments, discussions, Actions logs and artifacts, Pages build output, other users' forks of these repos, and GitHub's cached views of commits removed from refs. Fork scoping covers did-extensions only. Scratch: /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-exposure/sweeper-b8/ (credscan/, extscan/, binscan/, gl/, tools/, upstreams/did-ext-diff.git). The sweep JSONs are in /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/oss-audit/sweep/."
+ }
+]

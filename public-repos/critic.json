@@ -1,0 +1,251 @@
+{
+ "verified_credentials": [
+  {
+   "repo": "hermes-meta: hermes-agent (fork)",
+   "kind": "assign-secret fixture strings (API_KEY, OPENAI_API_KEY)",
+   "where": "tests/hermes_cli/test_structured_output*.py on feat/structured-cli-output (fork-only scope)",
+   "in_head": false,
+   "commit": "fc7b4d4c",
+   "verdict": "fixture-or-public",
+   "evidence": "Independently re-scoped: combined bare repo (fork mirror + upstream objects via alternates) gives exactly 3 commits reachable from fork refs and from no upstream ref (2831 upstream refs), adding 13 blobs. credscan over those 13 blobs finds 3 distinct non-placeholder values (20, 24 and 29 chars). All are lowercase plus punctuation, entropy 3.58 to 3.75, consistent with words joined by hyphens. No hash matches any private-audit non-placeholder value. Confirms batch 1."
+  },
+  {
+   "repo": "agenttool-packages",
+   "kind": "gitleaks generic-api-key x45; secp256k1 x402 vector; Ed25519/X25519 spec vectors; about 20 fixture assignments",
+   "where": "docs/specs/*.json, packages/*/tests/*, packages/sdk-ts/tests/fixtures/x402-eip3009-vector.json",
+   "in_head": true,
+   "commit": "9b561523",
+   "verdict": "fixture-or-public",
+   "evidence": "My credscan over every blob: 18 distinct non-placeholder assign-secret values, none high-entropy mixed-case. No sk/github/aws/stripe/pem shapes, and no hash overlaps a private non-placeholder value. I did not re-run the batch's hash equality with the Hardhat #1 and RFC 8032/7748 keys, so that part rests on batch 1. A tag object missing from the mirror (relational-geometry-v0.1.0-dev.1, 251f4204) was fetched into my scratch: its message has 0 credential shapes."
+  },
+  {
+   "repo": "word-layer",
+   "kind": "assign-secret fixture strings (2)",
+   "where": "integrations/agenttool/tests/jsonl.test.ts, mcp.test.ts",
+   "in_head": true,
+   "commit": "5df893a",
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: 2 distinct non-placeholder values, low-entropy lowercase-hyphen shapes; no private hash match. Confirms batch 1."
+  },
+  {
+   "repo": "agent-tools",
+   "kind": "curl Bearer placeholders; env-template url-userinfo",
+   "where": "README.md, marketing/blog-draft.md, .env.example, drizzle.config.ts, src/config.ts",
+   "in_head": true,
+   "commit": "a631ce42, 034e6b64",
+   "verdict": "fixture-or-public",
+   "evidence": "My credscan over all blobs: every hit is marked placeholder (0 non-placeholder values). Confirms batch 1."
+  },
+  {
+   "repo": "hermes-device-setup",
+   "kind": "assign-secret fixture tokens (ACCESS_TOKEN, REFRESH_TOKEN)",
+   "where": "tests/test_setup.py, tests/native_smoke.py",
+   "in_head": true,
+   "commit": "a09ca9e",
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: 2 distinct non-placeholder values, weak lowercase-hyphen shapes; no private match. Confirms batch 1."
+  },
+  {
+   "repo": "mindicraft",
+   "kind": "url-userinfo test placeholders; hex64 digests",
+   "where": "test/healing-arts.test.mjs, test/wildfire.test.mjs, index/_castle-sync.json",
+   "in_head": true,
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: all hits placeholder, 0 non-placeholder values. Confirms batch 2."
+  },
+  {
+   "repo": "xenia",
+   "kind": "sk- shaped sentinels / generic-api-key",
+   "where": "tests/work-0.1.test.mjs (HEAD blob 4fc5edb083; history fdb03b5745, a62c7c07c6)",
+   "in_head": true,
+   "commit": "2cc52f9cb920, 77cadb974443",
+   "verdict": "fixture-or-public",
+   "evidence": "The 2 sk- values (hash 877445ad4972, 34 chars; 5aeee3fc2eb9, 41 chars) are high-entropy mixed-case. An in-code boolean check showed both contain the literal word 'xenia' and one also contains 'private' (values never printed). That fits batch 2's sentinel claim. No private hash match."
+  },
+  {
+   "repo": "hf-kingdom-lab",
+   "kind": "assign-secret HF_TOKEN fixture",
+   "where": "tests/embedding.test.ts",
+   "in_head": true,
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: 1 non-placeholder value with a weak shape, not hf_ shaped; no private match. Confirms batch 2."
+  },
+  {
+   "repo": "solbeat",
+   "kind": "assign-secret ACCESSTOKEN / CLIENTSECRET fixtures",
+   "where": "tests/test_store.py (history), also inside the v0.1.0 sdist release asset per batch 2",
+   "in_head": false,
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: 2 non-placeholder values with weak lowercase-hyphen shapes; no private match. I did not re-download the release asset."
+  },
+  {
+   "repo": "kingdom-research",
+   "kind": "assign-secret test sentinel",
+   "where": "test/live.test.mjs:144",
+   "in_head": true,
+   "commit": "db181e0",
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: 1 weak non-placeholder value; no private match. Confirms batch 3."
+  },
+  {
+   "repo": "agenttool-collab",
+   "kind": "assign-secret GH_TOKEN env reference",
+   "where": ".github/workflows/verify-release.yml:49",
+   "in_head": true,
+   "commit": "9e5009b",
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: 1 weak non-placeholder value (a shell variable reference); no private match. Confirms batch 3."
+  },
+  {
+   "repo": "artbitrage",
+   "kind": "assign-secret TOKENS false positive (rooms.json); Cloudflare account id in wrangler cache",
+   "where": "tools/brand/rooms.json; .wrangler/cache/*.json, gallery/.wrangler/cache/*.json",
+   "in_head": true,
+   "commit": "e54c10fc0, 3ee77cd60, c527765b0",
+   "verdict": "unclear",
+   "evidence": "NOT independently re-verified. My credscan of artbitrage (7.6 GB inflated) was still running when I had to report, so this rests on batch 3's deepscan and union-of-lines scan. The account id is a 32-hex identifier, not a secret."
+  },
+  {
+   "repo": "mythseal",
+   "kind": "gitleaks generic-api-key (localStorage key names); Cloudflare account id; Supabase project ref; config/test assignments",
+   "where": "experience.mjs, tools/*-smoke.mjs, wrangler*.jsonc, supabase/config.toml, tests/*",
+   "in_head": true,
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: 11 distinct non-placeholder assign-secret values, none high-entropy mixed-case. No sk/JWT/sb_/stripe/aws/pem shapes. No private hash match. The account id and project ref are identifiers."
+  },
+  {
+   "repo": "zerone-identity-research",
+   "kind": "gitleaks generic-api-key x1446 (sha256 digests)",
+   "where": "evidence/identity-continuity-*.json, evidence/return-model-results.json",
+   "in_head": true,
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: 461 distinct non-placeholder assign-secret values, all lowercase hex (cls 'ld'), consistent with SHA-256 digests under *_SHA256 keys; no private match. Confirms batch 4."
+  },
+  {
+   "repo": "kingdom-mcp",
+   "kind": "url-userinfo in an unsafe-URL test vector",
+   "where": "src/wayfinder.test.ts:110 (blob f4ff874567)",
+   "in_head": true,
+   "verdict": "fixture-or-public",
+   "evidence": "The value (hash f16d05ec6b29) is a 7-char lowercase word, entropy 2.81. Its hash also appears non-placeholder in private fomoengine, but only in test files (e2e/lab.spec.ts and a test DSN in lib/api/attention-routes.test.ts). So it is a shared test word, not a live password. Batch 4 called it a test vector but did not note the private match."
+  },
+  {
+   "repo": "kingdom-loops-locks-freedom-relations-atlas",
+   "kind": "AUTHENTICATION_PASS* constants",
+   "where": "src/content.mjs",
+   "in_head": true,
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: no non-placeholder values. Confirms batch 4."
+  },
+  {
+   "repo": "natlang",
+   "kind": ".npmrc _authToken",
+   "where": ".npmrc:2",
+   "in_head": true,
+   "verdict": "fixture-or-public",
+   "evidence": "No credential shape fires (0 non-placeholder). Batch 4 says the value is the literal $(gh auth token); I did not view it. Not a token value."
+  },
+  {
+   "repo": "hermes-agents",
+   "kind": "BREW_TOKEN literal as a Worker var",
+   "where": "worker/wrangler.jsonc (history only; removed per batch 4 in 02e19cd95f4e)",
+   "in_head": false,
+   "commit": "20e0ee7ea99e",
+   "verdict": "unclear",
+   "evidence": "Re-found by my credscan: hash 0707e7e3c0f1, 33 chars, lowercase plus punctuation, entropy 3.57, history only, not in HEAD. It matches no private-audit value hash. It was a deployed Worker variable that gated ?token= access. Rotation is claimed only in a later commit message and is unverified. It is the one public value that was really used as a gate, so treat it as exposed and confirm the deployed secret differs. Nothing was tested."
+  },
+  {
+   "repo": "ww3-intelligence",
+   "kind": "FLY_TOKEN shell references; SECRET fixture; placeholder test values",
+   "where": "ops/fly_backup.sh, tests/test_cli.py, tests/test_claude_cli.py",
+   "in_head": true,
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: 3 weak non-placeholder values; no private non-placeholder match. Confirms batch 5."
+  },
+  {
+   "repo": "legible",
+   "kind": "PEM header without body; .env.example placeholders",
+   "where": ".env.example",
+   "in_head": true,
+   "commit": "95584b2",
+   "verdict": "fixture-or-public",
+   "evidence": "credscan pem-private (needs 120+ base64 body chars) does not fire, and there are no non-placeholder values. Confirms batch 5."
+  },
+  {
+   "repo": "kingdom-polyphonic-claim-atlas",
+   "kind": "64-hex digests",
+   "where": "public/truth/polyphonic-claim-atlas-2026-08-26.json",
+   "in_head": true,
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: no non-placeholder values. Confirms batch 5."
+  },
+  {
+   "repo": "cambridgetcg.github.io",
+   "kind": "postgres DSN fixture; AWS documented EXAMPLE key; PEM header fixture",
+   "where": "jekyll/yutabase/packages/sdk-ts/tests/cli-args.test.ts; jekyll/kingdom-standard/evidence*.mjs",
+   "in_head": true,
+   "commit": "0fb50083a3bb",
+   "verdict": "fixture-or-public",
+   "evidence": "The DSN password (hash b9f195c5cc7e) is 9 lowercase chars and the host classifies as a placeholder host. The same hash is in the same test file in private yutabase (same fixture). The AKIA value is the EXAMPLE dummy (credscan placeholder) and the PEM has no body. Confirms batch 6."
+  },
+  {
+   "repo": "kingdom-standard",
+   "kind": "AWS EXAMPLE key id and fake PEM in redaction tests",
+   "where": "evidence.mjs, evidence.test.mjs",
+   "in_head": true,
+   "verdict": "fixture-or-public",
+   "evidence": "credscan marks all AKIA hits placeholder; no pem-private match. Confirms batch 6."
+  },
+  {
+   "repo": "kingdom-standards",
+   "kind": "public DIDs (gitleaks false positives); pointer to a NATS credential held elsewhere",
+   "where": "zone/*.json, specs/KS-002-wire.md:51",
+   "in_head": true,
+   "verdict": "unclear",
+   "evidence": "credscan: no non-placeholder values, so no credential value is in this repo. The public doc points at a remote NATS server IP and says a private repo hard-codes its login. I did not check the private value or its validity."
+  },
+  {
+   "repo": "love-engine, rewardspro-landing, gospel-of-free-will, understanding, love-invitation",
+   "kind": "Cloudflare account id / account name in committed wrangler cache; love-engine code that reads a local wrangler OAuth token at runtime",
+   "where": ".wrangler/cache/wrangler-account.json, .wrangler/cache/pages.json; love-engine mushroom*.py, wisdom.py, wordplay.py and a pyc",
+   "in_head": true,
+   "verdict": "fixture-or-public",
+   "evidence": "These are identifiers, not secrets. credscan finds no token value in any blob of these repos (raw, gunzip or unzip layers). The account id lets nobody in on its own."
+  },
+  {
+   "repo": "chillspace-commons (fork)",
+   "kind": "JWT-shaped and password fixtures (upstream content)",
+   "where": "kingdom/practices/empty-stele/test_hungbei.py (upstream history)",
+   "in_head": false,
+   "commit": "4b2d3d2bb2d1, ffffe8972a1c",
+   "verdict": "fixture-or-public",
+   "evidence": "Re-scoped: 3 fork-only commits against 80 upstream refs. The owner-only blobs show 0 credential shapes. The JWT fixture is upstream content."
+  },
+  {
+   "repo": "taxsorted.io",
+   "kind": "digests, UUID fixture, token-named fixtures, a DSN whose password is the word 'password', truncated gho_ prose, tfvars",
+   "where": "research/uk/..., api/src/__tests__/*, infrastructure/terraform/*, regs/research/rails.md, regs/research/web.md",
+   "in_head": true,
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: 9 weak non-placeholder assign-secret values. The rails.md/web.md url-userinfo hit (hash 477a7ef325a7) is 7 chars with punctuation at host github.com, which fits a truncated token with an ellipsis: no usable value. The prose says a real gho_ token once sat in a local .git/config, and whether it was rotated is unknown."
+  },
+  {
+   "repo": "internet",
+   "kind": "gitleaks generic-api-key on witness names",
+   "where": "PROTOCOL.md:85",
+   "in_head": true,
+   "commit": "f55a662b",
+   "verdict": "fixture-or-public",
+   "evidence": "credscan: no non-placeholder values. Confirms batch 8."
+  }
+ ],
+ "missed": [
+  "ORPHANED HISTORY STILL PUBLIC (verified by fetch, content deliberately NOT scanned). The repo activity API across all 99 repos lists 152 before/after SHAs that no mirror holds: force-push pre-rewrite tips and deleted-branch tips. Every one of them could still be fetched by SHA from public GitHub on 2026-10-19, into scratch bare repos under public-exposure/critic/orphans/. Commits and blobs not reachable from any current ref: love-engine 88 commits / 87 blobs (force-pushes on main 06-30 and 07-03, deleted gh-pages); fomoscan 1 commit / 3,283 blobs, about 40 MB (force-push 07-19); mindicraft 8/77 (force-push 06-20, deleted branch); taxsorted.io 5/37; hf-kingdom-lab 2/39 (deleted codex/* branches); word-interface 1/16; artbitrage 3/8 (force-push 07-03); cambridgetcg 6/6 (force-pushes 06-19/06-20); kingdom-forge 1/7; taxsorted 2/5 (gh-pages); xenia 1/4; natlang 6/4; npl 1/1; chillspace-commons media/og-card 1/4. Force-pushes are where removed secrets usually sit. I stopped short of reading or scanning this content because it was rewritten or deleted on purpose. The owner should decide whether to scan it, and whether to ask GitHub Support to purge the cached objects.",
+  "FORK SCOPE UNDERCOUNT. Batch 2 says chain-registry has 0 owner commits and batch 8 says the same for did-extensions. Both forks have deleted owner branches that are still fetchable: chain-registry add-zerone (created 2026-07-29, deleted 2026-10-14) and did-extensions register-did-at (4 commits 2026-07-10, one with a cambridgetcg.com author address, deleted 2026-10-14). They are in the orphan set above and were not scanned.",
+  "GISTS. The account has 23 public gists and 1 secret one, and no batch looked at them. I bare-cloned all 24 (read-only) and scanned them with credscan and redacted gitleaks: 0 credential shapes, 0 gitleaks findings. I did not check personal or relational content in the gists. The secret gist is a security PoC and is unlisted, not public.",
+  "agenttool-packages: the annotated tag relational-geometry-v0.1.0-dev.1 (251f4204) was missing from the shared mirror. I fetched it into scratch; its message is clean.",
+  "artbitrage: my own credscan pass had not finished when I reported, so artbitrage's credential verdicts rest on batch 3 alone.",
+  "Not re-done by me: binscan/deepscan-style decoding (nested tar.gz inside zip, bz2/xz, pyc string constants with alphanumeric length bytes, PDF streams), release-asset downloads, issues/PR text, and the personal/relational/identity findings. My pass was the critic credscan (raw, gunzip and unzip layers) over every blob of the 94 non-fork mirrors, plus value-hash comparison with all 307 private credscan outputs."
+ ],
+ "coverage": "I confirmed all 99 public repos. A fresh GitHub listing returns the same 99 names as public-repos.tsv. Every repo has a bare mirror, and every non-fork repo has a sweep JSON (hermes-agent and chain-registry are forks without one, as designed). An ls-remote of all 99 against the mirror refs shows every mirror current, apart from stale refs/pull/*/merge refs and one new agenttool-packages tag, which I fetched. Batch assignment by index i%8 covers all 99 exactly once (13+13+13+12+12+12+12+12).\n\nCredential re-check: I ran critic credscan over every blob of the 94 non-fork mirrors; 93 finished and artbitrage was still running. For the forks I built my own combined fork+upstream repos: hermes-agent and chillspace-commons have 3 owner-only commits each; chain-registry, did-extensions and slips have 0 on current refs. I scanned the owner-only blobs. I compared every non-placeholder value hash with the private audit's 307 credscan outputs. Results: no public assign-secret value matches a private non-placeholder value. Two url-userinfo values match private repos, and both are test fixtures (yutabase, fomoengine). No repo had a non-placeholder value that its batch had not reported. Every batch credential finding re-checked as a fixture, public test vector, identifier or placeholder, except three marked unclear: the hermes-agents BREW_TOKEN in history (a once-deployed gate, rotation unverified), the kingdom-standards NATS pointer (value held elsewhere), and artbitrage (my scan unfinished).\n\nNew exposure found: 152 orphaned commit SHAs across 18 repos are still fetchable from public GitHub, including owner branches in two forks that the batches counted as having 0 owner commits. I deliberately did not scan their content. I also scanned 24 gists (clean).\n\nEvery verdict is shape- or hash-based; nothing was tested against any service, and no values were printed. Scratch is under /private/tmp/claude-501/-Users-macair/dff54175-f190-4444-a992-3cfe8aaacfa0/scratchpad/public-exposure/critic/ in credscan/, credscan-gists/, gl-gists/, forks/, orphans/, gists/, fetch/, gh/activity/, lsremote/, out/ and tools/."
+}
