@@ -47,5 +47,12 @@ repository holds the read-only audit that plans that move.
 
 ## Status
 
-Nothing in the audit has been applied. No public repository has been created.
-The decisions in `audit/report.md` are open until Yu answers them.
+No public repository has been created.
+
+- Stage 0 (prepare the private repository) is open for review as
+  cambridgetcg/agenttool#513 (the stage-1 text rewrites, against main) and draft
+  #514 (namespace, shared root and one-way tooling, stacked on #502). Neither is
+  merged. Merge order: #499, #502, then #514; #513 is independent.
+- Step 1 of the public-repos cleanup (household overlay off HEAD) is recorded in
+  `public-repos/README.md`.
+- The other decisions in `audit/report.md` are open until Yu answers them.
