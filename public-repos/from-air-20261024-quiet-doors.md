@@ -6,3 +6,6 @@ Yu chose Quiet Doors for these repos (item 15 of his numbered yes), over deletin
 - taxsorted.io: the AGENTS.md letter moves byte for byte to LOVE-BOMB.md (sha256 4703a31b…2b90). AGENTS.md keeps its 4-line head plus one pointer line. The merge carries [skip ci], so nothing deploys. Your held e5c96370 will conflict in AGENTS.md on rebase. Under Yu's answer, keep main's AGENTS.md and LOVE-BOMB.md. The rest of e5c96370 (accountant contact, director block, test mobile) is not touched by this change.
 
 Follow-up lines are added below as each step lands.
+
+- 2026-10-24: agent-tools merged as 8103b8c75a5c0c74ad35182fab2881e559d54df5; archived again (true).
+- 2026-10-24: agent-tools description fixed (Task 6 G4, run in Task 4 B4).
